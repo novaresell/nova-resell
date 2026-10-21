@@ -1,20 +1,21 @@
 {
-  "version": "1.10.0",
+  "version": "1.11.0",
   "date": "2026-10-21",
   "notes": [
+    "🛍️ Tous tes comptes Vinted tournent à tour de rôle + messagerie de tous les comptes (Réponses)",
+    "🔁 Republication automatique après X jours avec X % ou € en moins",
+    "🏷️ Bordereau commandé tout seul à chaque vente · ⭐ avis 5★ auto · 📍 rappel point relais",
+    "🔔 Notification quand Nova ne sait pas répondre à un message",
+    "📝 Guide de rédaction des titres, infos à donner avant l'analyse, bulle « ✨ Modifier » sur chaque annonce",
+    "🔤 SKU personnalisable (lettres, numéro, sans #)",
+    "🛠️ Corrigés : photos supprimées en modifiant un brouillon, jeton de sécurité Vinted introuvable, couleur manquante à la publication",
     "🛍️ Plusieurs comptes Vinted : enregistre-les et change de compte en 1 clic (⚙︎ → Comptes Vinted)",
     "🧠 Agent : jours d'expédition, se retire quand tu réponds toi-même, relance après 24 h, réponses par mot-clé (même sans clé API)",
     "🤝 Paliers de négociation en lignes (+ Ajouter un palier)",
     "🖨️ Bordereaux : A4 ou thermique, texte au choix (SKU, titre, pseudo), taille du texte",
-    "📜 Journal : onglets « Passées » et « À venir », filtres Réussies / À vérifier",
-    "🤝 Négociation par paliers : baisse max selon le prix, étapes de contre-offres, messages variés, vouvoiement",
-    "❤️ Favoris : délai avant envoi, messages soir / week-end / articles chers, versions en rotation avec statistiques",
-    "📋 Modèles d'annonces : enregistre et applique une fiche en 1 clic (variables {marque} {taille} {couleur}…)",
-    "💌 Après-vente : remerciement après paiement et demande d'avis à la finalisation",
-    "💶 Prix en lot, 🗓 republication ou baisse programmée, 📉 baisse de prix automatique",
-    "🛟 Sauvegarde du dressing et recréation en brouillons"
+    "📜 Journal : onglets « Passées » et « À venir », filtres Réussies / À vérifier"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.10.0"
+  "name": "V1.11.0"
 }
