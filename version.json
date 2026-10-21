@@ -1,20 +1,16 @@
 {
-  "version": "1.14.0",
+  "version": "1.14.1",
   "date": "2026-10-21",
   "notes": [
+    "🖨️ Impression sans clic : bouton qui crée le raccourci « Chrome - Nova impression auto » + bouton de test",
     "🗓 Planning : calendrier pour programmer les annonces (glisse un brouillon sur un jour)",
     "🚀 Publication automatique des brouillons sûrs aux meilleures heures",
     "🛫 Pilote automatique : tout s'active en 1 clic (onglet Auto)",
     "🖨️ Impression automatique des bordereaux à chaque vente",
     "📋 Ma journée (Accueil) : colis à emballer avec SKU et emplacement, annonces et messages à vérifier",
-    "📍 Emplacement de rangement sur le bordereau et dans l'appli iPhone · 💶 plafond de dépense IA par jour",
-    "☁️ Stock, modèles d'annonces et factures sauvegardés dans ton compte Nova",
-    "🧭 Assistant de démarrage en 4 écrans (onglet Auto)",
-    "🔎 Estimer avant d'acheter : photo en friperie → prix de revente et prix d'achat max",
-    "🔎 Titre optimisé avec les mots des annonces similaires sur Vinted",
-    "🌍 Hashtags étrangers pour Vinted UK, DE, IT, ES, NL"
+    "📍 Emplacement de rangement sur le bordereau et dans l'appli iPhone · 💶 plafond de dépense IA par jour"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.14.0"
+  "name": "V1.14.1"
 }
