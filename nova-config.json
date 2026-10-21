@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "note": "Réglages par défaut",
+  "apiBase": "/api/v2",
+  "paths": [],
+  "headers": {},
+  "csrfPages": ["/items/new", "/"],
+  "relaisRegex": "point relais|disponible|à récupérer|a recuperer|retrait"
+}

@@ -1,18 +1,18 @@
 {
-  "version": "1.12.1",
+  "version": "1.12.2",
   "date": "2026-10-21",
   "notes": [
+    "🛠️ Bouton « Faire corriger par Claude » dans le diagnostic",
+    "🌐 Correctifs à distance : Nova se répare sans réinstaller quand Vinted change une adresse",
+    "🔁 Réparation automatique du jeton de sécurité Vinted (erreur 403)",
     "⚡ Nouvel onglet Auto : tous les automatismes au même endroit, avec interrupteur et « Régler › »",
     "👕 Onglets renommés : Dressing, Messages",
     "🛠️ Après une mise à jour, les onglets Vinted se rechargent tout seuls (corrige « CSRF_TOKEN introuvable » et l'erreur 403 des tailles)",
     "🏠 Nouvel onglet Accueil : chiffre du jour et du mois, bénéfice, objectif du mois, records, graphique 30 jours",
     "📦 Stock : ajoute tes achats, SKU automatique, bénéfice calculé à la vente · export CSV et factures PDF",
-    "🗣️ Réponses guidées (mesures, état, authenticité, photos portées), personnalité et niveau de liberté de l'IA",
-    "💬 Mots-clés avec offre jointe et situations pour les lots · négociation plus souple sur les lots",
-    "❤️ Relance des favoris sans réponse après 24 h",
-    "📈 Prix qui monte pour les articles très mis en favori · 🗑 suppression en lot · 🛡️ alerte au-delà de 30 republications par jour"
+    "🗣️ Réponses guidées (mesures, état, authenticité, photos portées), personnalité et niveau de liberté de l'IA"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.12.1"
+  "name": "V1.12.2"
 }
