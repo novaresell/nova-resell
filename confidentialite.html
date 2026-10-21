@@ -38,6 +38,8 @@ table { width:100%; border-collapse: collapse; font-size: 14px; } td, th { borde
 <tr><td>Adresse e-mail et mot de passe du compte Nova</td><td>Connexion, essai gratuit, accès bêta</td><td>Compte Nova (Supabase) ; le mot de passe est chiffré par le service d'authentification</td></tr>
 <tr><td>Photos d'articles envoyées depuis l'appli téléphone, bordereaux PDF pour le téléphone</td><td>Transférer les photos vers le PC, imprimer depuis le téléphone</td><td>Espace privé de ton compte Nova</td></tr>
 <tr><td>Photos et textes envoyés à l'IA</td><td>Rédiger les annonces et les réponses</td><td>Envoyés à Anthropic (Claude) avec <b>ta propre clé API</b>, qui reste sur ton PC</td></tr>
+<tr><td>Identifiant aléatoire de l'appareil, empreinte de carte fournie par Stripe (jamais le numéro)</td><td>Un seul essai gratuit par personne (anti multi-comptes)</td><td>Compte Nova</td></tr>
+<tr><td>Abonnement (formule, dates, identifiant client Stripe)</td><td>Gérer ton abonnement Nova Pro</td><td>Compte Nova + Stripe</td></tr>
 <tr><td>Rapports d'erreur et suggestions que tu envoies</td><td>Corriger les bugs</td><td>Compte Nova (lisibles par l'administrateur uniquement)</td></tr>
 <tr><td>Abonnement aux notifications du téléphone</td><td>Te prévenir (vente, offre, colis…)</td><td>Services de notification Apple, Google, Mozilla ou Microsoft selon ton appareil</td></tr>
 </table></div>
@@ -58,13 +60,14 @@ table { width:100%; border-collapse: collapse; font-size: 14px; } td, th { borde
 <h2>6. Sous-traitants</h2>
 <ul>
 <li>Supabase (compte Nova et sauvegardes)</li>
+<li>Stripe (paiement de l'abonnement)</li>
 <li>Anthropic (IA Claude, via ta propre clé API)</li>
 <li>GitHub Pages (hébergement de l'appli mobile et des mises à jour)</li>
 <li>Services de notifications push de ton appareil</li>
 </ul>
 
 <h2>7. Responsable</h2>
-<p>Nova Resell est un projet indépendant en version bêta. Contact : formulaire « Suggestions » dans l'extension.</p>
-<p class="muted">Voir aussi les <a href="conditions.html">conditions d'utilisation</a>.</p>
+<p>Responsable du traitement : Nova Resell, projet indépendant en version bêta. Contact : formulaire « Suggestions » dans l'extension<span id="mail"></span>.</p>
+<p class="muted">Voir aussi les <a href="conditions.html">conditions d'utilisation</a> et les <a href="vente.html">conditions de vente</a>.</p>
 </div></main></body>
 </html>

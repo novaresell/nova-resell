@@ -391,6 +391,11 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
   }
   // ---------- Notifications (Web Push : le PC envoie, l'iPhone affiche) ----------
   const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  // Android : bouton d'installation natif proposé par Chrome
+  let installEvt = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; document.querySelectorAll('.and-install').forEach((b) => (b.hidden = false)); });
+  window.novaInstall = async () => { if (!installEvt) return toast('Chrome → menu ⋮ → « Installer l’application »'); installEvt.prompt(); await installEvt.userChoice.catch(() => null); installEvt = null; };
   const standalone = () => window.navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
   let swReg = null;
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then((r) => { swReg = r; }).catch(() => {});
@@ -398,7 +403,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
   async function enablePush() {
     if (!state?.pushKey) return toast('Ouvre d’abord Nova sur le PC (mise à jour V1.5)');
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') return toast('Notifications refusées : Réglages iPhone → Notifications → Nova');
+    if (perm !== 'granted') return toast(isAndroid ? 'Notifications refusées : Paramètres Android → Applications → Nova → Notifications' : 'Notifications refusées : Réglages iPhone → Notifications → Nova');
     const reg = swReg || await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     const want = keyBytes(state.pushKey);
@@ -412,7 +417,8 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
   function pushCard() {
     const on = window.Notification?.permission === 'granted' && store.get('nova_push') && state?.pushOn;
     const c = h('div', { className: 'card push' }, h('b', { textContent: '🔔 Notifications' }));
-    if (!pushSupported()) c.append(h('div', { className: 'sub', textContent: standalone() ? 'Ton iPhone doit être en iOS 16.4 ou plus pour recevoir les notifications.' : 'Ajoute d’abord Nova à l’écran d’accueil (Safari → Partager → « Sur l’écran d’accueil »), puis ouvre-la depuis l’icône.' }));
+    if (!pushSupported()) c.append(h('div', { className: 'sub', textContent: isAndroid ? 'Ouvre Nova dans Chrome pour Android pour recevoir les notifications.' : standalone() ? 'Ton iPhone doit être en iOS 16.4 ou plus pour recevoir les notifications.' : 'Ajoute d’abord Nova à l’écran d’accueil (Safari → Partager → « Sur l’écran d’accueil »), puis ouvre-la depuis l’icône.' }));
+    if (isAndroid && !standalone()) { const b = h('button', { className: 'btn and-install', textContent: '📲 Installer Nova sur Android' }); b.addEventListener('click', () => window.novaInstall()); c.append(b); }
     else if (on) {
       c.append(h('div', { className: 'sub', textContent: 'Activées : nouvelles ventes, offres, colis livrés, argent versé et rappels d’expédition. (Le PC doit être allumé.)' }));
       const t = h('button', { className: 'linkbtn', textContent: 'Envoyer un test' }); t.addEventListener('click', () => doAction('ptest-' + Date.now(), 'pushTest', {})); c.append(t);
@@ -616,7 +622,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
         o.label ? printBtn(o.label, `Bordereau ${(o.skus || []).join('+') || 'Vinted'}.pdf`, '🖨️') : null))));
       const all = state?.labelsAll || (list.length === 1 ? list[0].label : null);
       if (all) v.append(printBtn(all, 'Bordereaux Nova.pdf', `🖨️ Imprimer ${list.length > 1 ? 'les ' + list.length + ' bordereaux' : 'le bordereau'}`, 'btn primary'));
-      v.append(h('p', { className: 'sub', textContent: 'Le bordereau s’ouvre avec le SKU en gros : touche Partager → Imprimer (imprimante AirPrint), ou Enregistrer dans Fichiers.' }));
+      v.append(h('p', { className: 'sub', textContent: isAndroid ? 'Le bordereau s’ouvre avec le SKU en gros : menu ⋮ → Partager → Imprimer, ou Télécharger.' : 'Le bordereau s’ouvre avec le SKU en gros : touche Partager → Imprimer (imprimante AirPrint), ou Enregistrer dans Fichiers.' }));
       const a = actions['print'];
       const b = h('button', { className: 'btn', textContent: a ? (a.status === 'done' ? 'Ouvert sur le PC ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : '🖥️ Ouvrir les bordereaux sur le PC', disabled: a && a.status !== 'error' && a.status !== 'done' });
       b.addEventListener('click', () => doAction('print', 'printLabels', {}));
