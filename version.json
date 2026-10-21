@@ -1,7 +1,11 @@
 {
-  "version": "1.14.1",
+  "version": "1.15.0",
   "date": "2026-10-21",
   "notes": [
+    "✅ Version stable : relecture complète et tests de tous les onglets",
+    "🛠️ Changement de prix : format corrigé (identique au site Vinted)",
+    "🔎 Titre optimisé : lit vraiment les titres des annonces (et plus les noms de catégories)",
+    "🖨️ L'assistant de démarrage ne s'ouvre plus dans la fenêtre d'impression",
     "🖨️ Impression sans clic : bouton qui crée le raccourci « Chrome - Nova impression auto » + bouton de test",
     "🗓 Planning : calendrier pour programmer les annonces (glisse un brouillon sur un jour)",
     "🚀 Publication automatique des brouillons sûrs aux meilleures heures",
@@ -12,5 +16,5 @@
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.14.1"
+  "name": "V1.15.0"
 }
