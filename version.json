@@ -1,18 +1,20 @@
 {
-  "version": "1.12.2",
+  "version": "1.13.0",
   "date": "2026-10-21",
   "notes": [
+    "☁️ Stock, modèles d'annonces et factures sauvegardés dans ton compte Nova",
+    "🧭 Assistant de démarrage en 4 écrans (onglet Auto)",
+    "🔎 Estimer avant d'acheter : photo en friperie → prix de revente et prix d'achat max",
+    "🔎 Titre optimisé avec les mots des annonces similaires sur Vinted",
+    "🌍 Hashtags étrangers pour Vinted UK, DE, IT, ES, NL",
+    "📊 Bilan de la semaine le dimanche soir · 🎯 objectif du mois dans l'appli iPhone",
     "🛠️ Bouton « Faire corriger par Claude » dans le diagnostic",
     "🌐 Correctifs à distance : Nova se répare sans réinstaller quand Vinted change une adresse",
     "🔁 Réparation automatique du jeton de sécurité Vinted (erreur 403)",
     "⚡ Nouvel onglet Auto : tous les automatismes au même endroit, avec interrupteur et « Régler › »",
-    "👕 Onglets renommés : Dressing, Messages",
-    "🛠️ Après une mise à jour, les onglets Vinted se rechargent tout seuls (corrige « CSRF_TOKEN introuvable » et l'erreur 403 des tailles)",
-    "🏠 Nouvel onglet Accueil : chiffre du jour et du mois, bénéfice, objectif du mois, records, graphique 30 jours",
-    "📦 Stock : ajoute tes achats, SKU automatique, bénéfice calculé à la vente · export CSV et factures PDF",
-    "🗣️ Réponses guidées (mesures, état, authenticité, photos portées), personnalité et niveau de liberté de l'IA"
+    "👕 Onglets renommés : Dressing, Messages"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.12.2"
+  "name": "V1.13.0"
 }

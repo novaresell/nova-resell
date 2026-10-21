@@ -577,6 +577,10 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
         ms.length ? h('div', { className: 'mbars' }, ms.map((m) => { const val = st.hasExcel ? m.profit : m.ca; return h('div', { className: 'mb' }, h('i', { style: `height:${Math.max(4, (Math.max(0, val) / max) * 100)}%` }), h('span', { textContent: m.label.replace('.', '') })); })) : null,
         h('div', { className: 'sub', textContent: st.hasExcel ? `Barres : bénéfice des 6 derniers mois${st.monthKnown < st.monthN ? ` (prix d’achat connu pour ${st.monthKnown}/${st.monthN} ventes ce mois)` : ''}.` : 'Barres : chiffre d’affaires des 6 derniers mois. Relie ton Excel sur le PC pour voir ton bénéfice.' })));
     }
+    if (st?.goal) { const val = st.goalType === 'profit' ? (st.monthProfit || 0) : (st.month || 0), p = Math.min(1, val / st.goal);
+      v.append(h('div', { className: 'card' }, h('b', { textContent: `🎯 Objectif du mois : ${euro(val)} / ${euro(st.goal)}${st.goalType === 'profit' ? ' de bénéfice' : ''}` }),
+        h('div', { style: 'height:10px;border-radius:9px;background:rgba(127,127,127,.25);overflow:hidden;margin-top:8px' }, h('i', { style: `display:block;height:100%;width:${Math.round(p * 100)}%;background:var(--accent,#22d3ee)` })),
+        h('div', { className: 'sub', textContent: val >= st.goal ? '🎉 Objectif atteint !' : `Encore ${euro(st.goal - val)}` }))); }
     if (st?.late) v.append(h('div', { className: 'card warnbox' }, h('b', { textContent: `⚠️ ${st.late} colis à déposer depuis plus de 2 jours` }), h('div', { className: 'sub', textContent: 'Dépose-les vite en point relais : Vinted peut annuler la commande.' })));
     v.append(h('h2', { textContent: 'À expédier' }));
     if (!list.length) v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Rien à expédier 🎉' }), 'Les nouvelles ventes apparaîtront ici.'));
