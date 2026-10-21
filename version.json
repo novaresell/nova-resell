@@ -1,21 +1,19 @@
 {
-  "version": "1.8.2",
-  "date": "2026-10-16",
+  "version": "1.9.0",
+  "date": "2026-10-21",
   "notes": [
+    "🤝 Négociation par paliers : baisse max selon le prix, étapes de contre-offres, messages variés, vouvoiement",
+    "❤️ Favoris : délai avant envoi, messages soir / week-end / articles chers, versions en rotation avec statistiques",
+    "📋 Modèles d'annonces : enregistre et applique une fiche en 1 clic (variables {marque} {taille} {couleur}…)",
+    "💌 Après-vente : remerciement après paiement et demande d'avis à la finalisation",
+    "💶 Prix en lot, 🗓 republication ou baisse programmée, 📉 baisse de prix automatique",
+    "🛟 Sauvegarde du dressing et recréation en brouillons",
+    "🔐 Fini les déconnexions au démarrage du PC",
     "☁️ À la connexion, tes réglages et réponses enregistrées reviennent tout seuls (même après une réinstallation)",
     "🤖 Agent IA en mode Automatique : il répond tout seul, sans aucune validation (les réponses en attente partent aussi)",
-    "❤️ Favoris : la liste se met à jour toute seule quand tu ouvres l'onglet",
-    "⚡ Mise à jour en 1 clic : plus besoin de trouver le bon dossier, choisis « Nova Resell » et Nova se retrouve tout seul",
-    "🛡️ Nova relit tes annonces beaucoup moins souvent : moins de vérifications « Je ne suis pas un robot » de Vinted",
-    "🔁 Republier : les anciennes annonces modifiées (prix, photos…) apparaissent enfin — leur vraie date est retrouvée",
-    "🔓 Pendant l'essai, sans clé API : republication, favoris, lots, prix, ventes, étiquettes, Excel et photos marchent directement (plus de fenêtre « clé API » au lancement)",
-    "✨ Bouton « Améliorer / Retirer l'effet IA » sur chaque article, y compris ceux reçus du téléphone",
-    "🤖 Surveillance automatique : si Vinted change quelque chose, la panne est signalée tout de suite pour être corrigée",
-    "🔧 Correctifs : articles « Réponse de Claude illisible », prix du marché (Vinted a changé sa recherche), couleur manquante au brouillon",
-    "🗺️ Nouveau : « Bientôt dans Nova » dans l'onglet Aide (stock intégré, IA incluse…)",
-    "🛡️ Sécurité renforcée (accès admin, suggestions réservées aux comptes, code protégé)"
+    "❤️ Favoris : la liste se met à jour toute seule quand tu ouvres l'onglet"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.8.2"
+  "name": "V1.9.0"
 }
