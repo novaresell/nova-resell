@@ -1,7 +1,8 @@
 {
-  "version": "1.19.1",
+  "version": "1.19.2",
   "date": "2026-10-21",
   "notes": [
+    "📗 Stock en « vue Excel » : ton tableau Suivi achat / revente affiché tel quel dans Nova (Accueil → Stock)",
     "📊 Stock façon tableur (Accueil → Stock / Bilan) : achats, lots, ventes reliées par SKU, bénéfice, import de n'importe quel tableau Excel",
     "💶 Prix basés sur les articles similaires réellement VENDUS sur Vinted (annonces et estimation avant achat)",
     "🕒 Meilleure heure de publication calculée sur tes vraies ventes",
@@ -14,5 +15,5 @@
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.19.1"
+  "name": "V1.19.2"
 }
