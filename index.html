@@ -541,7 +541,7 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
   }
   const RET_TYPE = { snad: 'Article non conforme', damaged: 'Article endommagé', not_received: 'Colis non reçu' };
   const thumb = (src) => src ? h('img', { src, alt: '', loading: 'lazy' }) : h('img', { alt: '' });
-  const skuChips = (o) => (o.skus || []).map((s) => h('span', { className: 'sku', textContent: s }));
+  const skuChips = (o) => [...(o.skus || []).map((s) => h('span', { className: 'sku', textContent: s })), o.place ? h('span', { className: 'sku', textContent: '📍 ' + o.place }) : null];
   // Bordereaux PDF préparés par le PC (avec le SKU) : ouverture → Partager → Imprimer (AirPrint) ou Enregistrer
   const pdfCache = {};
   async function getPdf(path) {

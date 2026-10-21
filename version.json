@@ -1,20 +1,20 @@
 {
-  "version": "1.13.0",
+  "version": "1.14.0",
   "date": "2026-10-21",
   "notes": [
+    "🗓 Planning : calendrier pour programmer les annonces (glisse un brouillon sur un jour)",
+    "🚀 Publication automatique des brouillons sûrs aux meilleures heures",
+    "🛫 Pilote automatique : tout s'active en 1 clic (onglet Auto)",
+    "🖨️ Impression automatique des bordereaux à chaque vente",
+    "📋 Ma journée (Accueil) : colis à emballer avec SKU et emplacement, annonces et messages à vérifier",
+    "📍 Emplacement de rangement sur le bordereau et dans l'appli iPhone · 💶 plafond de dépense IA par jour",
     "☁️ Stock, modèles d'annonces et factures sauvegardés dans ton compte Nova",
     "🧭 Assistant de démarrage en 4 écrans (onglet Auto)",
     "🔎 Estimer avant d'acheter : photo en friperie → prix de revente et prix d'achat max",
     "🔎 Titre optimisé avec les mots des annonces similaires sur Vinted",
-    "🌍 Hashtags étrangers pour Vinted UK, DE, IT, ES, NL",
-    "📊 Bilan de la semaine le dimanche soir · 🎯 objectif du mois dans l'appli iPhone",
-    "🛠️ Bouton « Faire corriger par Claude » dans le diagnostic",
-    "🌐 Correctifs à distance : Nova se répare sans réinstaller quand Vinted change une adresse",
-    "🔁 Réparation automatique du jeton de sécurité Vinted (erreur 403)",
-    "⚡ Nouvel onglet Auto : tous les automatismes au même endroit, avec interrupteur et « Régler › »",
-    "👕 Onglets renommés : Dressing, Messages"
+    "🌍 Hashtags étrangers pour Vinted UK, DE, IT, ES, NL"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.13.0"
+  "name": "V1.14.0"
 }
