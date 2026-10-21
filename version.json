@@ -1,21 +1,20 @@
 {
-  "version": "1.16.0",
+  "version": "1.17.0",
   "date": "2026-10-21",
   "notes": [
+    "🎨 Nouveau design : bleu nuit retravaillé, vrai thème clair, icônes, cartes plus lisibles",
+    "🖥️ Grand écran : menu latéral par rubriques et réglages sur 2 colonnes",
+    "📱 Appli iPhone : thème clair automatique (ou au choix), notifications bordereau prêt et annonce publiée",
+    "🛠️ Fini l'alerte « CSRF_TOKEN introuvable » au lancement (ancien diagnostic revérifié automatiquement)",
+    "🐞 Corrigés : 1re vente ignorée sur un compte neuf, relance sans nom d'article",
     "🧭 Catégories bien plus justes : Nova utilise la recherche de catégories de Vinted (fini les vestes de ski par erreur)",
     "🃏 Cartes Pokémon, mangas, livres, jeux vidéo, consoles, objets : l'IA sait maintenant les mettre en vente",
     "🧠 Mémoire de l'IA : coche « Retenir » dans la bulle ✨ et la consigne s'applique à toutes les annonces",
     "📌 Les catégories que tu corriges sont retenues pour ce type d'article · 🔎 recherche libre de catégorie sur chaque fiche",
     "✅ Version stable : relecture complète et tests de tous les onglets",
-    "🛠️ Changement de prix : format corrigé (identique au site Vinted)",
-    "🔎 Titre optimisé : lit vraiment les titres des annonces (et plus les noms de catégories)",
-    "🖨️ L'assistant de démarrage ne s'ouvre plus dans la fenêtre d'impression",
-    "🖨️ Impression sans clic : bouton qui crée le raccourci « Chrome - Nova impression auto » + bouton de test",
-    "🗓 Planning : calendrier pour programmer les annonces (glisse un brouillon sur un jour)",
-    "🚀 Publication automatique des brouillons sûrs aux meilleures heures",
-    "🛫 Pilote automatique : tout s'active en 1 clic (onglet Auto)"
+    "🛠️ Changement de prix : format corrigé (identique au site Vinted)"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.16.0"
+  "name": "V1.17.0"
 }
