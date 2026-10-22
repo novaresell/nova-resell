@@ -606,10 +606,14 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
   // Mon stock : le même tableau que l'onglet Stock du PC (envoyé en direct par l'extension)
   let stockCache = null, stockOpen = false, stockAt = 0;
   async function loadStock() {
-    const t = await token(); if (!t) throw new Error('Session expirée');
-    const r = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_stock/stock.json?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' });
-    if (!r.ok) throw new Error(r.status === 400 || r.status === 404 ? 'Ton stock apparaîtra ici dès que tu l’auras rempli sur le PC (Accueil → Stock).' : 'Stock indisponible (' + r.status + ')');
-    stockCache = await r.json(); stockAt = Date.now(); return stockCache;
+    const offline = () => { const c = store.get('nova_stock'); if (c?.rows) { stockCache = { ...c, offline: true }; stockAt = Date.now(); return stockCache; } return null; };
+    let r;
+    try {
+      const t = await token(); if (!t) throw new Error('Session expirée');
+      r = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_stock/stock.json?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' });
+    } catch (e) { const c = offline(); if (c) return c; throw new Error('Pas de réseau : ton stock s’affichera dès que tu seras connecté.'); }
+    if (!r.ok) { if (r.status !== 400 && r.status !== 404) { const c = offline(); if (c) return c; } throw new Error(r.status === 400 || r.status === 404 ? 'Ton stock apparaîtra ici dès que tu l’auras rempli sur le PC (Accueil → Stock).' : 'Stock indisponible (' + r.status + ')'); }
+    stockCache = await r.json(); stockAt = Date.now(); store.set('nova_stock', stockCache); return stockCache;
   }
   function stockCard() {
     const box = h('div', { className: 'stock-list' }), q = h('input', { type: 'search', placeholder: '🔎 Article, SKU, lot…', className: 'stock-q' });
@@ -618,7 +622,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     const draw = () => {
       const rows = Object.entries(stockCache?.rows || {}).map(([k, r]) => ({ ...r, sku: r.sku || (k.startsWith('_') ? '' : k) })).sort((a, b) => (b.at || 0) - (a.at || 0));
       const inSt = rows.filter((r) => r.sold == null), sold = rows.filter((r) => r.sold != null);
-      head.textContent = `${inSt.length} en stock · valeur ${euro(inSt.reduce((t, r) => t + (Number(r.cost) || 0), 0))} · ${sold.length} vendus · bénéfice ${euro(sold.reduce((t, r) => t + (r.sold - (Number(r.cost) || 0)), 0))}`;
+      head.textContent = `${stockCache?.offline ? '📴 hors ligne · ' : ''}${inSt.length} en stock · valeur ${euro(inSt.reduce((t, r) => t + (Number(r.cost) || 0), 0))} · ${sold.length} vendus · bénéfice ${euro(sold.reduce((t, r) => t + (r.sold - (Number(r.cost) || 0)), 0))}`;
       const f = sel.value, s2 = q.value.trim().toLowerCase();
       const list = rows.filter((r) => (f === 'all' || (f === 'sold' ? r.sold != null : r.sold == null)) && (!s2 || `${r.title} ${r.sku} ${r.lot || ''} ${r.place || ''}`.toLowerCase().includes(s2))).slice(0, 200);
       box.replaceChildren(...(list.length ? list.map((r) => h('div', { className: 'stock-row' },

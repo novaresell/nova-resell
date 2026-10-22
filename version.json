@@ -1,16 +1,20 @@
 {
-  "version": "1.20.0",
+  "version": "1.21.0",
   "date": "2026-10-22",
   "notes": [
+    "🩺 Bilan de santé chaque matin : Nova te prévient seulement si quelque chose ne va pas",
+    "📦 Chaque matin : la liste des colis à déposer avec SKU et emplacement",
+    "🛒 Stats : quoi acheter au prochain ballot (ce qui part vite et rapporte) et quoi éviter",
+    "🎯 Republication intelligente : très vue mais pas vendue → baisse de prix ; peu vue → republication",
+    "🧺 Offres sur un lot : jamais sous la somme des prix planchers des articles",
+    "📴 Appli téléphone : stock consultable hors ligne",
     "🏷️ Étiquettes SKU pour tes ballots (planche A4 ou imprimante thermique) : Accueil → Stock → carte du lot",
     "🧾 Compteur DAC7 : tes ventes de l’année face au seuil des impôts (30 ventes ou 2 000 €), avec alerte",
     "📱 Ton stock en direct sur ton compte Nova : visible sur un autre PC et dans l’appli téléphone (Ventes → Mon stock)",
     "📄 Export comptable mensuel en PDF (Accueil → Bilan)",
-    "🛡️ Prix plancher : jamais moins de X × ton prix d’achat en négociation",
-    "🎓 Mini-tutoriel au premier lancement (rejouable dans Aide)",
-    "📗 Excel ↔ Stock synchronisés · 🧺 ballot relié aux annonces · 📊 Stats refaites"
+    "🛡️ Prix plancher : jamais moins de X × ton prix d’achat en négociation"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.20.0"
+  "name": "V1.21.0"
 }
