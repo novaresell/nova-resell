@@ -1,22 +1,16 @@
 {
-  "version": "1.19.3",
-  "date": "2026-10-21",
+  "version": "1.20.0",
+  "date": "2026-10-22",
   "notes": [
-    "📗 Ton fichier Excel et l’onglet Stock sont synchronisés dans les deux sens (achats, lots, prix, ventes)",
-    "🧺 Ballot : chaque nouvelle annonce reprend le SKU d’un article du lot → achat, annonce et vente reliés",
-    "📊 Page Stats refaite : plus claire, graphiques lisibles, bénéfice calculé avec ton Stock",
-    "📋 Ma journée : tes dernières ventes et négociations",
-    "🤫 Fini les alertes « composition illisible » et « genre » : l’IA décide toute seule",
-    "📗 Stock en « vue Excel » : ton tableau Suivi achat / revente affiché tel quel dans Nova (Accueil → Stock)",
-    "📊 Stock façon tableur (Accueil → Stock / Bilan) : achats, lots, ventes reliées par SKU, bénéfice, import de n'importe quel tableau Excel",
-    "💶 Prix basés sur les articles similaires réellement VENDUS sur Vinted (annonces et estimation avant achat)",
-    "🕒 Meilleure heure de publication calculée sur tes vraies ventes",
-    "🪦 Alerte « annonce morte » : les annonces sans intérêt depuis 30 j te sont signalées, avec quoi faire",
-    "🎯 Lots ciblés : à qui aime 1 article, Nova propose aussi tes articles de la même taille",
-    "👥 Mes acheteurs : fidèles et à risque, d'après tes ventes",
-    "🙂 Mode Simple / 🧠 Expert (⚙︎ en haut) : cache les réglages avancés"
+    "🏷️ Étiquettes SKU pour tes ballots (planche A4 ou imprimante thermique) : Accueil → Stock → carte du lot",
+    "🧾 Compteur DAC7 : tes ventes de l’année face au seuil des impôts (30 ventes ou 2 000 €), avec alerte",
+    "📱 Ton stock en direct sur ton compte Nova : visible sur un autre PC et dans l’appli téléphone (Ventes → Mon stock)",
+    "📄 Export comptable mensuel en PDF (Accueil → Bilan)",
+    "🛡️ Prix plancher : jamais moins de X × ton prix d’achat en négociation",
+    "🎓 Mini-tutoriel au premier lancement (rejouable dans Aide)",
+    "📗 Excel ↔ Stock synchronisés · 🧺 ballot relié aux annonces · 📊 Stats refaites"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.19.3"
+  "name": "V1.20.0"
 }

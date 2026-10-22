@@ -125,6 +125,15 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .help ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
 .relay { border-color: rgba(52,211,153,.4); }
 .beta { display: inline-block; vertical-align: middle; margin-left: 2px; padding: 3px 7px; border-radius: 7px; background: #EF4444; color: #fff; font: 800 11px/1.2 system-ui, sans-serif; font-style: normal; letter-spacing: .08em; box-shadow: 0 0 12px rgba(239,68,68,.5); position: relative; top: -3px; }
+.stock-card summary { cursor: pointer; list-style: none; display: grid; gap: 4px; }
+.stock-card summary::-webkit-details-marker { display: none; }
+.stock-tools { display: flex; gap: 8px; margin: 10px 0; }
+.stock-q { flex: 1; min-width: 0; }
+.stock-q, .stock-f { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3)); background: transparent; color: inherit; font: inherit; font-size: 14px; }
+.stock-list { display: grid; gap: 2px; max-height: 60vh; overflow-y: auto; }
+.stock-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }
+.stock-row .st-t { display: grid; min-width: 0; } .stock-row .st-t b { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stock-row .st-r { display: grid; justify-items: end; gap: 2px; flex: none; text-align: right; }
 </style><style>
 :root { padding-top: env(safe-area-inset-top, 0px); }
 [hidden] { display: none !important; }
@@ -594,7 +603,37 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     if (!window.open(url, '_blank')) location.href = url;
   }
   const printBtn = (path, name, label, cls = 'btn small') => { const b = h('button', { className: cls, textContent: label }); b.addEventListener('click', () => openPdf(path, name)); return b; };
+  // Mon stock : le même tableau que l'onglet Stock du PC (envoyé en direct par l'extension)
+  let stockCache = null, stockOpen = false, stockAt = 0;
+  async function loadStock() {
+    const t = await token(); if (!t) throw new Error('Session expirée');
+    const r = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_stock/stock.json?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' });
+    if (!r.ok) throw new Error(r.status === 400 || r.status === 404 ? 'Ton stock apparaîtra ici dès que tu l’auras rempli sur le PC (Accueil → Stock).' : 'Stock indisponible (' + r.status + ')');
+    stockCache = await r.json(); stockAt = Date.now(); return stockCache;
+  }
+  function stockCard() {
+    const box = h('div', { className: 'stock-list' }), q = h('input', { type: 'search', placeholder: '🔎 Article, SKU, lot…', className: 'stock-q' });
+    const sel = h('select', { className: 'stock-f' }, h('option', { value: 'stock', textContent: 'En stock' }), h('option', { value: 'sold', textContent: 'Vendus' }), h('option', { value: 'all', textContent: 'Tout' }));
+    const head = h('div', { className: 'sub', textContent: 'Chargement…' });
+    const draw = () => {
+      const rows = Object.entries(stockCache?.rows || {}).map(([k, r]) => ({ ...r, sku: r.sku || (k.startsWith('_') ? '' : k) })).sort((a, b) => (b.at || 0) - (a.at || 0));
+      const inSt = rows.filter((r) => r.sold == null), sold = rows.filter((r) => r.sold != null);
+      head.textContent = `${inSt.length} en stock · valeur ${euro(inSt.reduce((t, r) => t + (Number(r.cost) || 0), 0))} · ${sold.length} vendus · bénéfice ${euro(sold.reduce((t, r) => t + (r.sold - (Number(r.cost) || 0)), 0))}`;
+      const f = sel.value, s2 = q.value.trim().toLowerCase();
+      const list = rows.filter((r) => (f === 'all' || (f === 'sold' ? r.sold != null : r.sold == null)) && (!s2 || `${r.title} ${r.sku} ${r.lot || ''} ${r.place || ''}`.toLowerCase().includes(s2))).slice(0, 200);
+      box.replaceChildren(...(list.length ? list.map((r) => h('div', { className: 'stock-row' },
+        h('div', { className: 'st-t' }, h('b', { textContent: r.title || '—' }), h('span', { className: 'sub', textContent: [r.cat, r.lot && 'lot ' + r.lot, r.place && '📍 ' + r.place].filter(Boolean).join(' · ') })),
+        h('div', { className: 'st-r' }, r.sku ? h('span', { className: 'sku', textContent: r.sku }) : null, h('span', { className: 'sub', textContent: r.sold != null ? `${euro(Number(r.cost) || 0)} → ${euro(r.sold)}` : `acheté ${euro(Number(r.cost) || 0)}` })))) : [h('div', { className: 'sub', textContent: 'Aucun article.' })]));
+    };
+    q.addEventListener('input', draw); sel.addEventListener('change', draw);
+    const d = h('details', { className: 'card stock-card' }, h('summary', {}, h('b', { textContent: '📦 Mon stock' }), ' ', head), h('div', { className: 'stock-tools' }, q, sel), box);
+    d.open = stockOpen;
+    d.addEventListener('toggle', () => { stockOpen = d.open; });
+    (stockCache && Date.now() - stockAt < 60000 ? Promise.resolve() : loadStock()).then(draw).catch((e) => { head.textContent = e.message; });
+    return d;
+  }
   function viewVentes(v) {
+    v.append(stockCard());
     const list = state?.sales || [], rets = state?.returns || [], transit = state?.transit || [];
     const st = state?.stats;
     if (st && st.today) {
