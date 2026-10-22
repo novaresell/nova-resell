@@ -1,18 +1,17 @@
 {
-  "version": "1.21.2",
+  "version": "1.22.0",
   "date": "2026-10-22",
   "notes": [
+    "🔗 Tout est relié par le SKU : une vente Vinted met à jour la ligne du Stock (prix, date), le Bilan et ton fichier Excel ; un retour remet l’article en stock",
+    "⚡ Ton fichier Excel se met à jour tout seul (fichier relié directement)",
+    "☁️ Même compte sur plusieurs appareils : réglages, réponses, modèles, mémoire de l’IA et stock suivent en direct",
     "🔁 Planning : programme aussi des REPUBLICATIONS (glisse une annonce en ligne sur un jour, avec un nouveau prix si tu veux)",
     "⚡ Mises à jour automatiques : une fois le dossier de Nova autorisé, les nouvelles versions s’installent toutes seules (Chrome / Edge)",
     "🦁 Brave : option pour mettre à jour en 1 clic sans fichier .exe",
     "🩺 Bilan de santé chaque matin : Nova te prévient seulement si quelque chose ne va pas",
-    "📦 Chaque matin : la liste des colis à déposer avec SKU et emplacement",
-    "🛒 Stats : quoi acheter au prochain ballot (ce qui part vite et rapporte) et quoi éviter",
-    "🎯 Republication intelligente : très vue mais pas vendue → baisse de prix ; peu vue → republication",
-    "🧺 Offres sur un lot : jamais sous la somme des prix planchers des articles",
-    "📴 Appli téléphone : stock consultable hors ligne"
+    "📦 Chaque matin : la liste des colis à déposer avec SKU et emplacement"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.21.2"
+  "name": "V1.22.0"
 }
