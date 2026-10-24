@@ -4,6 +4,14 @@
   "apiBase": "/api/v2",
   "paths": [],
   "headers": {},
-  "csrfPages": ["/items/new", "/"],
-  "relaisRegex": "point relais|disponible|à récupérer|a recuperer|retrait"
+  "csrfPages": [
+    "/items/new",
+    "/"
+  ],
+  "relaisRegex": "point relais|disponible|à récupérer|a recuperer|retrait",
+  "stripe": {
+    "link": "https://buy.stripe.com/test_00wbJ299fdyLgxccxP8og00",
+    "portal": "https://billing.stripe.com/p/login/test_00wbJ299fdyLgxccxP8og00",
+    "price": "9,99 €/mois"
+  }
 }
