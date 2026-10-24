@@ -1,17 +1,19 @@
 {
-  "version": "1.22.0",
+  "version": "1.23.0",
   "date": "2026-10-22",
   "notes": [
+    "🪄 Dépose les photos de plusieurs articles d’un coup : Nova les trie par article",
+    "💶 Prix d’achat dès la création de l’annonce → la ligne du Stock se crée toute seule",
+    "📥 Stock : « Importer mon dressing » (toutes tes annonces en ligne) + filtre « Sans prix d’achat »",
+    "🏖️ Mode vacances : tout en pause d’un clic, tout revient au retour",
+    "📷 Photo floue, trop sombre ou étiquette manquante : Nova te prévient",
+    "🤖 Stats : coût de l’IA du mois et par annonce",
+    "⌨️ Raccourcis clavier (N, P, M, V, S, A) · 💾 sauvegarde complète dans un fichier",
     "🔗 Tout est relié par le SKU : une vente Vinted met à jour la ligne du Stock (prix, date), le Bilan et ton fichier Excel ; un retour remet l’article en stock",
     "⚡ Ton fichier Excel se met à jour tout seul (fichier relié directement)",
-    "☁️ Même compte sur plusieurs appareils : réglages, réponses, modèles, mémoire de l’IA et stock suivent en direct",
-    "🔁 Planning : programme aussi des REPUBLICATIONS (glisse une annonce en ligne sur un jour, avec un nouveau prix si tu veux)",
-    "⚡ Mises à jour automatiques : une fois le dossier de Nova autorisé, les nouvelles versions s’installent toutes seules (Chrome / Edge)",
-    "🦁 Brave : option pour mettre à jour en 1 clic sans fichier .exe",
-    "🩺 Bilan de santé chaque matin : Nova te prévient seulement si quelque chose ne va pas",
-    "📦 Chaque matin : la liste des colis à déposer avec SKU et emplacement"
+    "☁️ Même compte sur plusieurs appareils : réglages, réponses, modèles, mémoire de l’IA et stock suivent en direct"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.22.0"
+  "name": "V1.23.0"
 }
