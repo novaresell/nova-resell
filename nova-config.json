@@ -8,5 +8,6 @@
     "/items/new",
     "/"
   ],
-  "relaisRegex": "point relais|disponible|à récupérer|a recuperer|retrait"
+  "relaisRegex": "point relais|disponible|à récupérer|a recuperer|retrait",
+  "storeUrl": "https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj"
 }
