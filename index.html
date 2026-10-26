@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Layout : appli mobile à une colonne, en-tête « orbite » + onglets fixes en bas, comme une app native */
 :root {
@@ -21,7 +21,7 @@
   --text: #EAF0FF; --muted: #93A0BF; --cyan: #22D3EE; --indigo: #818CF8;
   --ok: #34D399; --warn: #FBBF24; --err: #F87171;
   --grad: linear-gradient(135deg, #06B6D4, #6366F1);
-  --display: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --display: Inter, 'Segoe UI', system-ui, sans-serif;
   --body: Inter, -apple-system, 'Segoe UI', system-ui, sans-serif;
   color-scheme: dark;
 }
@@ -75,7 +75,14 @@ h2 { margin: 6px 0 0; font: 700 18px var(--display); text-wrap: balance; }
 .thumbs { display: flex; gap: 6px; overflow-x: auto; }
 .thumbs img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; flex: none; background: var(--surface-2); }
 .staged { display: grid; gap: 8px; }
-.staged .item { display: flex; gap: 10px; align-items: center; background: var(--surface-2); border-radius: 14px; padding: 8px; }
+.staged .item { position: relative; display: grid; gap: 8px; background: var(--surface-2); border-radius: 14px; padding: 10px; }
+.staged .item .x { position: absolute; top: 8px; right: 8px; }
+.st-head { display: flex; align-items: center; gap: 8px; padding-right: 34px; }
+.st-head b { flex: 1; font-size: 13px; }
+.sku-in { width: 120px; padding: 7px 9px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 600 13px var(--body); text-transform: uppercase; }
+.st-ctl { display: flex; gap: 10px; flex-wrap: wrap; }
+.check-row { display: flex; gap: 10px; align-items: flex-start; margin: 10px 2px; font-size: 13.5px; color: var(--muted); }
+.check-row input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--cyan); }
 .staged .item .thumbs { flex: 1; min-width: 0; }
 .x { border: 0; background: rgba(255,255,255,.08); width: 32px; height: 32px; border-radius: 50%; flex: none; }
 
@@ -185,6 +192,18 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
 :root[data-theme="light"] .kpi span, :root[data-theme="light"] .pc { color: var(--muted) !important; }
 :root[data-theme="light"] .hero::before, :root[data-theme="light"] .hero::after { display: none; }
 .thm { margin-left: 6px; width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--line); background: var(--soft); display: grid; place-items: center; font-size: 15px; flex: none; }
+
+.seg { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; margin: 4px 0 12px; overflow-x: auto; }
+.seg-b { flex: 1; border: 0; background: none; color: var(--muted); padding: 8px 10px; border-radius: 9px; font: 600 12.5px var(--body); white-space: nowrap; }
+.seg-b.on { background: var(--surface-2); color: var(--text); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 99px; padding: 6px 11px; font: 600 12.5px var(--body); }
+.chip.on { border-color: var(--cyan); color: var(--cyan); }
+a.li { text-decoration: none; color: inherit; }
+.li.conv.unread .t { font-weight: 800; }
+.li .acct { color: var(--muted); font-weight: 500; font-size: 11.5px; }
+.tab .badge { position: absolute; top: 2px; left: calc(50% + 6px); min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; background: #EF4444; color: #fff; font: 700 10px/16px var(--body); }
+.tab { position: relative; }
 </style>
 <script>(function(){try{var t=localStorage.getItem('novaPhoneTheme');if(t&&t!=='auto')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
@@ -192,7 +211,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
 <div class="login" id="login" hidden>
   <div class="box">
     <svg class="logo" viewBox="0 0 128 128" aria-hidden="true"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#818CF8"/></linearGradient></defs><rect width="128" height="128" rx="34" fill="#0B1226"/><ellipse cx="64" cy="64" rx="46" ry="20" fill="none" stroke="url(#lg2)" stroke-width="7" transform="rotate(-28 64 64)"/><path d="M64 34c2 14 8 21 22 25-14 4-20 11-22 26-2-15-8-22-22-26 14-4 20-11 22-25z" fill="#fff"/><circle cx="104" cy="44" r="6" fill="#22D3EE"/></svg>
-    <h1>Nova <span>Resell</span> <em class="beta">BETA</em></h1>
+    <h1>Nova <span>Resell</span></h1>
     <p id="loginSub">Connecte-toi avec ton compte Nova : le même que dans l'extension sur ton PC.</p>
     <label class="field">E-mail<input id="lMail" type="email" autocomplete="username" inputmode="email"></label>
     <label class="field" id="lPassWrap">Mot de passe<input id="lPass" type="password" autocomplete="current-password"></label>
@@ -208,7 +227,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
   <header class="hero">
     <div class="brand">
       <svg viewBox="0 0 128 128" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#818CF8"/></linearGradient></defs><rect width="128" height="128" rx="34" fill="#0B1226"/><ellipse cx="64" cy="64" rx="46" ry="20" fill="none" stroke="url(#lg)" stroke-width="7" transform="rotate(-28 64 64)"/><path d="M64 34c2 14 8 21 22 25-14 4-20 11-22 26-2-15-8-22-22-26 14-4 20-11 22-25z" fill="#fff"/><circle cx="104" cy="44" r="6" fill="#22D3EE"/></svg>
-      <h1>Nova <span>Resell</span> <em class="beta">BETA</em></h1>
+      <h1>Nova <span>Resell</span></h1>
       <span class="pc" id="pcStatus"><i></i><span id="pcText">PC…</span></span>
       <button class="thm" id="thmBtn" aria-label="Thème" title="Thème : auto / clair / bleu nuit">🌓</button>
     </div>
@@ -225,12 +244,12 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
 </div>
 
 <nav class="tabs" aria-label="Sections">
-  <button class="tab active" data-tab="photos" id="tabPhotos"><span class="i">📸</span>Photos</button>
-  <button class="tab" data-tab="drafts" id="tabDrafts"><span class="i">📝</span>Brouillons</button>
-  <button class="tab" data-tab="repost" id="tabRepost"><span class="i">🔁</span>Republier</button>
-  <button class="tab" data-tab="favs" id="tabFavs"><span class="i">❤️</span>Favoris</button>
-  <button class="tab" data-tab="messages" id="tabMessages"><span class="i">💬</span>Messages</button>
-  <button class="tab" data-tab="ventes" id="tabVentes"><span class="i">📦</span>Ventes</button>
+  <button class="tab active" data-tab="photos" id="tabPhotos"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13.5" r="3.5"/></svg></span>Photos</button>
+  <button class="tab" data-tab="drafts" id="tabDrafts"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v3M16 2.5v3"/></svg></span>Brouillons</button>
+  <button class="tab" data-tab="repost" id="tabRepost"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 6l2.5 3L8 8v13h8V8l1.5 1L20 6l-4-3-1.5 1.5a3 3 0 0 1-5 0z"/></svg></span>Dressing</button>
+  <button class="tab" data-tab="favs" id="tabFavs"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></span>Favoris</button>
+  <button class="tab" data-tab="messages" id="tabMessages"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-12 7l-5 1 1-4a8 8 0 1 1 16-4z"/></svg></span>Messages</button>
+  <button class="tab" data-tab="ventes" id="tabVentes"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg></span>Ventes</button>
 </nav>
 
 <script src="config.js"></script>
@@ -368,7 +387,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
       for (const s of staged.slice()) {
         const folder = `${session.user.id}/${uid4()}`; const paths = []; let thumb = null;
         for (let i = 0; i < s.files.length; i++) { const { blob, thumb: t } = await shrink(s.files[i]); if (!thumb) thumb = t; const p = `${folder}/${i + 1}.jpg`; await upload(p, blob); paths.push(p); }
-        await rest('POST', 'jobs', { photos: paths, thumb, status: 'new' });
+        await rest('POST', 'jobs', { photos: paths, thumb, status: 'new', ...(s.sku ? { sku: s.sku } : {}) });
         staged.shift();
       }
       toast('Envoyé au PC ✓'); await refresh();
@@ -430,7 +449,14 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     if (!pushSupported()) c.append(h('div', { className: 'sub', textContent: isAndroid ? 'Ouvre Nova dans Chrome pour Android pour recevoir les notifications.' : standalone() ? 'Ton iPhone doit être en iOS 16.4 ou plus pour recevoir les notifications.' : 'Ajoute d’abord Nova à l’écran d’accueil (Safari → Partager → « Sur l’écran d’accueil »), puis ouvre-la depuis l’icône.' }));
     if (isAndroid && !standalone()) { const b = h('button', { className: 'btn and-install', textContent: '📲 Installer Nova sur Android' }); b.addEventListener('click', () => window.novaInstall()); c.append(b); }
     else if (on) {
-      c.append(h('div', { className: 'sub', textContent: 'Activées : nouvelles ventes, offres, colis livrés, argent versé et rappels d’expédition. (Le PC doit être allumé.)' }));
+      c.append(h('div', { className: 'sub', textContent: 'Choisis ce que tu veux recevoir (le PC doit être allumé) :' }));
+      const kinds = state?.pushKinds || [];
+      const pend = actions.pkinds?.status === 'new';
+      for (const k of kinds) {
+        const cb = h('input', { type: 'checkbox', checked: k.on, disabled: pend });
+        cb.addEventListener('change', () => { k.on = cb.checked; doAction('pkinds', 'setPushKinds', { kinds: Object.fromEntries(kinds.map((x) => [x.k, x.on])) }); });
+        c.append(h('label', { className: 'check-row' }, cb, h('span', { textContent: k.label })));
+      }
       const t = h('button', { className: 'linkbtn', textContent: 'Envoyer un test' }); t.addEventListener('click', () => doAction('ptest-' + Date.now(), 'pushTest', {})); c.append(t);
     } else {
       c.append(h('div', { className: 'sub', textContent: 'Sois prévenu même appli fermée : vente, offre reçue, colis livré, argent versé.' }));
@@ -467,7 +493,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     $('#captcha').hidden = !s?.captcha;
     const badge = (id, n) => { const t = $(id); t.querySelector('.n')?.remove(); if (n) t.append(h('span', { className: 'n', textContent: n })); };
     badge('#tabDrafts', s?.drafts?.length || 0);
-    badge('#tabMessages', s?.aiQueue?.length || 0);
+    badge('#tabMessages', (s?.aiQueue?.length || 0) + (s?.questions?.length || 0) + (s?.reviews?.length || 0) + (s?.inbox || []).filter((c) => c.unread).length);
     badge('#tabVentes', (s?.stats?.toShip || 0) + (s?.returns?.length || 0));
     badge('#tabRepost', (s?.repostItems || []).filter((i) => i.due).length);
     badge('#tabFavs', s?.favs?.length || 0);
@@ -483,22 +509,66 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     picking = false; clearTimeout(pickT);
     const files = [...pickInput.files]; pickInput.value = '';
     if (!files.length) return;
-    staged.push({ files, urls: files.map((f) => URL.createObjectURL(f)) });
-    render();
+    splitByTime(files).then((groups) => {
+      for (const g of groups) staged.push({ files: g, urls: g.map((f) => URL.createObjectURL(f)), sku: '' });
+      if (groups.length > 1) toast(`🪄 ${files.length} photos triées en ${groups.length} articles : vérifie puis envoie`);
+      render();
+    });
   });
+  // tri automatique : plusieurs articles dans une même sélection, séparés selon l'heure de prise de vue (EXIF)
+  async function exifTime(file) {
+    try {
+      const b = new DataView(await file.slice(0, 262144).arrayBuffer());
+      if (b.getUint16(0) !== 0xFFD8) return null;
+      let o = 2;
+      while (o < b.byteLength - 10) {
+        const m = b.getUint16(o), len = b.getUint16(o + 2);
+        if (m === 0xFFE1 && b.getUint32(o + 4) === 0x45786966) {
+          const t = o + 10, le = b.getUint16(t) === 0x4949;
+          const g16 = (x) => b.getUint16(x, le), g32 = (x) => b.getUint32(x, le);
+          const ifd = (off) => { const n = g16(t + off), out = {}; for (let i = 0; i < n; i++) { const e = t + off + 2 + i * 12; out[g16(e)] = g32(e + 8); } return out; };
+          const i0 = ifd(g32(t + 4)), ex = i0[0x8769] ? ifd(i0[0x8769]) : {};
+          const at = ex[0x9003] || i0[0x0132]; if (!at) return null;
+          let str = ''; for (let i = 0; i < 19; i++) str += String.fromCharCode(b.getUint8(t + at + i));
+          const d = str.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+          return d ? new Date(+d[1], d[2] - 1, +d[3], +d[4], +d[5], +d[6]).getTime() : null;
+        }
+        if ((m & 0xFF00) !== 0xFF00) break; o += 2 + len;
+      }
+    } catch { /* pas d'heure dans la photo */ }
+    return null;
+  }
+  async function splitByTime(files) {
+    if (files.length < 2 || store.get('nova_split') === false) return [files];
+    const times = await Promise.all(files.map(exifTime));
+    if (times.filter(Boolean).length < files.length * 0.8) return [files];
+    const order = files.map((f, i) => i).sort((a, b) => (times[a] || 0) - (times[b] || 0));
+    const groups = [[files[order[0]]]];
+    for (let k = 1; k < order.length; k++) { if ((times[order[k]] || 0) - (times[order[k - 1]] || 0) > 60000) groups.push([]); groups.at(-1).push(files[order[k]]); }
+    return groups;
+  }
   pickInput.addEventListener('cancel', () => { picking = false; });
   function viewPhotos(v) {
     const input = pickInput;
     v.append(
       h('h2', { textContent: 'Nouvel article' }),
-      h('p', { className: 'sub', textContent: "Une sélection = un article. Prends face, dos et étiquettes, ajoute autant d'articles que tu veux, puis envoie tout au PC." }),
+      h('p', { className: 'sub', textContent: "Choisis toutes tes photos d'un coup, même pour plusieurs articles : Nova les trie par article. Tu peux ajouter un SKU à chaque article, ou photographier son étiquette SKU." }),
       h('label', { className: 'pick' }, input, h('span', { className: 'ico', textContent: '📷' }), h('b', { textContent: 'Prendre ou choisir des photos' }), h('span', { className: 'sub', textContent: 'Appareil photo ou galerie' })),
     );
+    const splitOn = store.get('nova_split') !== false;
+    const sw = h('input', { type: 'checkbox', checked: splitOn });
+    sw.addEventListener('change', () => { store.set('nova_split', sw.checked); toast(sw.checked ? 'Tri automatique activé' : 'Une sélection = un article'); });
+    v.append(h('label', { className: 'check-row' }, sw, h('span', { textContent: 'Plusieurs articles dans une même sélection : tri automatique par article' })));
     if (staged.length) {
       v.append(h('div', { className: 'staged' }, staged.map((s, i) => {
         const x = h('button', { className: 'x', textContent: '✕', ariaLabel: 'Retirer cet article' });
         x.addEventListener('click', () => { staged.splice(i, 1); render(); });
-        return h('div', { className: 'item' }, h('div', { className: 'thumbs' }, s.urls.map((u) => h('img', { src: u, alt: '' }))), x);
+        const sku = h('input', { className: 'sku-in', placeholder: 'SKU (facultatif)', value: s.sku || '', autocapitalize: 'characters', maxLength: 10 });
+        sku.addEventListener('input', () => { s.sku = sku.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+        const ctl = h('div', { className: 'st-ctl' },
+          i ? (() => { const b = h('button', { className: 'linkbtn small', textContent: '⤴ Même article que le précédent' }); b.addEventListener('click', () => { const p = staged[i - 1]; p.files.push(...s.files); p.urls.push(...s.urls); staged.splice(i, 1); render(); }); return b; })() : null,
+          s.files.length > 1 ? (() => { const b = h('button', { className: 'linkbtn small', textContent: '✂️ Séparer la dernière photo' }); b.addEventListener('click', () => { staged.splice(i + 1, 0, { files: [s.files.pop()], urls: [s.urls.pop()], sku: '' }); render(); }); return b; })() : null);
+        return h('div', { className: 'item' }, h('div', { className: 'st-head' }, h('b', { textContent: `Article ${i + 1} · ${s.files.length} photo${s.files.length > 1 ? 's' : ''}` }), sku), h('div', { className: 'thumbs' }, s.urls.map((u) => h('img', { src: u, alt: '' }))), ctl, x);
       })));
       const send = h('button', { className: 'btn primary', disabled: busy, textContent: busy ? 'Envoi en cours…' : `Envoyer ${staged.length} article${staged.length > 1 ? 's' : ''} au PC` });
       send.addEventListener('click', sendStaged);
@@ -560,7 +630,48 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     })));
   }
 
+  let msgTab = 'inbox', inboxFilter = '';
   function viewMessages(v) {
+    const qn = (state?.aiQueue || []).length, aqn = (state?.questions || []).length, rvn = (state?.reviews || []).length;
+    const seg = h('div', { className: 'seg' }, ...[['inbox', 'Messagerie'], ['queue', `À valider${qn ? ' · ' + qn : ''}`], ['questions', `Questions${aqn ? ' · ' + aqn : ''}`], ['reviews', `Avis${rvn ? ' · ' + rvn : ''}`]].map(([k, l]) => { const b = h('button', { className: 'seg-b' + (msgTab === k ? ' on' : ''), textContent: l }); b.addEventListener('click', () => { msgTab = k; render(); }); return b; }));
+    v.append(seg);
+    if (msgTab === 'inbox') {
+      const all = state?.inbox || [];
+      const chips = h('div', { className: 'chips' }, ...[['', 'Tous'], ['unread', `Non lus · ${all.filter((c) => c.unread).length}`], ['todo', `À répondre · ${all.filter((c) => c.todo).length}`]].map(([k, l]) => { const b = h('button', { className: 'chip' + (inboxFilter === k ? ' on' : ''), textContent: l }); b.addEventListener('click', () => { inboxFilter = k; render(); }); return b; }));
+      v.append(h('h2', { textContent: 'Messagerie' }), h('p', { className: 'sub', textContent: 'Tous tes comptes Vinted. Touche une conversation pour répondre dans Vinted.' }), chips);
+      const list = all.filter((c) => !inboxFilter || (inboxFilter === 'unread' ? c.unread : c.todo));
+      if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: all.length ? 'Rien ici' : 'Pas encore de conversation' }), all.length ? 'Change de filtre.' : 'Ta messagerie apparaîtra ici quand le PC l’aura lue.'));
+      return v.append(h('div', { className: 'list' }, list.map((c) => h('a', { className: 'li conv' + (c.unread ? ' unread' : ''), href: `https://www.vinted.fr/inbox/${c.id}`, target: '_blank', rel: 'noopener' }, c.photo ? h('img', { src: c.photo, alt: '', loading: 'lazy' }) : h('img', { alt: '' }),
+        h('div', { className: 'meta' }, h('div', { className: 't' }, (c.unread ? '● ' : '') + c.who, c.login ? h('span', { className: 'acct', textContent: ' @' + c.login }) : null), h('div', { className: 's', textContent: c.text }),
+          c.tags?.length ? h('div', { className: 's' }, c.tags.map((t) => h('span', { className: 'pill ' + (/Répondu|vendu|Livré/.test(t) ? 'ok' : /expédier/.test(t) ? 'warn' : 'run'), textContent: t }))) : null, h('div', { className: 's', textContent: ago(c.at) }))))));
+    }
+    if (msgTab === 'questions') {
+      v.append(h('h2', { textContent: "Questions de l'assistant" }), h('p', { className: 'sub', textContent: "Nova n'a pas su répondre : écris la réponse une fois, il s'en souviendra." }));
+      const list = state?.questions || [];
+      if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Aucune question en attente' }), "Quand l'assistant ne sait pas répondre à un acheteur, la question arrive ici."));
+      return list.forEach((q) => {
+        const key = 'aq-' + q.id; const a = actions[key];
+        const ta = h('textarea', { rows: 2, placeholder: 'Ce que l’assistant doit répondre…', id: 'ta-' + key });
+        const go = (send) => { if (!ta.value.trim()) return toast('Écris la réponse'); doAction(key, 'aqAnswer', { id: q.id, answer: ta.value.trim(), send }); };
+        const b1 = h('button', { className: 'btn small', textContent: 'Mémoriser', disabled: a && a.status !== 'error' }); b1.addEventListener('click', () => go(false));
+        const b2 = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Fait ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Mémoriser et répondre', disabled: a && a.status !== 'error' }); b2.addEventListener('click', () => go(true));
+        v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + (q.pseudo || 'acheteur') }), h('span', { className: 'sub grow', textContent: q.article })), h('div', { className: 'q', textContent: '« ' + q.question + ' »' }), ta, h('div', { className: 'row' }, b1, b2)));
+      });
+    }
+    if (msgTab === 'reviews') {
+      v.append(h('h2', { textContent: 'Avis à valider' }), h('p', { className: 'sub', textContent: 'Avis négatifs : Nova te propose une réponse calme. Modifie si besoin puis valide.' }));
+      const list = state?.reviews || [];
+      if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Aucun avis à valider' }), 'Les avis négatifs apparaîtront ici avec une réponse prête.'));
+      return list.forEach((r) => {
+        const key = 'rv-' + r.id; const a = actions[key];
+        const ta = h('textarea', { rows: 3, value: r.reply, id: 'ta-' + key });
+        const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Publié ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Valider et envoyer', disabled: a && a.status !== 'error' });
+        b.addEventListener('click', () => doAction(key, 'reviewSend', { id: r.id, comment: ta.value, author: r.author }));
+        v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + r.author }), h('span', { className: 'sub grow', textContent: '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) })),
+          h('div', { className: 'q', textContent: '« ' + (r.text || '(sans texte)') + ' »' }), r.lang !== 'fr' && r.textFr ? h('div', { className: 'sub', textContent: 'Traduction : ' + r.textFr }) : null,
+          ta, r.lang !== 'fr' && r.replyFr ? h('div', { className: 'sub', textContent: 'En français : ' + r.replyFr }) : null, b));
+      });
+    }
     v.append(h('h2', { textContent: "Réponses de l'agent IA" }), h('p', { className: 'sub', textContent: "Les réponses proposées par l'agent (mode « Je valide »). Modifie si besoin puis envoie." }));
     const q = state?.aiQueue || [];
     if (!q.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Rien à valider' }), "Active l'agent IA en mode « Je valide » dans l'extension pour recevoir ses propositions ici."));
@@ -569,7 +680,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
       const ta = h('textarea', { rows: 3, value: m.message, id: 'ta-' + key });
       const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Envoyé ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : (m.offerPrice ? `Envoyer + offre ${m.offerPrice} €` : 'Envoyer'), disabled: a && a.status !== 'error' });
       b.addEventListener('click', () => doAction(key, 'aiSend', { conversationId: m.conversationId, lastId: m.lastId, body: ta.value, offerPrice: m.offerPrice || null, transactionId: m.transactionId || null }));
-      v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + m.pseudo }), h('span', { className: 'sub grow', textContent: m.article })), h('div', { className: 'q', textContent: '« ' + m.question + ' »' }), ta, a?.error ? h('div', { className: 'sub', textContent: a.error }) : null, h('div', { className: 'row' }, b)));
+      v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + m.pseudo }), h('span', { className: 'sub grow', textContent: m.article })), h('div', { className: 'q', textContent: '« ' + (m.question || '') + ' »' }), ta, b));
     });
   }
 
@@ -694,9 +805,20 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
     const all = state?.repostItems || [];
     const due = all.filter((i) => i.due);
     const disc = state?.repostLabel || (state?.repostDiscount ? `-${state.repostDiscount} %` : '');
-    v.append(h('h2', { textContent: 'Republier' }), h('p', { className: 'sub', textContent: `Ton PC copie l'annonce (photos comprises), la remet en ligne${disc ? ` à ${disc}` : ''} puis supprime l'ancienne. Une à la fois, environ toutes les 30 s.` }));
+    v.append(h('h2', { textContent: 'Dressing' }), h('p', { className: 'sub', textContent: `Ton PC copie l'annonce (photos comprises), la remet en ligne${disc ? ` à ${disc}` : ''} puis supprime l'ancienne. Une à la fois, environ toutes les 30 s.` }));
     const seg = h('div', { className: 'row segm' }, ...[['À republier (' + due.length + ')', false], ['Toutes (' + all.length + ')', true]].map(([t, val]) => { const b = h('button', { className: 'btn small' + (repostAll === val ? ' primary' : ''), textContent: t }); b.addEventListener('click', () => { repostAll = val; render(); }); return b; }));
     v.append(seg);
+    // conseils de prix : monter, baisser ou republier selon les retours des acheteurs
+    const adv = state?.advice || [];
+    if (adv.length) {
+      v.append(h('h2', { textContent: '💡 Conseils prix' }));
+      v.append(h('div', { className: 'list' }, adv.map((a) => {
+        const k = 'adv-' + a.id; const x = actions[k];
+        const b = h('button', { className: 'btn small' + (a.dir === 'up' ? ' primary' : ''), textContent: x ? (x.status === 'done' ? 'Fait ✓' : x.status === 'error' ? 'Réessayer' : 'Envoi…') : a.dir === 'repost' ? 'Republier' : `${a.dir === 'up' ? '⬆' : '⬇'} ${euro(a.price)}`, disabled: x && x.status !== 'error' });
+        b.addEventListener('click', () => a.dir === 'repost' ? doAction(k, 'repost', { id: a.id, price: a.cur }) : doAction(k, 'setPrice', { id: a.id, price: a.price, title: a.title }));
+        return h('div', { className: 'li' }, thumb(a.photo), h('div', { className: 'meta' }, h('div', { className: 't', textContent: a.title }), h('div', { className: 's', textContent: a.why })), b);
+      })));
+    }
     const shown = repostAll ? all : due;
     if (!shown.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: state ? 'Rien à republier 👌' : 'PC pas encore relié' }), state ? 'Aucune annonce assez ancienne pour le moment.' : 'La liste apparaîtra quand ton PC sera relié.'));
     v.append(h('div', { className: 'list' }, shown.map((i) => {
@@ -707,7 +829,7 @@ body { background: var(--bg) !important; color: var(--text); font-family: Inter,
         doAction('rep-' + i.id, 'repost', { id: i.id, price: i.price });
       });
       return h('div', { className: 'li' }, thumb(i.photo), h('div', { className: 'meta' }, h('div', { className: 't', textContent: i.title }),
-        h('div', { className: 's', textContent: [euro(i.price), i.days != null ? `en ligne depuis ${i.days} j` : '', `❤️ ${i.favs || 0}`, `👁 ${i.views || 0}`].filter(Boolean).join(' · ') }),
+        h('div', { className: 's', textContent: [euro(i.price), i.days != null ? `en ligne depuis ${i.days} j` : '', `❤️ ${i.favs || 0}`, `👁 ${i.views || 0}`, state?.repostCounts?.[i.id] ? `republiée ${state.repostCounts[i.id]} fois` : ''].filter(Boolean).join(' · ') }),
         a?.error ? h('div', { className: 's', textContent: a.error }) : null), b);
     })));
   }

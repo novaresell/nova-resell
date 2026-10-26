@@ -1,19 +1,21 @@
 {
-  "version": "1.23.0",
-  "date": "2026-10-22",
+  "version": "1.24.0",
+  "date": "2026-10-26",
   "notes": [
-    "🪄 Dépose les photos de plusieurs articles d’un coup : Nova les trie par article",
-    "💶 Prix d’achat dès la création de l’annonce → la ligne du Stock se crée toute seule",
-    "📥 Stock : « Importer mon dressing » (toutes tes annonces en ligne) + filtre « Sans prix d’achat »",
-    "🏖️ Mode vacances : tout en pause d’un clic, tout revient au retour",
-    "📷 Photo floue, trop sombre ou étiquette manquante : Nova te prévient",
-    "🤖 Stats : coût de l’IA du mois et par annonce",
-    "⌨️ Raccourcis clavier (N, P, M, V, S, A) · 💾 sauvegarde complète dans un fichier",
-    "🔗 Tout est relié par le SKU : une vente Vinted met à jour la ligne du Stock (prix, date), le Bilan et ton fichier Excel ; un retour remet l’article en stock",
-    "⚡ Ton fichier Excel se met à jour tout seul (fichier relié directement)",
-    "☁️ Même compte sur plusieurs appareils : réglages, réponses, modèles, mémoire de l’IA et stock suivent en direct"
+    "🧭 Nouveau tableau de bord : menu en groupes, pastilles de notification, police Inter",
+    "💬 Messagerie de tous tes comptes : non lus, « à vous de répondre », étiquettes, réponse directe",
+    "💶 Négociation automatique : paliers jusqu’à 100 €, étapes 50 % / 80 %, bonus lots, un message par étape",
+    "🤖 Réponses auto par sujet (envoi, mesures lues sur les photos, authenticité, photos portées, hésitation, état, langue) + mémoire des questions",
+    "📸 Photos remises à l’endroit et recadrées, éditeur (zoom, rotation, lumière, cadre), photo SKU lue puis retirée",
+    "📏 Taille, coupe et genre déduits des mesures (guide des tailles) · état Très bon / Bon état selon tes règles",
+    "📝 Ton modèle de description (sans emoji) avec la réduction abonnés · message de bienvenue aux nouveaux abonnés",
+    "💡 Conseils prix : monter, baisser ou republier selon les vues, favoris et offres",
+    "🗓️ Planning des republications prévues avec limite par jour · compteur de republications",
+    "🛡️ Après la vérification anti-robot, les actions en attente repartent toutes seules · plus jamais de double envoi",
+    "🧹 Annonces en double supprimées automatiquement · erreurs regroupées dans le Journal",
+    "⭐ Réponses aux avis proposées par l’IA (toujours à valider pour les avis négatifs)"
   ],
   "setup": "https://novaresell.github.io/nova-resell/nova-resell-setup.exe",
   "zip": "https://novaresell.github.io/nova-resell/nova-resell.zip",
-  "name": "V1.23.0"
+  "name": "V1.24.0"
 }
