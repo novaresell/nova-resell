@@ -1155,6 +1155,12 @@ Réponds UNIQUEMENT en JSON :
         h('div', { style: 'height:10px;border-radius:9px;background:rgba(127,127,127,.25);overflow:hidden;margin-top:8px' }, h('i', { style: `display:block;height:100%;width:${Math.round(p * 100)}%;background:var(--accent,#22d3ee)` })),
         h('div', { className: 'sub', textContent: val >= st.goal ? '🎉 Objectif atteint !' : `Encore ${euro(st.goal - val)}` }))); }
     if (st?.late) v.append(h('div', { className: 'card warnbox' }, h('b', { textContent: `⚠️ ${st.late} colis à déposer depuis plus de 2 jours` }), h('div', { className: 'sub', textContent: 'Dépose-les vite en point relais : Vinted peut annuler la commande.' })));
+    const rd = state?.returnsDone || [];
+    if (rd.length) v.append(h('div', { className: 'card warnbox' }, h('b', { textContent: `Retour${rd.length > 1 ? 's' : ''} terminé${rd.length > 1 ? 's' : ''} : vérifie l’article` }),
+      ...rd.map((r) => { const k = 'ret-' + r.tid, a = actions[k];
+        const yes = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Fait ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Remettre en vente', disabled: a && a.status !== 'error' }); yes.addEventListener('click', () => doAction(k, 'returnRelist', { tid: r.tid }));
+        const no = h('button', { className: 'btn small', textContent: 'Non', disabled: !!a && a.status !== 'error' }); no.addEventListener('click', () => doAction(k, 'returnDismiss', { tid: r.tid }));
+        return h('div', { className: 'row' }, h('span', { className: 'grow', textContent: r.title }), no, yes); })));
     v.append(h('h2', { textContent: 'À expédier' }));
     if (!list.length) v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Rien à expédier 🎉' }), 'Les nouvelles ventes apparaîtront ici.'));
     else {
