@@ -219,6 +219,13 @@ button.li.conv { width: 100%; text-align: left; font: inherit; color: inherit; b
 .alert.off { background: linear-gradient(135deg, #475569, #334155); }
 .lot-c { margin: -4px 0 0; } .card.est.inlot { border-color: #22C55E; } .card.lot { border-color: #22C55E; position: sticky; top: 8px; z-index: 5; }
 .day-g { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .day-t { display: grid; gap: 2px; text-align: left; padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--soft); color: inherit; font: inherit; } .day-t b { font-size: 20px; } .day-t span { font-size: 12px; color: var(--muted); } .day-t.warn b { color: #F59E0B; }
+.alert.exp { background: linear-gradient(135deg, #B91C1C, #7F1D1D); } .set-row span.bad { color: #F87171; }
+.kpis.all .kpi span::after { content: ' · tous'; opacity: .7; }
+.chip.on { border-color: var(--cyan); color: var(--cyan); } .fb-l { cursor: pointer; } .card textarea { width: 100%; box-sizing: border-box; }
+.goal-v b { font-size: 22px; } .goal-v span { color: var(--muted); font-size: 13px; }
+.goal-bar { height: 10px; border-radius: 99px; background: var(--soft); overflow: hidden; } .goal-bar i { display: block; height: 100%; background: var(--grad); border-radius: 99px; transition: width .4s; }
+.card.goal select.sku-in { width: 100%; }
+.wn-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; max-height: 55vh; overflow: auto; } .wn-list li { display: grid; gap: 2px; } .wn-list b { font-size: 14.5px; } .wn-list span { font-size: 13px; color: var(--muted); line-height: 1.4; }
 .np-wrap { position: fixed; inset: 0; z-index: 90; background: rgba(4,8,20,.6); display: grid; place-items: end center; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
 .np { width: min(440px, 100%); } .np > b { font-size: 17px; }
 .set-h { display: flex; align-items: center; gap: 10px; } .set-h h2 { margin: 0; font-size: 20px; flex: 1; }
@@ -273,6 +280,7 @@ a.li { text-decoration: none; color: inherit; }
     </div>
     <div class="alert" id="captcha" hidden><b>🛡️ Vérification anti-robot Vinted</b>Passe la vérification sur vinted.fr depuis ton PC : les automatismes sont en pause.</div>
     <div class="alert off" id="offInfo" hidden><span></span></div>
+    <div class="alert exp" id="acctExp" hidden><b>Compte Vinted à reconnecter</b><span></span></div>
     <div class="alert pause" id="pauseInfo" hidden><b>Automatismes en pause</b>Réglages → Automatismes pour tout reprendre.</div>
   </header>
 
@@ -436,6 +444,28 @@ a.li { text-decoration: none; color: inherit; }
 
   // ---------- Synchronisation (toutes les 6 s quand l'appli est ouverte) ----------
   // ---------- fenêtre « Active les notifications » : au plus une fois tous les 3 jours, seulement si elles sont coupées ----------
+  // « Quoi de neuf » : montré une fois après chaque mise à jour de l'appli
+  const APP_VER = '1.24.1';
+  const APP_NOTES = [
+    ['Réglages en haut à droite', 'Notifications, automatismes un par un, comptes Vinted, clé API, signaler un problème.'],
+    ['Estimer un prix en brocante', 'Une photo suffit, même PC éteint : revente estimée, prix d’achat max, mode lot.'],
+    ['Répondre depuis le téléphone', 'Touche une conversation dans Messagerie, choisis une réponse rapide, envoie.'],
+    ['Tous tes comptes réunis', 'Les chiffres du haut additionnent tes comptes Vinted. Alerte si un compte se déconnecte.'],
+    ['Hors ligne', 'Sans réseau, tes photos et estimations partent toutes seules au retour du réseau.'],
+    ['Objectif du mois', 'Progression et montant à vendre par jour, réglable ici.'],
+    ['Clé API une seule fois', 'Gardée dans ton compte Nova, elle sert sur le téléphone et sur tous tes PC.'],
+  ];
+  function whatsNew(force) {
+    if (!session) return;
+    const seen = store.get('nova_seen_ver');
+    if (!force && seen === APP_VER) return;
+    if (!force && !seen) { store.set('nova_seen_ver', APP_VER); return; } // première installation : pas de nouveautés à montrer
+    const ok = h('button', { className: 'btn primary', textContent: 'C’est parti' });
+    const box = h('div', { className: 'np-wrap' }, h('div', { className: 'np card wn' }, h('b', { textContent: 'Quoi de neuf dans Nova ' + APP_VER }),
+      h('ul', { className: 'wn-list' }, ...APP_NOTES.map(([t, d]) => h('li', {}, h('b', { textContent: t }), h('span', { textContent: d })))), ok));
+    ok.addEventListener('click', () => { store.set('nova_seen_ver', APP_VER); box.remove(); });
+    document.body.append(box);
+  }
   let pushAsked = false;
   function pushPrompt() {
     if (pushAsked || !session || !state?.pushKey || !pushSupported() || (isAndroid && !standalone())) return;
@@ -469,7 +499,7 @@ a.li { text-decoration: none; color: inherit; }
       jobs = (js || []).map((j) => ({ ...j, createdAt: new Date(j.created_at).getTime() }));
       actions = {}; (acts || []).reverse().forEach((a) => { actions[a.key] = { status: a.status, error: a.error, at: a.payload?.at ?? null }; });
       if (!busy && !picking && !document.activeElement?.matches('textarea')) render(); else renderHeader();
-      pushPrompt(); if (!flushing) { flushQueue(); updQueue(); }
+      if (!document.querySelector('.np-wrap')) { whatsNew(); if (!document.querySelector('.np-wrap')) pushPrompt(); } if (!flushing) { flushQueue(); updQueue(); }
     } catch (e) { if (/session/i.test(e.message)) logout(); }
   }
   let pollT; function poll() { clearInterval(pollT); refresh(); pollT = setInterval(() => { if (!document.hidden) refresh(); }, 6000); }
@@ -554,38 +584,43 @@ a.li { text-decoration: none; color: inherit; }
   addEventListener('offline', updQueue);
   // ---------- Clé API Claude : gardée sur ce téléphone, et dans le compte Nova si l'utilisateur le veut ----------
   const KEY_PATH = () => `${session.user.id}/_secret/claude-key.json`;
+  let keyChecked = false;
   async function apiKeyGet() {
-    const local = store.get('nova_api_key'); if (local) return local;
+    const local = store.get('nova_api_key'); if (local && keyChecked) return local;
+    keyChecked = true;
     try {
       const t = await token(); if (!t) return null;
       const r = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${KEY_PATH()}?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' });
       if (!r.ok) return null;
-      const k = (await r.json())?.key; if (k) { store.set('nova_api_key', k); store.set('nova_key_cloud', true); }
-      return k || null;
-    } catch { return null; }
+      const j = await r.json(); const k = j?.key;
+      // la clé la plus récente gagne (collée sur le PC ou sur ce téléphone)
+      if (k && (!local || (Number(j.at) || 0) > (Number(store.get('nova_key_at')) || 0))) { store.set('nova_api_key', k); store.set('nova_key_at', Number(j.at) || Date.now()); return k; }
+      return local || k || null;
+    } catch { return local || null; }
   }
   async function apiKeySave(key, cloud) {
-    store.set('nova_api_key', key || null); store.set('nova_key_cloud', !!cloud);
+    store.set('nova_api_key', key || null); store.set('nova_key_at', Date.now());
     const t = await token(); if (!t) return;
     if (cloud && key) {
       const r = await fetch(`${CFG.url}/storage/v1/object/photos/${KEY_PATH()}`, { method: 'POST', headers: { apikey: CFG.key, authorization: `Bearer ${t}`, 'content-type': 'application/json', 'x-upsert': 'true' }, body: JSON.stringify({ key, at: Date.now() }) });
       if (!r.ok) throw new Error('Clé non enregistrée dans le compte (' + r.status + ')');
+      store.set('nova_key_at', Date.now());
     } else await fetch(`${CFG.url}/storage/v1/object/photos/${KEY_PATH()}`, { method: 'DELETE', headers: { apikey: CFG.key, authorization: `Bearer ${t}` } }).catch(() => {});
   }
   function keyCard() {
     const c = h('div', { className: 'card' }, h('b', { textContent: 'Clé API Claude' }));
     const has = !!store.get('nova_api_key');
-    c.append(h('div', { className: 'sub', textContent: has ? 'Clé enregistrée' + (store.get('nova_key_cloud') ? ' (aussi dans ton compte Nova)' : ' sur ce téléphone') + ' : sk-ant-…' + String(store.get('nova_api_key')).slice(-4) : 'Elle sert à estimer un prix depuis une photo, même PC éteint. Environ 1 centime par estimation.' }));
+    c.append(h('div', { className: 'sub', textContent: has ? 'Clé enregistrée dans ton compte Nova : sk-ant-…' + String(store.get('nova_api_key')).slice(-4) + '. Elle sert sur le téléphone et sur tous tes PC.' : 'Colle-la une seule fois : elle est gardée dans ton compte Nova et sert aussi sur ton PC. Environ 1 centime par estimation.' }));
     const inp = h('input', { className: 'sku-in', type: 'password', placeholder: has ? 'Nouvelle clé (facultatif)' : 'sk-ant-…', autocomplete: 'off' });
-    const cloud = h('input', { type: 'checkbox', checked: store.get('nova_key_cloud') !== false });
+    const cloud = { checked: true };
     const save = h('button', { className: 'btn primary', textContent: 'Enregistrer' });
     save.addEventListener('click', async () => {
       const k = inp.value.trim() || store.get('nova_api_key');
       if (!/^sk-ant-/.test(k || '')) return toast('La clé commence par sk-ant-');
       save.disabled = true;
-      try { await apiKeySave(k, cloud.checked); toast(cloud.checked ? 'Clé gardée dans ton compte Nova' : 'Clé gardée sur ce téléphone'); render(); } catch (e) { toast(e.message); } finally { save.disabled = false; }
+      try { await apiKeySave(k, cloud.checked); toast('Clé gardée dans ton compte Nova'); render(); } catch (e) { toast(e.message); } finally { save.disabled = false; }
     });
-    c.append(inp, h('label', { className: 'check-row' }, cloud, h('span', { textContent: 'Garder ma clé dans mon compte Nova (plus besoin de la recoller, sur le téléphone comme sur le PC)' })), save);
+    c.append(inp, save);
     if (has) { const del = h('button', { className: 'linkbtn danger', textContent: 'Effacer la clé' }); del.addEventListener('click', async () => { if (!confirm('Effacer la clé de ce téléphone et de ton compte Nova ?')) return; await apiKeySave(null, false); render(); }); c.append(del); }
     const coef = h('input', { className: 'sku-in', type: 'number', min: '1.5', max: '10', step: '0.5', value: store.get('nova_coef') || 3 });
     coef.addEventListener('change', () => { store.set('nova_coef', Math.min(10, Math.max(1.5, Number(coef.value) || 3))); toast('Enregistré'); });
@@ -628,7 +663,8 @@ Réponds UNIQUEMENT en JSON :
 {"article":"…","marque":"…","type":"…","matiere":"…","taille":"…","etat":"…","revente_min":0,"revente_max":0,"revente_probable":0,"vitesse":"rapide|moyenne|lente","demande":"forte|moyenne|faible","confiance":"haute|moyenne|faible","conseil":"une phrase","reference":"","a_verifier":["…"]}` }];
       const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-haiku-5-5', max_tokens: 600, messages: [{ role: 'user', content }] }) });
       const j = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(res.status === 401 ? 'Clé API refusée : vérifie-la dans Réglages' : (j.error?.message || 'Erreur API ' + res.status));
+      if (res.status === 401 || res.status === 403) { keyChecked = false; const k2 = await apiKeyGet(); if (k2 && k2 !== key) { estimBusy = false; return runEstim(files); } tab = 'settings'; throw new Error('Ta clé API a expiré : colle une nouvelle clé ici, elle servira aussi sur ton PC'); }
+      if (!res.ok) throw new Error(j.error?.message || 'Erreur API ' + res.status);
       const m = (j.content || []).map((b) => b.text || '').join('').match(/\{[\s\S]*\}/);
       if (!m) throw new Error('Réponse illisible, réessaie avec une photo plus nette');
       const e = { ...JSON.parse(m[0]), id: uid4().slice(0, 12), at: Date.now(), thumb };
@@ -693,11 +729,19 @@ Réponds UNIQUEMENT en JSON :
     if (L.length) { v.append(h('h2', { textContent: 'Dernières estimations' })); L.forEach((e, i) => v.append(estimCard(e, i === 0 && !estimBusy))); }
   }
   // ---------- Réglages (bouton ⚙︎ en haut) : notifications, automatismes, compte, appli ----------
+  let goalWant = null;
   const autoWant = {}; // choix faits sur le téléphone, gardés le temps que le PC les applique
   function viewSettings(v) {
     const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'photos'; render(); });
     v.append(h('div', { className: 'set-h' }, h('h2', { textContent: 'Réglages' }), back));
     v.append(pushCard());
+    if ((state?.accounts || []).length) {
+      const A = state.accounts; const agoT = (t) => !t ? 'pas encore de passage' : 'dernier passage ' + ago(t);
+      v.append(h('div', { className: 'card' }, h('b', { textContent: `Comptes Vinted reliés (${A.length})` }),
+        ...A.map((a) => h('div', { className: 'set-row' }, h('b', { textContent: '@' + a.login }), h('span', { textContent: a.expired ? 'à reconnecter' : a.active ? 'actif sur le PC' : agoT(a.last), className: a.expired ? 'bad' : '' }))),
+        ...(A.length > 1 ? [(() => { const cb = h('input', { type: 'checkbox', checked: store.get('nova_kpi_all') !== false }); cb.addEventListener('change', () => { store.set('nova_kpi_all', cb.checked); renderHeader(); }); return h('label', { className: 'check-row' }, cb, h('span', { textContent: 'Chiffres du haut : total de tous les comptes' })); })()] : []),
+        h('div', { className: 'sub', textContent: A.length > 1 ? 'Nova passe tout seul sur chaque compte, jour et nuit (réglable dans Automatismes). Ta messagerie regroupe tous les comptes.' : 'Ajoute un autre compte depuis le PC : ⚙︎ → Comptes Vinted.' })));
+    }
     v.append(keyCard());
     // automatismes : la même liste que l'onglet Automatismes du PC, un interrupteur par ligne
     const auto = h('div', { className: 'card' }, h('b', { textContent: 'Automatismes' }));
@@ -727,9 +771,30 @@ Réponds UNIQUEMENT en JSON :
     const app = h('div', { className: 'card' }, h('b', { textContent: 'Appli et PC' }),
       h('div', { className: 'set-row' }, h('b', { textContent: 'PC' }), h('span', { textContent: !state ? 'jamais vu' : fresh ? 'en ligne' : 'hors ligne depuis ' + new Date(state.updatedAt).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) })),
       h('div', { className: 'set-row' }, h('b', { textContent: 'Version de Nova sur le PC' }), h('span', { textContent: state?.version || '–' })));
+    const wnB = h('button', { className: 'linkbtn small', textContent: 'Voir les nouveautés de la ' + APP_VER }); wnB.addEventListener('click', () => whatsNew(true)); app.append(wnB);
     const rl = h('button', { className: 'btn', textContent: 'Recharger l’appli' }); rl.addEventListener('click', () => location.reload());
     app.append(rl, h('div', { className: 'sub', textContent: 'Recharge l’appli pour récupérer la dernière version, si un bouton ou un écran ne réagit pas.' }));
     v.append(app);
+    // signaler un problème : message + capture, avec la version et l'état du PC joints automatiquement
+    const fbKind = { v: 'bug' };
+    const seg = h('div', { className: 'chips' }, ...[['bug', 'Un problème'], ['idee', 'Une idée'], ['avis', 'Un avis']].map(([k, l]) => { const b = h('button', { type: 'button', className: 'chip' + (k === 'bug' ? ' on' : ''), textContent: l }); b.addEventListener('click', () => { fbKind.v = k; seg.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === b)); }); return b; }));
+    const fbTa = h('textarea', { rows: 3, placeholder: 'Ce qui se passe, ou ce que tu aimerais…' });
+    const fbFile = h('input', { type: 'file', accept: 'image/*', hidden: true });
+    const fbLbl = h('span', { textContent: 'Joindre une capture d’écran' });
+    fbFile.addEventListener('change', () => { fbLbl.textContent = fbFile.files[0] ? 'Capture jointe ✓' : 'Joindre une capture d’écran'; });
+    const fbSend = h('button', { className: 'btn primary', textContent: 'Envoyer' });
+    fbSend.addEventListener('click', async () => {
+      const text = fbTa.value.trim(); if (text.length < 3) return toast('Écris ton message');
+      fbSend.disabled = true; fbSend.textContent = 'Envoi…';
+      try {
+        let rep = `Téléphone : ${navigator.userAgent.slice(0, 140)}\nPC : ${state ? 'v' + (state.version || '?') + ', vu ' + ago(state.updatedAt || 0) : 'jamais vu'}\nPause : ${state?.paused ? 'oui' : 'non'} · Comptes : ${(state?.accounts || []).map((a) => '@' + a.login + (a.expired ? ' (déconnecté)' : '')).join(', ')}`;
+        if (fbFile.files[0]) { const { blob } = await shrink(fbFile.files[0], 1400, 0.82); const path = `${session.user.id}/_feedback/${Date.now()}.jpg`; await upload(path, blob); rep = `[capture] ${path}\n` + rep; }
+        await rest('POST', 'feedback', { kind: fbKind.v, message: text.slice(0, 3900), version: 'tel-' + (state?.version || '?'), email: session?.user?.email || null, report: rep.slice(0, 9000) }, 'return=minimal');
+        fbTa.value = ''; fbFile.value = ''; fbLbl.textContent = 'Joindre une capture d’écran'; toast('Merci ! Message envoyé');
+      } catch (e) { toast('Envoi impossible : ' + e.message); }
+      finally { fbSend.disabled = false; fbSend.textContent = 'Envoyer'; }
+    });
+    v.append(h('div', { className: 'card' }, h('b', { textContent: 'Signaler un problème' }), h('div', { className: 'sub', textContent: 'Ton message arrive directement à l’équipe Nova, avec les infos utiles (version, état du PC).' }), seg, fbTa, h('label', { className: 'linkbtn small fb-l' }, fbFile, fbLbl), fbSend));
     const out = h('button', { className: 'linkbtn', textContent: 'Se déconnecter' }); out.addEventListener('click', logout);
     v.append(h('div', { className: 'card' }, h('b', { textContent: 'Compte Nova' }), h('div', { className: 'sub', textContent: session?.user?.email || '' }), out));
   }
@@ -753,10 +818,13 @@ Réponds UNIQUEMENT en JSON :
     const fresh = s && Date.now() - (s.updatedAt || 0) < 6 * 60000;
     $('#pcStatus').className = 'pc ' + (s ? (fresh ? 'on' : 'off') : '');
     $('#pcText').textContent = !s ? 'PC jamais vu' : fresh ? 'PC en ligne' : 'PC hors ligne';
-    $('#kShip').textContent = s?.stats?.toShip ?? '–';
-    $('#kDrafts').textContent = s?.stats?.drafts ?? '–';
-    $('#kOnline').textContent = s?.stats?.online ?? '–';
-    $('#kMonth').textContent = s?.stats ? euro(s.stats.month) : '–';
+    const allK = s?.statsAll && store.get('nova_kpi_all') !== false; const K = allK ? s.statsAll : s?.stats;
+    $('#kShip').textContent = K?.toShip ?? '–';
+    $('#kDrafts').textContent = K?.drafts ?? '–';
+    $('#kOnline').textContent = K?.online ?? '–';
+    $('#kMonth').textContent = K ? euro(K.month) : '–';
+    document.querySelector('.kpis')?.classList.toggle('all', !!allK);
+    const ex = (s?.accounts || []).filter((a) => a.expired); $('#acctExp').hidden = !ex.length; if (ex.length) $('#acctExp').querySelector('span').textContent = ex.map((a) => '@' + a.login).join(', ') + ' déconnecté : reconnecte-le depuis le PC (⚙︎ → Comptes Vinted).';
     $('#captcha').hidden = !s?.captcha;
     $('#pauseInfo').hidden = !s?.paused;
     const badge = (id, n) => { const t = $(id); t.querySelector('.n')?.remove(); if (n) t.append(h('span', { className: 'n', textContent: n })); };
@@ -832,6 +900,32 @@ Réponds UNIQUEMENT en JSON :
         tile(String(state.stats?.toShip ?? 0), state.stats?.late ? `colis · ${state.stats.late} en retard` : 'colis à déposer', go('ventes'), true),
         tile(String((state.aiQueue || []).length), 'offres à valider', go('messages', 'queue'), true),
         tile(String(unread), 'messages non lus', go('messages', 'inbox'), true))));
+    }
+    // objectif du mois : progression, reste à faire par jour, réglable ici
+    if (state?.stats) {
+      const st = state.stats, allK = state.statsAll && store.get('nova_kpi_all') !== false;
+      const gw = goalWant && Date.now() - goalWant.t < 120000 ? goalWant : null;
+      const goal = gw ? gw.goal : (st.goal || 0), type = gw ? gw.type : (st.goalType || 'ca');
+      const val = type === 'profit' ? (st.monthProfit || 0) : (allK ? state.statsAll.month : (st.month || 0));
+      const d = new Date(), left = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate() + 1;
+      const card = h('div', { className: 'card goal' });
+      const edit = h('button', { className: 'linkbtn small', textContent: goal ? 'Modifier' : 'Fixer un objectif' });
+      if (goal) {
+        const pc = Math.min(100, Math.round(val / goal * 100));
+        card.append(h('div', { className: 'row' }, h('b', { textContent: 'Objectif du mois' }), h('span', { className: 'grow' }), edit),
+          h('div', { className: 'goal-v' }, h('b', { textContent: euro(val) }), h('span', { textContent: ` / ${euro(goal)}${type === 'profit' ? ' de bénéfice' : ''}${allK && type !== 'profit' ? ' · tous les comptes' : ''}` })),
+          h('div', { className: 'goal-bar' }, h('i', { style: `width:${pc}%` })),
+          h('div', { className: 'sub' + (val >= goal ? ' ok' : ''), textContent: val >= goal ? `Objectif atteint (${pc} %) : bravo !` : `${pc} % · encore ${euro(goal - val)}, soit environ ${euro(Math.ceil((goal - val) / left))} par jour sur les ${left} jour${left > 1 ? 's' : ''} restants` }));
+      } else card.append(h('div', { className: 'row' }, h('b', { textContent: 'Objectif du mois' }), h('span', { className: 'grow' }), edit), h('div', { className: 'sub', textContent: 'Fixe un montant à atteindre ce mois-ci : Nova te montre ta progression et ce qu’il reste à vendre chaque jour.' }));
+      edit.addEventListener('click', () => {
+        const inp = h('input', { className: 'sku-in', type: 'number', inputmode: 'numeric', min: 0, step: 10, value: goal || '', placeholder: 'Montant en €' });
+        const sel = h('select', { className: 'sku-in' }, h('option', { value: 'ca', textContent: 'Chiffre d’affaires', selected: type === 'ca' }), h('option', { value: 'profit', textContent: 'Bénéfice', selected: type === 'profit' }));
+        const ok = h('button', { className: 'btn primary small', textContent: 'Enregistrer' });
+        ok.addEventListener('click', () => { const g = Math.max(0, Math.round(Number(inp.value) || 0)); goalWant = { goal: g, type: sel.value, t: Date.now() }; doAction('goal', 'setGoal', { goal: g, type: sel.value }); });
+        card.replaceChildren(h('b', { textContent: 'Objectif du mois' }), inp, sel, ok);
+        inp.focus();
+      });
+      v.append(card);
     }
     const est = h('button', { className: 'btn est-go', type: 'button', textContent: 'Estimer un prix (brocante)' }); est.addEventListener('click', () => { tab = 'estim'; render(); scrollTo(0, 0); });
     v.append(est);
