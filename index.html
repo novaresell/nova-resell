@@ -226,6 +226,7 @@ button.li.conv { width: 100%; text-align: left; font: inherit; color: inherit; b
 .goal-bar { height: 10px; border-radius: 99px; background: var(--soft); overflow: hidden; } .goal-bar i { display: block; height: 100%; background: var(--grad); border-radius: 99px; transition: width .4s; }
 .card.goal select.sku-in { width: 100%; }
 .wn-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; max-height: 55vh; overflow: auto; } .wn-list li { display: grid; gap: 2px; } .wn-list b { font-size: 14.5px; } .wn-list span { font-size: 13px; color: var(--muted); line-height: 1.4; }
+.prep-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); } .prep-row input { width: 22px; height: 22px; flex: none; } .prep-row > span { display: grid; gap: 2px; min-width: 0; } .prep-row small { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .prep-row.done b { text-decoration: line-through; opacity: .6; }
 .np-wrap { position: fixed; inset: 0; z-index: 90; background: rgba(4,8,20,.6); display: grid; place-items: end center; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
 .np { width: min(440px, 100%); } .np > b { font-size: 17px; }
 .set-h { display: flex; align-items: center; gap: 10px; } .set-h h2 { margin: 0; font-size: 20px; flex: 1; }
@@ -1017,7 +1018,7 @@ Réponds UNIQUEMENT en JSON :
       if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: all.length ? 'Rien ici' : 'Pas encore de conversation' }), all.length ? 'Change de filtre.' : 'Ta messagerie apparaîtra ici quand le PC l’aura lue.'));
       return v.append(h('div', { className: 'list' }, list.map((c) => {
         const row = h('button', { type: 'button', className: 'li conv' + (c.unread ? ' unread' : '') }, c.photo ? h('img', { src: c.photo, alt: '', loading: 'lazy' }) : h('img', { alt: '' }),
-          h('div', { className: 'meta' }, h('div', { className: 't' }, (c.unread ? '● ' : '') + c.who, c.login ? h('span', { className: 'acct', textContent: ' @' + c.login }) : null), h('div', { className: 's', textContent: c.text }),
+          h('div', { className: 'meta' }, h('div', { className: 't' }, (c.unread ? '● ' : '') + c.who, c.login ? h('span', { className: 'acct', textContent: ' @' + c.login }) : null, (state?.badBuyers || []).includes(String(c.who || '').toLowerCase()) ? h('span', { className: 'pill err', textContent: ' acheteur à risque' }) : null), h('div', { className: 's', textContent: c.text }),
             c.tags?.length ? h('div', { className: 's' }, c.tags.map((t) => h('span', { className: 'pill ' + (/Répondu|vendu|Livré/.test(t) ? 'ok' : /expédier/.test(t) ? 'warn' : 'run'), textContent: t }))) : null, h('div', { className: 's', textContent: ago(c.at) })));
         row.addEventListener('click', () => { openConv = openConv === c.id ? null : c.id; render(); });
         if (openConv !== c.id) return row;
@@ -1158,6 +1159,11 @@ Réponds UNIQUEMENT en JSON :
     if (!list.length) v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Rien à expédier 🎉' }), 'Les nouvelles ventes apparaîtront ici.'));
     else {
       [...list.map((o) => o.label), state?.labelsAll].filter(Boolean).forEach((p) => getPdf(p).catch(() => {})); // préchargement : impression instantanée
+      // préparation : coche chaque colis prêt (gardé sur ce téléphone), les colis à préparer d'abord, avec leur emplacement
+      const prep = store.get('nova_prep') || {}; const nPrep = list.filter((o) => prep[o.tid]).length;
+      v.append(h('div', { className: 'card prep' }, h('div', { className: 'row' }, h('b', { textContent: `Préparation : ${nPrep}/${list.length} colis prêts` }), h('span', { className: 'grow' })), h('div', { className: 'goal-bar' }, h('i', { style: `width:${list.length ? Math.round(nPrep / list.length * 100) : 0}%` })),
+        ...[...list].sort((a, b) => Number(!!prep[a.tid]) - Number(!!prep[b.tid])).map((o) => { const cb = h('input', { type: 'checkbox', checked: !!prep[o.tid] }); cb.addEventListener('change', () => { const p2 = store.get('nova_prep') || {}; if (cb.checked) p2[o.tid] = Date.now(); else delete p2[o.tid]; store.set('nova_prep', p2); render(); });
+          return h('label', { className: 'prep-row' + (prep[o.tid] ? ' done' : '') }, cb, h('span', { className: 'grow' }, h('b', { textContent: (o.skus || []).join(' + ') || o.title.slice(0, 30) }), h('small', { textContent: (o.place ? 'Rangé : ' + o.place + ' · ' : '') + o.title })), o.days >= 2 ? h('span', { className: 'pill err', textContent: o.days + ' j' }) : null); })));
       v.append(h('div', { className: 'list' }, list.map((o) => h('div', { className: 'li' }, thumb(o.photo),
         h('div', { className: 'meta' }, h('div', { className: 't', textContent: o.title }), h('div', { className: 's' }, skuChips(o), ' ' + euro(o.price), o.days >= 2 ? h('span', { className: 'pill err', textContent: ` vendu il y a ${o.days} j` }) : null), o.label ? null : h('div', { className: 's', textContent: 'Bordereau en préparation sur le PC…' })),
         o.label ? printBtn(o.label, `Bordereau ${(o.skus || []).join('+') || 'Vinted'}.pdf`, '🖨️') : null))));
