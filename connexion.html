@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connexion à l'extension · Nova Resell</title>
+<link rel="icon" href="icon-192.png">
+<script src="config.js"></script>
+<style>
+:root { --bg: #070B18; --card: #0E152A; --line: #1D2847; --text: #E9EEFB; --muted: #94A0BE; --accent: #22D3EE; --grad: linear-gradient(135deg, #22D3EE, #6366F1); --err: #F87171; --ok: #22C55E; color-scheme: dark; }
+@media (prefers-color-scheme: light) { :root { --bg: #F4F6FB; --card: #FFFFFF; --line: #E2E7F1; --text: #0E1530; --muted: #5A6685; --accent: #0EA5E9; color-scheme: light; } }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font: 15px/1.5 Inter, system-ui, -apple-system, Segoe UI, sans-serif; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-left)); }
+main { width: min(420px, 100%); display: grid; gap: 18px; }
+.brand { display: flex; flex-direction: column; align-items: center; gap: 6px; } .brand svg { width: 52px; height: 52px; border-radius: 14px; } .brand b { font-size: 20px; } .brand small { color: var(--muted); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: grid; gap: 12px; }
+h1 { margin: 0; font-size: 22px; text-align: center; } p { margin: 0; color: var(--muted); text-align: center; }
+label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--text); font: inherit; }
+input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pw { position: relative; } .pw button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 13px; }
+.btn { width: 100%; padding: 13px; border: 0; border-radius: 12px; font: 700 15px/1 inherit; font-family: inherit; cursor: pointer; background: var(--grad); color: #fff; }
+.btn:disabled { opacity: .6; } .link { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; padding: 4px; }
+.row { display: flex; justify-content: space-between; align-items: center; } .center { text-align: center; }
+.msg { min-height: 20px; text-align: center; font-size: 13.5px; } .msg.err { color: var(--err); } .msg.ok { color: var(--ok); }
+footer { text-align: center; font-size: 12.5px; color: var(--muted); } footer a { color: var(--muted); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="34" fill="#0B1226"/><ellipse cx="64" cy="64" rx="46" ry="20" fill="none" stroke="#22D3EE" stroke-width="7" transform="rotate(-28 64 64)"/><path d="M64 34c2 14 8 21 22 25-14 4-20 11-22 26-2-15-8-22-22-26 14-4 20-11 22-25z" fill="#fff"/><circle cx="104" cy="44" r="6" fill="#22D3EE"/></svg><b>Nova Resell</b><small>novaresell.github.io</small></div>
+
+  <!-- compte reconnu : il ne reste qu'à confirmer -->
+  <form class="card" id="known" hidden autocomplete="on">
+    <h1>Connecter l'extension ?</h1>
+    <p>L'extension Nova de ce navigateur va être connectée au compte <b id="kMail"></b>. Vérifie que c'est bien le tien.</p>
+    <input type="email" id="kUser" name="email" autocomplete="username" hidden>
+    <label>Mot de passe <span class="pw"><input type="password" id="kPass" name="password" autocomplete="current-password" required><button type="button" data-eye="kPass">Afficher</button></span></label>
+    <button class="btn" id="kGo" type="submit">Connecter l'extension</button>
+    <button class="link center" id="kOther" type="button">Ce n'est pas mon compte</button>
+    <div class="msg" id="kMsg" role="alert"></div>
+  </form>
+
+  <!-- connexion / inscription -->
+  <form class="card" id="login" hidden autocomplete="on">
+    <h1 id="lTitle">Connexion à l'extension</h1>
+    <p id="lSub">Utilise ton compte Nova (pas ton compte Vinted).</p>
+    <label>E-mail <input type="email" id="lMail" name="email" autocomplete="username" placeholder="ex. marie@gmail.com" required></label>
+    <label>Mot de passe <span class="pw"><input type="password" id="lPass" name="password" autocomplete="current-password" required minlength="6"><button type="button" data-eye="lPass">Afficher</button></span></label>
+    <label id="lPass2Wrap" hidden>Confirme le mot de passe <input type="password" id="lPass2" autocomplete="new-password" minlength="6"></label>
+    <div class="row"><span></span><button class="link" id="lForgot" type="button">Mot de passe oublié ?</button></div>
+    <button class="btn" id="lGo" type="submit">Se connecter</button>
+    <p id="lSwitchP">Pas encore de compte ? <button class="link" id="lSwitch" type="button">S'inscrire gratuitement</button></p>
+    <div class="msg" id="lMsg" role="alert"></div>
+  </form>
+
+  <!-- terminé -->
+  <div class="card" id="done" hidden>
+    <h1>C'est fait</h1>
+    <p id="dText">L'extension est connectée à ton compte Nova. Tu peux fermer cet onglet et revenir sur Nova.</p>
+  </div>
+
+  <!-- pas d'extension détectée -->
+  <div class="card" id="noext" hidden>
+    <h1>Installe d'abord l'extension</h1>
+    <p>Nova n'a pas été trouvée dans ce navigateur. Installe-la (gratuit), puis clique « Se connecter via le site » dans Nova.</p>
+    <a class="btn center" style="text-decoration:none" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">Ajouter Nova à mon navigateur</a>
+  </div>
+
+  <footer>contact.novaresell@gmail.com · <a href="conditions.html">Conditions</a> · <a href="confidentialite.html">Confidentialité</a></footer>
+</main>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const CFG = window.NOVA_CONFIG || {};
+  const q = new URLSearchParams(location.search);
+  const EXT = [q.get('ext') && /^[a-p]{32}$/.test(q.get('ext')) ? q.get('ext') : null, 'ahnbljlkhdpenpchhamlgppappcknbcj'].filter(Boolean);
+  const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } } };
+  const mask = (m) => { const [u, d] = String(m).split('@'); return u ? `${u.slice(0, 2)}•••@${d || ''}` : m; };
+  let extId = null, mode = 'in';
+  document.querySelectorAll('[data-eye]').forEach((b) => b.addEventListener('click', () => { const i = $(b.dataset.eye); i.type = i.type === 'password' ? 'text' : 'password'; b.textContent = i.type === 'password' ? 'Afficher' : 'Masquer'; }));
+  // l'extension est-elle installée ? (et déjà connectée ?)
+  function ping(id) { return new Promise((ok) => { try { chrome.runtime.sendMessage(id, { va: 'novaPing' }, (r) => { void chrome.runtime.lastError; ok(r?.ok ? { id, ...r } : null); }); } catch { ok(null); } setTimeout(() => ok(null), 1500); }); }
+  async function findExt() { if (!window.chrome?.runtime?.sendMessage) return null; for (const id of EXT) { const r = await ping(id); if (r) return r; } return null; }
+  async function auth(path, body) {
+    const r = await fetch(`${CFG.url}/auth/v1/${path}`, { method: 'POST', headers: { apikey: CFG.key, 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(/invalid login/i.test(j.error_description || j.msg || '') ? 'E-mail ou mot de passe incorrect' : /already registered/i.test(j.msg || '') ? 'Ce compte existe déjà : connecte-toi' : (j.error_description || j.msg || 'Erreur ' + r.status));
+    return j;
+  }
+  function sendToExt(j) {
+    const session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Math.floor(Date.now() / 1000) + (j.expires_in || 3600), user: { id: j.user?.id, email: j.user?.email } };
+    return new Promise((ok, ko) => { chrome.runtime.sendMessage(extId, { va: 'novaSession', session }, (r) => { const e = chrome.runtime.lastError; if (e || !r?.ok) ko(new Error(r?.error || 'L’extension n’a pas répondu : recharge-la puis réessaie')); else ok(); }); });
+  }
+  async function connect(email, password, msgEl, btn) {
+    msgEl.className = 'msg'; msgEl.textContent = ''; btn.disabled = true;
+    try {
+      const j = await auth('token?grant_type=password', { email, password }); // une session neuve, rien que pour l'extension
+      await sendToExt(j);
+      store.set('nova_last_email', email);
+      $('known').hidden = $('login').hidden = true; $('done').hidden = false;
+      setTimeout(() => { try { window.close(); } catch { /* */ } }, 2500);
+    } catch (e) { msgEl.className = 'msg err'; msgEl.textContent = e.message; }
+    finally { btn.disabled = false; }
+  }
+  function showLogin(m = 'in', email = '') {
+    mode = m; $('known').hidden = true; $('login').hidden = false;
+    $('lTitle').textContent = m === 'up' ? 'Créer ton compte Nova' : 'Connexion à l\'extension';
+    $('lSub').textContent = m === 'up' ? 'Gratuit, sans abonnement. Il relie ton PC, tes navigateurs et ton téléphone.' : 'Utilise ton compte Nova (pas ton compte Vinted).';
+    $('lGo').textContent = m === 'up' ? 'Créer mon compte' : 'Se connecter';
+    $('lPass2Wrap').hidden = m !== 'up'; $('lForgot').hidden = m === 'up';
+    $('lPass').autocomplete = m === 'up' ? 'new-password' : 'current-password';
+    $('lSwitchP').firstChild.textContent = m === 'up' ? 'Déjà un compte ? ' : 'Pas encore de compte ? ';
+    $('lSwitch').textContent = m === 'up' ? 'Se connecter' : 'S\'inscrire gratuitement';
+    if (email) $('lMail').value = email;
+  }
+  $('lSwitch').addEventListener('click', () => showLogin(mode === 'up' ? 'in' : 'up', $('lMail').value));
+  $('kOther').addEventListener('click', () => { store.set('nova_last_email', null); showLogin('in'); });
+  $('lForgot').addEventListener('click', async () => {
+    const email = $('lMail').value.trim(); const m = $('lMsg');
+    if (!/^\S+@\S+\.\S+$/.test(email)) { m.className = 'msg err'; m.textContent = 'Entre ton e-mail d’abord'; return; }
+    try { await fetch(`${CFG.url}/auth/v1/recover?redirect_to=${encodeURIComponent(location.origin + location.pathname.replace(/[^/]*$/, ''))}`, { method: 'POST', headers: { apikey: CFG.key, 'content-type': 'application/json' }, body: JSON.stringify({ email }) }); m.className = 'msg ok'; m.textContent = 'E-mail envoyé : clique sur le lien pour choisir un nouveau mot de passe.'; } catch { m.className = 'msg err'; m.textContent = 'Envoi impossible, réessaie'; }
+  });
+  $('known').addEventListener('submit', (e) => { e.preventDefault(); connect($('kUser').value, $('kPass').value, $('kMsg'), $('kGo')); });
+  $('login').addEventListener('submit', async (e) => {
+    e.preventDefault(); const email = $('lMail').value.trim(), pass = $('lPass').value, m = $('lMsg');
+    if (mode === 'up') {
+      if (pass !== $('lPass2').value) { m.className = 'msg err'; m.textContent = 'Les deux mots de passe ne sont pas identiques'; return; }
+      try { const j = await auth('signup', { email, password: pass }); if (!j.access_token) { m.className = 'msg ok'; m.textContent = 'Compte créé ! Clique sur le lien reçu par e-mail, puis reviens te connecter ici.'; showLogin('in', email); return; } await sendToExt(j); store.set('nova_last_email', email); $('login').hidden = true; $('done').hidden = false; } catch (er) { m.className = 'msg err'; m.textContent = er.message; }
+      return;
+    }
+    connect(email, pass, m, $('lGo'));
+  });
+  (async () => {
+    const ext = await findExt();
+    if (!ext) { $('noext').hidden = false; showLogin('in', store.get('nova_last_email') || ''); $('login').hidden = true; return; }
+    extId = ext.id;
+    if (ext.email) { $('dText').textContent = `L'extension est déjà connectée au compte ${mask(ext.email)}. Tu peux fermer cet onglet.`; $('done').hidden = false; return; }
+    // compte reconnu : celui de l'appli téléphone sur ce navigateur, ou le dernier utilisé ici / dans l'extension
+    const known = store.get('nova_session')?.user?.email || ext.last || store.get('nova_last_email');
+    if (known) { $('kMail').textContent = mask(known); $('kUser').value = known; $('known').hidden = false; $('kPass').focus(); }
+    else showLogin(q.get('mode') === 'up' ? 'up' : 'in');
+  })();
+})();
+</script>
+</body>
+</html>

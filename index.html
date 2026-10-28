@@ -227,6 +227,8 @@ button.li.conv { width: 100%; text-align: left; font: inherit; color: inherit; b
 .card.goal select.sku-in { width: 100%; }
 .wn-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; max-height: 55vh; overflow: auto; } .wn-list li { display: grid; gap: 2px; } .wn-list b { font-size: 14.5px; } .wn-list span { font-size: 13px; color: var(--muted); line-height: 1.4; }
 .prep-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); } .prep-row input { width: 22px; height: 22px; flex: none; } .prep-row > span { display: grid; gap: 2px; min-width: 0; } .prep-row small { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .prep-row.done b { text-decoration: line-through; opacity: .6; }
+.au-st { color: #22C55E !important; } .au-rr { flex: none; width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 16px; }
+.qr-desk { display: flex; gap: 12px; align-items: center; text-align: left; padding: 10px; border: 1px solid var(--line); border-radius: 14px; margin: 6px 0 4px; } .qr-desk .qr { width: 96px; height: 96px; flex: none; background: #fff; border-radius: 8px; padding: 3px; } .qr-desk .qr svg { width: 100%; height: 100%; display: block; } .qr-desk b { display: block; } .qr-desk span { display: block; font-size: 12.5px; color: var(--muted); margin: 2px 0 4px; }
 .np-wrap { position: fixed; inset: 0; z-index: 90; background: rgba(4,8,20,.6); display: grid; place-items: end center; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
 .np { width: min(440px, 100%); } .np > b { font-size: 17px; }
 .set-h { display: flex; align-items: center; gap: 10px; } .set-h h2 { margin: 0; font-size: 20px; flex: 1; }
@@ -248,11 +250,30 @@ a.li { text-decoration: none; color: inherit; }
 <script>(function(){try{var t=localStorage.getItem('novaPhoneTheme');if(t&&t!=='auto')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
+<div class="ext-bar" id="extBar" hidden><span><b>Sur ordinateur, Nova s'utilise dans l'extension</b> (gratuite) pour Chrome ou Brave.</span><a class="eb-btn" id="extBarBtn" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">Ajouter l'extension</a><button class="eb-x" id="extBarX" type="button" aria-label="Fermer">×</button></div>
+<style>.ext-bar{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;background:#1e3a8a;color:#fff;font-size:13.5px}.ext-bar span{flex:1;min-width:200px}.eb-btn{background:#fff;color:#1e3a8a;border-radius:10px;padding:7px 12px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font-size:13px}.eb-x{background:none;border:0;color:#fff;font-size:20px;cursor:pointer}</style>
+<script>(function(){
+  if (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) return;
+  var bar=document.getElementById('extBar'), btn=document.getElementById('extBarBtn');
+  try{ if(localStorage.getItem('extBarOff')) return; }catch(e){}
+  bar.hidden=false;
+  document.getElementById('extBarX').onclick=function(){ bar.hidden=true; try{localStorage.setItem('extBarOff','1')}catch(e){} };
+  var ID='ahnbljlkhdpenpchhamlgppappcknbcj';
+  if (window.chrome && chrome.runtime && chrome.runtime.sendMessage) {
+    try { chrome.runtime.sendMessage(ID,{va:'novaPing'},function(r){ if(chrome.runtime.lastError||!r||!r.ok) return;
+      bar.querySelector('span').innerHTML='<b>Nova est installé dans ce navigateur.</b> Ouvre-le pour tout gérer depuis ton PC.';
+      var b=document.createElement('button'); b.className='eb-btn'; b.type='button'; b.textContent='Ouvrir Nova';
+      b.onclick=function(){ chrome.runtime.sendMessage(ID,{va:'novaOpen'},function(){}); }; btn.replaceWith(b); }); } catch(e){}
+  }
+})();</script>
+
 <div class="login" id="login" hidden>
   <div class="box">
     <svg class="logo" viewBox="0 0 128 128" aria-hidden="true"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#818CF8"/></linearGradient></defs><rect width="128" height="128" rx="34" fill="#0B1226"/><ellipse cx="64" cy="64" rx="46" ry="20" fill="none" stroke="url(#lg2)" stroke-width="7" transform="rotate(-28 64 64)"/><path d="M64 34c2 14 8 21 22 25-14 4-20 11-22 26-2-15-8-22-22-26 14-4 20-11 22-25z" fill="#fff"/><circle cx="104" cy="44" r="6" fill="#22D3EE"/></svg>
     <h1>Nova <span>Resell</span></h1>
+    <p style="margin:2px 0 6px"><span style="display:inline-block;background:#16a34a;color:#fff;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:800;letter-spacing:.04em">GRATUIT</span> <small>pour le moment, sans carte bancaire</small></p>
     <p id="loginSub">Connecte-toi avec ton compte Nova : le même que dans l'extension sur ton PC.</p>
+    <div class="qr-desk" id="qrDesk" hidden><div class="qr" data-qr="https://novaresell.github.io/nova-resell/"></div><div><b>Sur ordinateur ?</b><span>Scanne ce code avec ton téléphone pour installer l'appli, et ajoute l'extension à ton navigateur.</span><a class="linkbtn small" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">Ajouter l'extension Nova</a></div></div>
     <label class="field">E-mail<input id="lMail" type="email" autocomplete="username" inputmode="email"></label>
     <label class="field" id="lPassWrap">Mot de passe<input id="lPass" type="password" autocomplete="current-password"></label>
     <label class="field" id="lPass2Wrap" hidden>Confirme le mot de passe<input id="lPass2" type="password" autocomplete="new-password"></label>
@@ -435,7 +456,8 @@ a.li { text-decoration: none; color: inherit; }
       for (const s of staged.slice()) {
         const folder = `${session.user.id}/${uid4()}`; const paths = []; let thumb = null;
         for (let i = 0; i < s.files.length; i++) { const { blob, thumb: t } = await shrink(s.files[i]); if (!thumb) thumb = t; const p = `${folder}/${i + 1}.jpg`; await upload(p, blob); paths.push(p); }
-        await rest('POST', 'jobs', { photos: paths, thumb, status: 'new', ...(s.sku ? { sku: s.sku } : {}) });
+        const tgt = (state?.devices || []).length > 1 ? store.get('nova_job_dev') : null;
+        await rest('POST', 'jobs', { photos: paths, thumb, status: 'new', ...(s.sku ? { sku: s.sku } : {}), ...(tgt ? { title: '@dev:' + tgt } : {}) });
         staged.shift();
       }
       toast('Envoyé au PC ✓'); await refresh();
@@ -448,6 +470,8 @@ a.li { text-decoration: none; color: inherit; }
   // « Quoi de neuf » : montré une fois après chaque mise à jour de l'appli
   const APP_VER = '1.24.1';
   const APP_NOTES = [
+    ['Tous tes navigateurs', 'Chrome et Brave reliés au même compte Nova apparaissent ensemble ; choisis sur quel navigateur créer les annonces.'],
+    ['Relancer un automatisme', 'Chaque automatisme montre sa dernière action, avec un bouton ↻ pour le relancer.'],
     ['Réglages en haut à droite', 'Notifications, automatismes un par un, comptes Vinted, clé API, signaler un problème.'],
     ['Estimer un prix en brocante', 'Une photo suffit, même PC éteint : revente estimée, prix d’achat max, mode lot.'],
     ['Répondre depuis le téléphone', 'Touche une conversation dans Messagerie, choisis une réponse rapide, envoie.'],
@@ -488,6 +512,42 @@ a.li { text-decoration: none; color: inherit; }
     go.addEventListener('click', async () => { close(); if (denied) return; try { await enablePush(); toast('Notifications activées'); } catch (e) { toast('Impossible : ' + e.message); } });
     document.body.append(box);
   }
+  // ---------- plusieurs navigateurs reliés (Chrome, Brave…) : un état par navigateur, réunis ici ----------
+  let devStates = [], devAt = 0;
+  async function loadDevices() {
+    if (Date.now() - devAt < 30000) return devStates; devAt = Date.now();
+    try {
+      const t = await token(); if (!t) return devStates;
+      const r = await fetch(`${CFG.url}/storage/v1/object/list/photos`, { method: 'POST', headers: { apikey: CFG.key, authorization: `Bearer ${t}`, 'content-type': 'application/json' }, body: JSON.stringify({ prefix: `${session.user.id}/_state/`, limit: 20 }) });
+      const files = r.ok ? (await r.json()).filter((f) => /\.json$/.test(f.name)) : [];
+      const out = [];
+      for (const f of files) {
+        const x = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_state/${f.name}?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' }).then((y) => (y.ok ? y.json() : null)).catch(() => null);
+        if (x?.data && x.device?.id && Date.now() - (x.updatedAt || 0) < 14 * 864e5) out.push(x);
+      }
+      devStates = out.sort((a, b) => b.updatedAt - a.updatedAt);
+    } catch { /* on garde la dernière liste */ }
+    return devStates;
+  }
+  const ARR = ['drafts', 'aiQueue', 'questions', 'reviews', 'inbox', 'sales', 'returns', 'transit', 'repostItems', 'favs', 'advice', 'accounts', 'returnsDone', 'soldMini'];
+  function mergeStates(list, fallback) {
+    if (!list.length) return fallback;
+    const main = { ...list[0].data, updatedAt: list[0].updatedAt };
+    if (list.length === 1) { main.devices = [{ ...list[0].device, at: list[0].updatedAt }]; main._dev = list[0].device.id; tagDev(main, list[0].device); return main; }
+    for (const k of ARR) main[k] = list.flatMap((d) => (d.data[k] || []).map((x) => (typeof x === 'object' && !Array.isArray(x) ? { ...x, _dev: d.device.id, _devName: d.device.browser } : x)));
+    const sum = (k) => list.reduce((a, d) => a + (Number(d.data.stats?.[k]) || 0), 0);
+    main.stats = { ...main.stats, toShip: sum('toShip'), drafts: sum('drafts'), online: sum('online'), month: sum('month'), late: sum('late') };
+    main.today = { sales: list.reduce((a, d) => a + (d.data.today?.sales || 0), 0), ca: list.reduce((a, d) => a + (d.data.today?.ca || 0), 0) };
+    main.statsAll = null; // les chiffres du haut sont déjà le total des navigateurs
+    main.estimChecks = Object.assign({}, ...list.map((d) => d.data.estimChecks || {}));
+    main.badBuyers = [...new Set(list.flatMap((d) => d.data.badBuyers || []))];
+    main.devices = list.map((d) => ({ ...d.device, at: d.updatedAt, paused: !!d.data.paused, version: d.data.version }));
+    main.updatedAt = Math.max(...list.map((d) => d.updatedAt));
+    main.paused = list.every((d) => d.data.paused);
+    main._dev = list[0].device.id;
+    return main;
+  }
+  function tagDev(st, dev) { for (const k of ARR) if (Array.isArray(st[k])) st[k] = st[k].map((x) => (typeof x === 'object' && x ? { ...x, _dev: dev.id, _devName: dev.browser } : x)); }
   async function refresh() {
     if (!session) return;
     try {
@@ -497,6 +557,7 @@ a.li { text-decoration: none; color: inherit; }
         rest('GET', 'actions?select=key,status,error,payload&order=created_at.desc&limit=50'),
       ]);
       state = st?.[0] ? { ...st[0].data, updatedAt: new Date(st[0].updated_at).getTime() } : null;
+      state = mergeStates(await loadDevices(), state);
       jobs = (js || []).map((j) => ({ ...j, createdAt: new Date(j.created_at).getTime() }));
       actions = {}; (acts || []).reverse().forEach((a) => { actions[a.key] = { status: a.status, error: a.error, at: a.payload?.at ?? null }; });
       if (!busy && !picking && !document.activeElement?.matches('textarea')) render(); else renderHeader();
@@ -506,10 +567,16 @@ a.li { text-decoration: none; color: inherit; }
   let pollT; function poll() { clearInterval(pollT); refresh(); pollT = setInterval(() => { if (!document.hidden) refresh(); }, 6000); }
   document.addEventListener('visibilitychange', () => { if (!document.hidden && session) refresh(); });
 
-  async function doAction(key, type, payload) {
+  const ALL_DEV = /^(setAuto|pauseAll|resumeAll|setGoal|setPushKinds|pushSub|pushTest|refreshState|runNow)$/;
+  async function doAction(key, type, payload = {}) {
     actions[key] = { status: 'new', at: payload?.at ?? null }; render();
-    try { await rest('POST', 'actions', { key, type, payload, status: 'new' }); toast('Envoyé au PC'); }
-    catch (e) { actions[key] = { status: 'error', error: e.message }; render(); }
+    try {
+      const devs = state?.devices || [];
+      const { _dev, ...p } = payload || {};
+      if (devs.length > 1 && ALL_DEV.test(type)) { for (const d of devs) await rest('POST', 'actions', { key: devs.indexOf(d) ? key + '@' + d.id : key, type, payload: { ...p, device: d.id }, status: 'new' }); }
+      else await rest('POST', 'actions', { key, type, payload: _dev && devs.length > 1 ? { ...p, device: _dev } : p, status: 'new' });
+      toast(devs.length > 1 && ALL_DEV.test(type) ? 'Envoyé à tes ' + devs.length + ' navigateurs' : 'Envoyé au PC');
+    } catch (e) { actions[key] = { status: 'error', error: e.message }; render(); }
   }
   // ---------- Notifications (Web Push : le PC envoie, l'iPhone affiche) ----------
   const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -736,6 +803,10 @@ Réponds UNIQUEMENT en JSON :
     const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'photos'; render(); });
     v.append(h('div', { className: 'set-h' }, h('h2', { textContent: 'Réglages' }), back));
     v.append(pushCard());
+    const devs = state?.devices || [];
+    if (devs.length) v.append(h('div', { className: 'card' }, h('b', { textContent: `Navigateurs reliés (${devs.length})` }),
+      ...devs.map((d) => { const fresh = Date.now() - (d.at || 0) < 15 * 60000; return h('div', { className: 'set-row' }, h('b', { textContent: d.browser + (d.login ? ' · @' + d.login : '') }), h('span', { className: fresh ? '' : 'bad', textContent: (fresh ? 'en ligne' : 'vu ' + ago(d.at)) + (d.paused ? ' · en pause' : '') })); }),
+      h('div', { className: 'sub', textContent: devs.length > 1 ? 'Chaque navigateur gère son compte Vinted ; tu vois tout réuni ici. Les réglages automatiques sont envoyés à tous.' : 'Pour un 2e compte Vinted : installe Nova dans un autre navigateur (Brave, Edge…), connecte-toi au même compte Nova, puis à ton 2e compte Vinted dans ce navigateur.' })));
     if ((state?.accounts || []).length) {
       const A = state.accounts; const agoT = (t) => !t ? 'pas encore de passage' : 'dernier passage ' + ago(t);
       v.append(h('div', { className: 'card' }, h('b', { textContent: `Comptes Vinted reliés (${A.length})` }),
@@ -759,7 +830,11 @@ Réponds UNIQUEMENT en JSON :
         if (a.g !== g) { g = a.g; auto.append(h('div', { className: 'au-g', textContent: g })); }
         const cb = h('input', { type: 'checkbox', checked: a.on, disabled: pend(a.k) });
         cb.addEventListener('change', () => { autoWant[a.k] = { on: cb.checked, t: Date.now() }; doAction('auto-' + a.k, 'setAuto', { k: a.k, on: cb.checked }); });
-        auto.append(h('label', { className: 'au-row' }, h('span', { className: 'au-t' }, h('b', { textContent: a.label }), h('small', { textContent: pend(a.k) ? 'Envoi au PC…' : a.desc })), h('span', { className: 'sw' }, cb, h('i'))));
+        const rk = 'run-' + a.k, ra = actions[rk];
+        const rr = h('button', { type: 'button', className: 'au-rr', title: 'Relancer', textContent: ra && ra.status !== 'done' && ra.status !== 'error' ? '…' : '↻' });
+        rr.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); doAction(rk, 'runNow', { k: a.k }); });
+        const stx = a.on ? (a.last ? 'Actif · dernière action ' + ago(a.last) : 'Actif · en attente') : '';
+        auto.append(h('label', { className: 'au-row' }, h('span', { className: 'au-t' }, h('b', { textContent: a.label }), h('small', { textContent: pend(a.k) ? 'Envoi au PC…' : a.desc }), stx ? h('small', { className: 'au-st', textContent: stx }) : ''), a.on ? rr : '', h('span', { className: 'sw' }, cb, h('i'))));
       }
       if (!state.paused) {
         const st = h('button', { className: 'linkbtn danger', textContent: 'Tout mettre en pause' });
@@ -930,6 +1005,13 @@ Réponds UNIQUEMENT en JSON :
     }
     const est = h('button', { className: 'btn est-go', type: 'button', textContent: 'Estimer un prix (brocante)' }); est.addEventListener('click', () => { tab = 'estim'; render(); scrollTo(0, 0); });
     v.append(est);
+    const devs = state?.devices || [];
+    if (devs.length > 1) {
+      const cur = store.get('nova_job_dev') || '';
+      const sel = h('select', { className: 'sku-in' }, h('option', { value: '', textContent: 'Le premier navigateur disponible', selected: !cur }), ...devs.map((d) => h('option', { value: d.id, textContent: `${d.browser}${d.login ? ' · @' + d.login : ''}`, selected: cur === d.id })));
+      sel.addEventListener('change', () => store.set('nova_job_dev', sel.value || null));
+      v.append(h('label', { className: 'set-row' }, h('b', { textContent: 'Créer les annonces sur' }), sel));
+    }
     const splitOn = store.get('nova_split') !== false;
     const sw = h('input', { type: 'checkbox', checked: splitOn });
     sw.addEventListener('change', () => { store.set('nova_split', sw.checked); toast(sw.checked ? 'Tri automatique activé' : 'Une sélection = un article'); });
@@ -977,7 +1059,7 @@ Réponds UNIQUEMENT en JSON :
     v.append(h('div', { className: 'list' }, list.map((d) => {
       const a = actions['pub-' + d.id];
       const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Publié ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Publier', disabled: a && a.status !== 'error' });
-      b.addEventListener('click', () => doAction('pub-' + d.id, 'publishDraft', { id: d.id }));
+      b.addEventListener('click', () => doAction('pub-' + d.id, 'publishDraft', { _dev: d._dev, id: d.id }));
       const pa = actions['plan-' + d.id];
       const pending = pa && (pa.status === 'new' || pa.status === 'running');
       const when = pending ? pa.at : d.scheduledAt;
@@ -990,10 +1072,10 @@ Réponds UNIQUEMENT en JSON :
         ok.addEventListener('click', () => {
           const at = new Date(inp.value).getTime();
           if (!at || at < Date.now() - 60000) return toast('Choisis une date dans le futur');
-          planOpen = null; doAction('plan-' + d.id, 'scheduleDraft', { id: d.id, at, title: d.title }); actions['plan-' + d.id].at = at; render();
+          planOpen = null; doAction('plan-' + d.id, 'scheduleDraft', { _dev: d._dev, id: d.id, at, title: d.title }); actions['plan-' + d.id].at = at; render();
         });
         const cancel = h('button', { className: 'btn small', textContent: when ? 'Annuler la date' : 'Fermer' });
-        cancel.addEventListener('click', () => { planOpen = null; if (when) { doAction('plan-' + d.id, 'scheduleDraft', { id: d.id, at: null }); actions['plan-' + d.id].at = null; } render(); });
+        cancel.addEventListener('click', () => { planOpen = null; if (when) { doAction('plan-' + d.id, 'scheduleDraft', { _dev: d._dev, id: d.id, at: null }); actions['plan-' + d.id].at = null; } render(); });
         picker = h('div', { className: 'plan' }, inp, ok, cancel);
       }
       const meta = h('div', { className: 'meta' }, h('div', { className: 't', textContent: d.title }), h('div', { className: 's', textContent: [euro(d.price), d.brand, d.size].filter(Boolean).join(' · ') }),
@@ -1027,7 +1109,7 @@ Réponds UNIQUEMENT en JSON :
         const ta = h('textarea', { rows: 3, placeholder: 'Ta réponse…', id: 'ta-' + key });
         const chips = h('div', { className: 'chips' }, ...(state?.quick || []).map((q) => { const b = h('button', { type: 'button', className: 'chip', textContent: q.t || q.x.slice(0, 20) }); b.addEventListener('click', () => { ta.value = q.x; ta.focus(); }); return b; }));
         const send = h('button', { className: 'btn primary small', textContent: a ? (a.status === 'done' ? 'Envoyé ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Envoyer', disabled: a && a.status !== 'error' && a.status !== 'done' });
-        send.addEventListener('click', () => { const body = ta.value.trim(); if (!body) return toast('Écris un message'); doAction(key, 'mxReply', { id: c.id, acct: c.acct, who: c.who, body }); });
+        send.addEventListener('click', () => { const body = ta.value.trim(); if (!body) return toast('Écris un message'); doAction(key, 'mxReply', { _dev: c._dev, id: c.id, acct: c.acct, who: c.who, body }); });
         const open = h('a', { className: 'linkbtn small', href: `https://www.vinted.fr/inbox/${c.id}`, target: '_blank', rel: 'noopener', textContent: 'Ouvrir dans Vinted' });
         return h('div', { className: 'conv-open' }, row, h('div', { className: 'card reply' }, (state?.quick || []).length ? chips : '', ta, a?.status === 'error' ? h('div', { className: 'sub bad', textContent: a.error || 'Erreur' }) : '', h('div', { className: 'row' }, open, h('span', { className: 'grow' }), send)));
       })));
@@ -1039,7 +1121,7 @@ Réponds UNIQUEMENT en JSON :
       return list.forEach((q) => {
         const key = 'aq-' + q.id; const a = actions[key];
         const ta = h('textarea', { rows: 2, placeholder: 'Ce que l’assistant doit répondre…', id: 'ta-' + key });
-        const go = (send) => { if (!ta.value.trim()) return toast('Écris la réponse'); doAction(key, 'aqAnswer', { id: q.id, answer: ta.value.trim(), send }); };
+        const go = (send) => { if (!ta.value.trim()) return toast('Écris la réponse'); doAction(key, 'aqAnswer', { _dev: q._dev, id: q.id, answer: ta.value.trim(), send }); };
         const b1 = h('button', { className: 'btn small', textContent: 'Mémoriser', disabled: a && a.status !== 'error' }); b1.addEventListener('click', () => go(false));
         const b2 = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Fait ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Mémoriser et répondre', disabled: a && a.status !== 'error' }); b2.addEventListener('click', () => go(true));
         v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + (q.pseudo || 'acheteur') }), h('span', { className: 'sub grow', textContent: q.article })), h('div', { className: 'q', textContent: '« ' + q.question + ' »' }), ta, h('div', { className: 'row' }, b1, b2)));
@@ -1053,7 +1135,7 @@ Réponds UNIQUEMENT en JSON :
         const key = 'rv-' + r.id; const a = actions[key];
         const ta = h('textarea', { rows: 3, value: r.reply, id: 'ta-' + key });
         const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Publié ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Valider et envoyer', disabled: a && a.status !== 'error' });
-        b.addEventListener('click', () => doAction(key, 'reviewSend', { id: r.id, comment: ta.value, author: r.author }));
+        b.addEventListener('click', () => doAction(key, 'reviewSend', { _dev: r._dev, id: r.id, comment: ta.value, author: r.author }));
         v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + r.author }), h('span', { className: 'sub grow', textContent: '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) })),
           h('div', { className: 'q', textContent: '« ' + (r.text || '(sans texte)') + ' »' }), r.lang !== 'fr' && r.textFr ? h('div', { className: 'sub', textContent: 'Traduction : ' + r.textFr }) : null,
           ta, r.lang !== 'fr' && r.replyFr ? h('div', { className: 'sub', textContent: 'En français : ' + r.replyFr }) : null, b));
@@ -1066,7 +1148,7 @@ Réponds UNIQUEMENT en JSON :
       const key = 'ai-' + m.conversationId + '-' + m.lastId; const a = actions[key];
       const ta = h('textarea', { rows: 3, value: m.message, id: 'ta-' + key });
       const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Envoyé ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : (m.offerPrice ? `Envoyer + offre ${m.offerPrice} €` : 'Envoyer'), disabled: a && a.status !== 'error' });
-      b.addEventListener('click', () => doAction(key, 'aiSend', { conversationId: m.conversationId, lastId: m.lastId, body: ta.value, offerPrice: m.offerPrice || null, transactionId: m.transactionId || null }));
+      b.addEventListener('click', () => doAction(key, 'aiSend', { _dev: m._dev, conversationId: m.conversationId, lastId: m.lastId, body: ta.value, offerPrice: m.offerPrice || null, transactionId: m.transactionId || null }));
       v.append(h('div', { className: 'card' }, h('div', { className: 'row' }, h('b', { textContent: '@' + m.pseudo }), h('span', { className: 'sub grow', textContent: m.article })), h('div', { className: 'q', textContent: '« ' + (m.question || '') + ' »' }), ta, b));
     });
   }
@@ -1158,8 +1240,8 @@ Réponds UNIQUEMENT en JSON :
     const rd = state?.returnsDone || [];
     if (rd.length) v.append(h('div', { className: 'card warnbox' }, h('b', { textContent: `Retour${rd.length > 1 ? 's' : ''} terminé${rd.length > 1 ? 's' : ''} : vérifie l’article` }),
       ...rd.map((r) => { const k = 'ret-' + r.tid, a = actions[k];
-        const yes = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Fait ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Remettre en vente', disabled: a && a.status !== 'error' }); yes.addEventListener('click', () => doAction(k, 'returnRelist', { tid: r.tid }));
-        const no = h('button', { className: 'btn small', textContent: 'Non', disabled: !!a && a.status !== 'error' }); no.addEventListener('click', () => doAction(k, 'returnDismiss', { tid: r.tid }));
+        const yes = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Fait ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Remettre en vente', disabled: a && a.status !== 'error' }); yes.addEventListener('click', () => doAction(k, 'returnRelist', { _dev: r._dev, tid: r.tid }));
+        const no = h('button', { className: 'btn small', textContent: 'Non', disabled: !!a && a.status !== 'error' }); no.addEventListener('click', () => doAction(k, 'returnDismiss', { _dev: r._dev, tid: r.tid }));
         return h('div', { className: 'row' }, h('span', { className: 'grow', textContent: r.title }), no, yes); })));
     v.append(h('h2', { textContent: 'À expédier' }));
     if (!list.length) v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Rien à expédier 🎉' }), 'Les nouvelles ventes apparaîtront ici.'));
@@ -1213,7 +1295,7 @@ Réponds UNIQUEMENT en JSON :
       v.append(h('div', { className: 'list' }, adv.map((a) => {
         const k = 'adv-' + a.id; const x = actions[k];
         const b = h('button', { className: 'btn small' + (a.dir === 'up' ? ' primary' : ''), textContent: x ? (x.status === 'done' ? 'Fait ✓' : x.status === 'error' ? 'Réessayer' : 'Envoi…') : a.dir === 'repost' ? 'Republier' : `${a.dir === 'up' ? '⬆' : '⬇'} ${euro(a.price)}`, disabled: x && x.status !== 'error' });
-        b.addEventListener('click', () => a.dir === 'repost' ? doAction(k, 'repost', { id: a.id, price: a.cur }) : doAction(k, 'setPrice', { id: a.id, price: a.price, title: a.title }));
+        b.addEventListener('click', () => a.dir === 'repost' ? doAction(k, 'repost', { _dev: a._dev, id: a.id, price: a.cur }) : doAction(k, 'setPrice', { _dev: a._dev, id: a.id, price: a.price, title: a.title }));
         return h('div', { className: 'li' }, thumb(a.photo), h('div', { className: 'meta' }, h('div', { className: 't', textContent: a.title }), h('div', { className: 's', textContent: a.why })), b);
       })));
     }
@@ -1224,7 +1306,7 @@ Réponds UNIQUEMENT en JSON :
       const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Republiée ✓' : a.status === 'error' ? 'Réessayer' : 'En file…') : 'Republier', disabled: a && a.status !== 'error' });
       b.addEventListener('click', () => {
         if (!confirm(`Republier « ${i.title} » ?${i.favs ? `\nSes ${i.favs} favoris seront perdus.` : ''}`)) return;
-        doAction('rep-' + i.id, 'repost', { id: i.id, price: i.price });
+        doAction('rep-' + i.id, 'repost', { _dev: i._dev, id: i.id, price: i.price });
       });
       return h('div', { className: 'li' }, thumb(i.photo), h('div', { className: 'meta' }, h('div', { className: 't', textContent: i.title }),
         h('div', { className: 's', textContent: [euro(i.price), i.days != null ? `en ligne depuis ${i.days} j` : '', `❤️ ${i.favs || 0}`, `👁 ${i.views || 0}`, state?.repostCounts?.[i.id] ? `republiée ${state.repostCounts[i.id]} fois` : ''].filter(Boolean).join(' · ') }),
@@ -1240,13 +1322,13 @@ Réponds UNIQUEMENT en JSON :
     const todo = list.filter((f) => !actions[key(f)] || actions[key(f)].status === 'error');
     if (todo.length > 1) {
       const all = h('button', { className: 'btn primary', textContent: `Envoyer à tous (${todo.length})` });
-      all.addEventListener('click', async () => { if (!confirm(`Envoyer ton message à ${todo.length} personne(s) ?`)) return; for (const f of todo) await doAction(key(f), 'favSend', { itemId: f.itemId, userId: f.userId, pseudo: f.pseudo }); });
+      all.addEventListener('click', async () => { if (!confirm(`Envoyer ton message à ${todo.length} personne(s) ?`)) return; for (const f of todo) await doAction(key(f), 'favSend', { _dev: f._dev, itemId: f.itemId, userId: f.userId, pseudo: f.pseudo }); });
       v.append(all);
     }
     v.append(h('div', { className: 'list' }, list.map((f) => {
       const a = actions[key(f)];
       const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Envoyé ✓' : a.status === 'error' ? 'Réessayer' : 'En file…') : 'Envoyer', disabled: a && a.status !== 'error' });
-      b.addEventListener('click', () => doAction(key(f), 'favSend', { itemId: f.itemId, userId: f.userId, pseudo: f.pseudo }));
+      b.addEventListener('click', () => doAction(key(f), 'favSend', { _dev: f._dev, itemId: f.itemId, userId: f.userId, pseudo: f.pseudo }));
       return h('div', { className: 'li' }, thumb(f.photo), h('div', { className: 'meta' }, h('div', { className: 't', textContent: '@' + f.pseudo }),
         h('div', { className: 's', textContent: f.title }), h('div', { className: 's' }, h('s', { textContent: euro(f.price) }), ' → ', h('b', { textContent: euro(f.remise) })),
         a?.error ? h('div', { className: 's', textContent: a.error }) : null), b);
@@ -1268,5 +1350,14 @@ Réponds UNIQUEMENT en JSON :
 })();
 </script>
 <script>(function(){var b=document.getElementById('thmBtn');if(!b)return;var order=['auto','light','dark'],ic={auto:'🌓',light:'☀️',dark:'🌙'};var cur='auto';try{cur=localStorage.getItem('novaPhoneTheme')||'auto';}catch(e){}b.textContent=ic[cur];b.addEventListener('click',function(){cur=order[(order.indexOf(cur)+1)%3];try{localStorage.setItem('novaPhoneTheme',cur);}catch(e){}if(cur==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',cur);b.textContent=ic[cur];});})();</script>
+<script src="qrcode.min.js"></script>
+<script>
+// QR code de l'appli téléphone (dessiné sur place, sans service extérieur)
+(function () {
+  function draw(el, url) { try { var q = qrcode(0, 'M'); q.addData(url); q.make(); el.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); el.querySelector('svg').setAttribute('aria-label', 'QR code : ' + url); } catch (e) { el.textContent = url; } }
+  document.querySelectorAll('[data-qr]').forEach(function (el) { draw(el, el.getAttribute('data-qr')); });
+})();
+</script>
+<script>(function(){ if (!/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) { var q = document.getElementById("qrDesk"); if (q) q.hidden = false; } })();</script>
 </body>
 </html>
