@@ -10,7 +10,7 @@ self.addEventListener('fetch', (e) => {
 });
 self.addEventListener('push', (e) => {
   let d = {}; try { d = e.data ? e.data.json() : {}; } catch { d = { title: 'Nova Resell', body: e.data ? e.data.text() : '' }; }
-  e.waitUntil(self.registration.showNotification(d.title || 'Nova Resell', { body: d.body || '', tag: d.tag || undefined, icon: 'icon-192.png', badge: 'icon-192.png', data: { url: d.url || './' } }));
+  e.waitUntil(self.registration.showNotification(d.title || 'Nova Resell', { body: d.body || '', tag: d.tag || undefined, requireInteraction: /^captcha/.test(d.tag || ''), renotify: /^captcha/.test(d.tag || ''), icon: 'icon-192.png', badge: 'icon-192.png', data: { url: d.url || './' } }));
 });
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Nova Resell · l'agent IA pour vendre sur Vinted</title>
-<meta name="description" content="Nova Resell crée tes annonces Vinted à partir de tes photos, répond et négocie, imprime tes bordereaux et suit ton stock et ton bénéfice.">
+<title>Nova Resell · l'agent IA gratuit pour vendre et acheter sur Vinted</title>
+<meta name="description" content="Gratuit : Nova Resell crée tes annonces Vinted à partir de tes photos, répond et négocie, achète avant les autres avec l’Auto-buy, imprime tes bordereaux et suit ton bénéfice.">
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -62,98 +62,184 @@ summary { cursor: pointer; font-weight: 600; } details p { color: var(--muted); 
 footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: 14px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 22px; }
 </style>
-<style>.qr-card{display:flex;gap:14px;align-items:center;margin-top:18px;padding:12px;border-radius:14px;border:1px solid rgba(148,163,184,.25);max-width:420px}.qr-card .qr{width:104px;height:104px;flex:none;background:#fff;border-radius:10px;padding:4px}.qr-card .qr svg{width:100%;height:100%;display:block}.qr-card b{display:block;margin-bottom:4px}.qr-card span{font-size:13px;opacity:.8}</style>
+<style>
+.qr-card{display:flex;gap:14px;align-items:center;margin-top:18px;padding:12px;border-radius:14px;border:1px solid var(--line);max-width:420px}.qr-card .qr{width:96px;height:96px;flex:none;background:#fff;border-radius:10px;padding:4px}.qr-card .qr svg{width:100%;height:100%;display:block}.qr-card b{display:block;margin-bottom:4px}.qr-card span{font-size:13px;color:var(--muted)}
+header .btn{padding:9px 14px;font-size:14px;margin-left:8px}
+@media (max-width:640px){header .btn{margin-left:auto}}
+.pill b{color:var(--accent)}
+.hero-vis{position:relative}
+.toast{position:absolute;left:-18px;bottom:-22px;max-width:300px;display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 18px 40px rgba(5,10,30,.22);font-size:13.5px;line-height:1.35}
+.toast .ti{width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;background:var(--grad);color:#fff;font-size:18px}
+.toast small{display:block;color:var(--muted)} .toast .ok{color:#16A34A;font-weight:700}
+@media (max-width:560px){.toast{position:static;margin-top:12px;max-width:none}}
+.strip{border-block:1px solid var(--line);background:var(--surface)}
+.strip .wrap{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;padding-block:16px;font-weight:600;font-size:14.5px;color:var(--muted)}
+.strip span{white-space:nowrap}
+.split{display:grid;gap:40px;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:center}
+@media (max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.ticks{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:12px}
+.ticks li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
+.ticks li::before{content:"✓";display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--surface2);color:var(--accent);font-weight:800;font-size:13px;margin-top:2px}
+.ticks b{display:block}.ticks span{color:var(--muted);font-size:14.5px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips span{padding:9px 14px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14.5px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:min(78%,560px);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px}
+.rail figure{margin:0;scroll-snap-align:start}.rail figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.sec4{display:grid;gap:16px;grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.sec4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.sec4{grid-template-columns:minmax(0,1fr)}}
+.price{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+@media (max-width:640px){.price{grid-template-columns:minmax(0,1fr)}}
+.cost{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--surface2);font-size:14.5px}
+.cost b{font-size:18px}
+.final{text-align:center;background:var(--surface);border-block:1px solid var(--line)}
+.final .ctas{justify-content:center}
+.final p{color:var(--muted);margin:0 auto;max-width:36em}
+</style>
 </head>
 <body>
 <header><div class="wrap">
   <a class="logo" href="#"><img src="icon-192.png" alt=""><span>Nova <b>Resell</b></span></a>
-  <nav><a href="#fonctions">Fonctions</a><a href="#video">Vidéo</a><a href="#prix">Prix</a><a href="#faq">Questions</a></nav>
+  <nav><a href="#fonctions">Fonctions</a><a href="#autobuy">Auto-buy</a><a href="#securite">Sécurité</a><a href="#prix">Prix</a><a href="#faq">Questions</a><a href="aide.html">Aide</a></nav>
+  <a class="btn primary storeLink" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">Essayer</a>
 </div></header>
 
 <main>
 <div class="wrap hero">
   <div>
-    <span class="pill">Extension Chrome · appli téléphone</span>
+    <span class="pill"><b>Gratuit</b> pendant la bêta · Chrome, Brave et téléphone</span>
     <h1>Vends sur Vinted <em>sans y passer tes soirées</em></h1>
-    <p class="lead">Tu prends les photos, Nova écrit l'annonce, fixe le prix, répond aux acheteurs, négocie, prépare le bordereau et calcule ton bénéfice. Toi, tu emballes et tu déposes.</p>
+    <p class="lead">Tu prends les photos, Nova écrit l'annonce, fixe le prix, répond, négocie et prépare le bordereau. Et quand tu achètes pour revendre, l'Auto-buy te place en premier sur les bonnes affaires.</p>
     <div class="ctas">
-      <a class="btn primary" id="storeBtn" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">⬇️ Ajouter à Chrome</a>
-      <a class="btn" href="./">📱 Ouvrir l'appli téléphone</a>
+      <a class="btn primary storeLink" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">⬇️ Ajouter à Chrome, c'est gratuit</a>
+      <a class="btn" href="#video">▶️ Voir en vidéo</a>
     </div>
-    <p class="small">Gratuit · aucun mot de passe Vinted demandé</p>
-    <div class="qr-card"><div class="qr" data-qr="https://novaresell.github.io/nova-resell/"></div><div><b>L'appli sur ton téléphone</b><span>Scanne ce code avec l'appareil photo de ton téléphone, puis « Ajouter à l'écran d'accueil ».</span></div></div>
+    <p class="small">Sans carte bancaire · aucun mot de passe Vinted demandé · marche aussi sur Brave</p>
+    <div class="qr-card"><div class="qr" data-qr="https://novaresell.github.io/nova-resell/"></div><div><b>L'appli sur ton téléphone</b><span>Scanne avec l'appareil photo, puis « Ajouter à l'écran d'accueil ». Ou <a href="./">ouvre-la ici</a>.</span></div></div>
   </div>
-  <img class="shot" src="img/1-accueil.jpg" alt="Accueil de Nova Resell : ventes du jour, bénéfice et objectif du mois" width="1280" height="800">
+  <div class="hero-vis">
+    <img class="shot" src="img/1-accueil.jpg" alt="Accueil de Nova Resell : ventes du jour, bénéfice et objectif du mois" width="1280" height="800">
+    <div class="toast" aria-hidden="true"><div class="ti">🎯</div><div><b>Nouvel article · Pull Ralph Lauren M</b><small>15 € · prix habituel 28 € · <span class="ok">marge ≈ +12 €</span></small></div></div>
+  </div>
 </div>
+
+<div class="strip"><div class="wrap"><span>📸 Annonces IA</span><span>💬 Réponses et négo</span><span>🎯 Auto-buy</span><span>📦 Bordereaux</span><span>🔁 Republication</span><span>📊 Bénéfice réel</span></div></div>
 
 <section id="fonctions"><div class="wrap">
   <h2>Tout ce qui te prend du temps, Nova le fait</h2>
-  <p class="sub">Pensé pour les revendeurs : ballots, brocantes, friperies. Chaque automatisme s'active ou se coupe d'un clic.</p>
+  <p class="sub">Pensé pour les revendeurs : ballots, brocantes, friperies, collections. Chaque automatisme s'active ou se coupe d'un clic.</p>
   <div class="grid">
-    <div class="card"><div class="ico">📸</div><h3>Annonces en 30 secondes</h3><p>Glisse les photos : titre optimisé, description, catégorie, marque, taille, état et prix basé sur les articles réellement vendus.</p></div>
-    <div class="card"><div class="ico">💬</div><h3>Réponses et négociation</h3><p>Questions fréquentes, offres et contre-offres par paliers, sans jamais descendre sous ton prix d'achat + ta marge.</p></div>
-    <div class="card"><div class="ico">❤️</div><h3>Favoris qui deviennent des ventes</h3><p>Message et offre à ceux qui aiment tes articles, lots proposés quand quelqu'un en aime plusieurs.</p></div>
-    <div class="card"><div class="ico">🗓️</div><h3>Planning et republication</h3><p>Calendrier glisser-déposer, publication aux meilleures heures, baisse de prix ou republication des annonces qui dorment.</p></div>
-    <div class="card"><div class="ico">📦</div><h3>Bordereaux avec ton SKU</h3><p>Commandés et imprimés tout seuls à chaque vente, avec le SKU et l'emplacement de rangement pour retrouver l'article.</p></div>
-    <div class="card"><div class="ico">📊</div><h3>Stock et bénéfice réel</h3><p>Ton tableau achat / revente intégré, synchronisé avec ton Excel, lots répartis, bilan mensuel et export comptable.</p></div>
+    <div class="card"><div class="ico">📸</div><h3>Annonces en 30 secondes</h3><p>Glisse les photos : titre, description, catégorie, marque, taille, état et prix basé sur les articles réellement vendus.</p></div>
+    <div class="card"><div class="ico">💬</div><h3>Réponses et négociation</h3><p>L'assistant répond aux questions, retient tes infos (réservation, envoi…) et négocie par paliers, jamais sous ton prix plancher.</p></div>
+    <div class="card"><div class="ico">🗂️</div><h3>Messagerie bien rangée</h3><p>Tous tes comptes au même endroit, triés en dossiers : questions, ventes, litiges, retours.</p></div>
+    <div class="card"><div class="ico">❤️</div><h3>Favoris qui deviennent des ventes</h3><p>Message et offre à ceux qui aiment tes articles, lot proposé quand quelqu'un en aime plusieurs.</p></div>
+    <div class="card"><div class="ico">🗓️</div><h3>Stratégie de prix</h3><p>Baisse, hausse et republication automatiques en un réglage, avec un prix plancher. Les annonces ne dorment plus.</p></div>
+    <div class="card"><div class="ico">📦</div><h3>Bordereaux avec ton SKU</h3><p>Regroupés en A4 ou thermique, avec le SKU pour retrouver l'article. Rappel point relais et demande d'avis.</p></div>
+    <div class="card"><div class="ico">↩️</div><h3>Retours et litiges suivis</h3><p>Sur ton téléphone : où est le colis, le point relais exact, l'itinéraire, et une notif quand il arrive.</p></div>
+    <div class="card"><div class="ico">💾</div><h3>Sauvegardes de ton dressing</h3><p>Annonces et photos d'origine gardées en lieu sûr, et transfert vers un autre compte.</p></div>
+    <div class="card"><div class="ico">📊</div><h3>Stock et bénéfice réel</h3><p>Achat, revente, bénéfice et objectif du mois. Pose une question à Nova, il répond avec tes vrais chiffres.</p></div>
   </div>
+</div></section>
+
+<section id="autobuy"><div class="wrap split">
+  <div>
+    <span class="tag">Nouveau · Auto-buy</span>
+    <h2>Sois le premier sur les bonnes affaires</h2>
+    <p class="sub">Les bonnes pièces partent en quelques minutes. Nova surveille pour toi et te laisse un temps d'avance.</p>
+    <ul class="ticks">
+      <li><div><b>Décris ce que tu cherches, ou envoie une photo</b><span>« Des TN noires taille 42, moins de 40 € » : l'IA prépare la recherche.</span></div></li>
+      <li><div><b>Alerte dès qu'un article sort</b><span>Sur ton PC, ton téléphone ou ton Discord, avec le prix habituel et la marge estimée.</span></div></li>
+      <li><div><b>Réservé pour toi en un clic</b><span>« Acheter » bloque l'article pendant que tu paies. Achat automatique possible, toujours dans ton budget.</span></div></li>
+      <li><div><b>Suis un vendeur</b><span>Nova se réveille pile à l'ouverture de sa vente.</span></div></li>
+    </ul>
+  </div>
+  <img class="shot" src="img/1-autobuy.jpg" alt="Page Auto-buy de Nova Resell : filtres, alertes et articles réservés" loading="lazy" width="1280" height="800">
+</div></section>
+
+<section><div class="wrap">
+  <h2>Pas que des vêtements</h2>
+  <p class="sub">L'IA reconnaît aussi ce que tu revends à côté.</p>
+  <div class="chips"><span>👕 Vêtements</span><span>👟 Sneakers</span><span>👜 Accessoires</span><span>🃏 Cartes à collectionner</span><span>📚 Mangas et livres</span><span>🎮 Jeux vidéo et consoles</span><span>🧸 Objets et déco</span></div>
 </div></section>
 
 <section><div class="wrap">
   <h2>Comment ça marche</h2>
   <p class="sub">Trois minutes pour démarrer.</p>
   <div class="steps">
-    <div class="card step"><h3>Installe Nova</h3><p>Ajoute l'extension à Chrome, puis crée ton compte Nova : 7 jours d'essai complet.</p></div>
-    <div class="card step"><h3>Ouvre vinted.fr</h3><p>Nova travaille avec ta propre session Vinted, dans un panneau à côté de la page. Il ne voit jamais ton mot de passe.</p></div>
-    <div class="card step"><h3>Choisis tes automatismes</h3><p>Annonces, réponses, favoris, bordereaux… active ce que tu veux. Le reste, tu le gardes en main.</p></div>
+    <div class="card step"><h3>Installe Nova</h3><p>Ajoute l'extension à Chrome ou Brave et crée ton compte Nova. C'est gratuit.</p></div>
+    <div class="card step"><h3>Branche l'IA</h3><p>Colle ta clé Claude, guide pas à pas fourni. Tu paies l'IA au centime près, en général moins d'1 € par mois.</p></div>
+    <div class="card step"><h3>Ouvre vinted.fr</h3><p>Nova travaille dans un panneau à côté de la page, avec ta session. Active ce que tu veux, garde le reste en main.</p></div>
   </div>
 </div></section>
 
 <section id="video"><div class="wrap">
   <h2>Nova en vidéo</h2>
   <p class="sub">Le tour du propriétaire en quelques minutes.</p>
-  <video src="guide.mp4" controls preload="metadata" poster="img/promo-grande-1400x560.png"></video>
+  <video src="guide.mp4" controls preload="metadata" playsinline poster="img/promo-grande-1400x560.png"></video>
 </div></section>
 
 <section><div class="wrap">
   <h2>En images</h2>
-  <p class="sub">Un vrai tableau de bord, clair et rapide.</p>
-  <div class="gallery">
+  <p class="sub">Fais défiler.</p>
+  <div class="rail">
+    <figure><img class="shot" src="img/2-filtre-ia.jpg" alt="Filtre Auto-buy préparé par l'IA à partir d'une phrase ou d'une photo" loading="lazy" width="1280" height="800"><figcaption>Un filtre Auto-buy en une phrase ou une photo</figcaption></figure>
+    <figure><img class="shot" src="img/3-messagerie.jpg" alt="Messagerie rangée en dossiers" loading="lazy" width="1280" height="800"><figcaption>La messagerie de tous tes comptes, en dossiers</figcaption></figure>
+    <figure><img class="shot" src="img/4-retours.jpg" alt="Suivi des retours sur téléphone avec point relais" loading="lazy" width="1280" height="800"><figcaption>Les retours sur ton téléphone, point relais compris</figcaption></figure>
     <figure><img class="shot" src="img/2-automatisations.jpg" alt="Onglet Automatisations" loading="lazy" width="1280" height="800"><figcaption>Toutes les automatisations au même endroit</figcaption></figure>
     <figure><img class="shot" src="img/3-planning.jpg" alt="Calendrier de publication" loading="lazy" width="1280" height="800"><figcaption>Le planning : glisse tes brouillons sur un jour</figcaption></figure>
-    <figure><img class="shot" src="img/4-messages.jpg" alt="Messages et négociation" loading="lazy" width="1280" height="800"><figcaption>Réponses et négociation par l'agent</figcaption></figure>
-    <figure><img class="shot" src="img/1-accueil.jpg" alt="Accueil" loading="lazy" width="1280" height="800"><figcaption>Ta journée : ventes, colis à déposer, objectif</figcaption></figure>
+  </div>
+</div></section>
+
+<section id="securite"><div class="wrap">
+  <h2>Ton compte Vinted d'abord</h2>
+  <p class="sub">Nova est conçu pour rester discret et ne jamais forcer.</p>
+  <div class="sec4">
+    <div class="card"><div class="ico">🔑</div><h3>Jamais ton mot de passe</h3><p>Tu te connectes toi-même sur vinted.fr. Nova utilise ta session, comme toi.</p></div>
+    <div class="card"><div class="ico">🐢</div><h3>Rythme limité</h3><p>Pauses entre chaque action et nombre d'actions plafonné, même quand tout tourne en même temps.</p></div>
+    <div class="card"><div class="ico">🛡️</div><h3>Pause automatique</h3><p>Si Vinted demande une vérification, tout s'arrête et tu es prévenu. Nova reprend seul une fois la vérification passée.</p></div>
+    <div class="card"><div class="ico">🎛️</div><h3>Tu gardes la main</h3><p>Chaque automatisme se règle ou se coupe à tout moment, et le journal montre tout ce que Nova a fait.</p></div>
   </div>
 </div></section>
 
 <section id="prix"><div class="wrap">
   <h2>Prix</h2>
-  <p class="sub">L'IA utilise ta propre clé API Claude : tu paies directement ce que tu consommes (quelques centimes par annonce).</p>
+  <p class="sub">Simple : Nova est gratuit pendant la bêta.</p>
   <div class="price">
-    <div class="card"><h3>Gratuit</h3><div class="amount">0 €</div><p>Toutes les fonctions, avec ta propre clé API Claude.</p>
-      <ul><li>Toutes les fonctions</li><li>Mises à jour automatiques</li><li>Appli téléphone</li></ul></div>
-    <div class="card hl"><h3>Nova Pro</h3><div class="amount">Bientôt</div><p>Abonnement mensuel sans engagement, résiliable en deux clics.</p>
-      <ul><li>Tout Nova, sans limite</li><li>Plusieurs comptes Vinted</li><li>Paiement sécurisé par Stripe</li></ul></div>
+    <div class="card hl"><h3>Bêta gratuite</h3><div class="amount">0 €</div><p>Toutes les fonctions, sans carte bancaire.</p>
+      <ul><li>Annonces, réponses, négociation, Auto-buy</li><li>Appli téléphone et notifications</li><li>Plusieurs comptes Vinted</li><li>Mises à jour automatiques</li></ul>
+      <div class="cost"><span>L'IA (ta clé Claude) :</span><b>≈ 0,1 centime</b><span>par annonce, avec un plafond par jour que tu choisis.</span></div></div>
+    <div class="card"><h3>Membres de la bêta</h3><p>Tu nous aides à construire Nova avec tes retours. Quand une offre payante arrivera, les comptes créés pendant la bêta garderont un avantage.</p>
+      <ul><li>Un bouton « Signaler un problème » dans l'appli</li><li>Les nouveautés en premier</li></ul></div>
   </div>
 </div></section>
 
 <section id="faq"><div class="wrap">
   <h2>Questions fréquentes</h2>
+  <details><summary>C'est vraiment gratuit ?</summary><p>Oui, pendant la bêta, sans carte bancaire. Seule l'IA se paie à l'usage, directement chez Anthropic (l'entreprise qui fait Claude), avec ta clé : en général moins d'1 € par mois, et tu fixes un plafond par jour.</p></details>
+  <details><summary>C'est quoi la clé Claude, et c'est compliqué ?</summary><p>C'est ce qui permet à Nova d'utiliser l'IA. Tu la crées une fois sur le site d'Anthropic et tu la colles dans Nova : le guide montre chaque écran. Nova affiche ce que tu as dépensé, au centime près.</p></details>
   <details><summary>Est-ce que Nova voit mon mot de passe Vinted ?</summary><p>Non. Tu te connectes toi-même sur vinted.fr ; Nova utilise ta session dans ton navigateur et ne voit jamais ton mot de passe.</p></details>
-  <details><summary>Mon compte Vinted risque-t-il quelque chose ?</summary><p>Nova applique des cadences prudentes et ne contourne aucune protection de Vinted. L'automatisation reste ta responsabilité : chaque automatisme se règle ou se coupe à tout moment. Voir les <a href="conditions.html">conditions d'utilisation</a>.</p></details>
-  <details><summary>Faut-il laisser le PC allumé ?</summary><p>Oui, avec un onglet vinted.fr ouvert, pour les automatismes (réponses, favoris, publications). L'appli téléphone te notifie et te laisse valider à distance.</p></details>
-  <details><summary>Ça marche pour autre chose que des vêtements ?</summary><p>Oui : cartes à collectionner, mangas, livres, jeux vidéo, consoles, objets.</p></details>
-  <details><summary>Où sont mes données ?</summary><p>Surtout dans ton navigateur ; tes réglages et ton stock sont sauvegardés dans ton compte Nova. Rien n'est revendu. Voir la <a href="confidentialite.html">politique de confidentialité</a>.</p></details>
+  <details><summary>Mon compte Vinted risque-t-il quelque chose ?</summary><p>Nova limite son rythme, ne contourne aucune protection de Vinted et se met en pause dès que Vinted demande une vérification. L'automatisation reste ta responsabilité : chaque automatisme se règle ou se coupe à tout moment. Voir les <a href="conditions.html">conditions d'utilisation</a>.</p></details>
+  <details><summary>Faut-il laisser le PC allumé ?</summary><p>Pour les automatismes (réponses, favoris, publications, Auto-buy), oui, avec Chrome ou Brave ouvert. L'appli téléphone te prévient et te laisse valider à distance.</p></details>
+  <details><summary>Ça marche sur Safari, Firefox ou seulement sur téléphone ?</summary><p>L'extension marche sur Chrome et Brave (ordinateur). L'appli téléphone marche partout, en complément de l'extension.</p></details>
+  <details><summary>Où sont mes données ?</summary><p>Tes annonces et messages restent dans ton navigateur. Tes réglages, ton stock et tes sauvegardes sont gardés dans ton compte Nova. Rien n'est revendu. Voir la <a href="confidentialite.html">politique de confidentialité</a>.</p></details>
+</div></section>
+
+<section class="final"><div class="wrap">
+  <h2>Prêt à gagner tes soirées ?</h2>
+  <p>Installe Nova en deux minutes. Gratuit, sans carte bancaire.</p>
+  <div class="ctas"><a class="btn primary storeLink" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">⬇️ Ajouter à Chrome</a></div>
+  <p class="small">Tu utilises déjà Nova ? <a class="reviewLink" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj/reviews" target="_blank" rel="noopener">Laisse un avis ⭐</a>, ça aide énormément.</p>
 </div></section>
 </main>
 
 <footer><div class="wrap">
   <span>© 2026 Nova Resell · outil indépendant, sans lien avec Vinted</span>
-  <a href="conditions.html">Conditions d'utilisation</a><a href="vente.html">Conditions de vente</a><a href="confidentialite.html">Confidentialité</a>
+  <a href="aide.html">Aide</a><a href="conditions.html">Conditions d'utilisation</a><a href="vente.html">Conditions de vente</a><a href="confidentialite.html">Confidentialité</a>
 </div></footer>
 <script>
-// lien du Chrome Web Store donné par la config à distance (activé dès la validation de Google)
-fetch('nova-config.json?t=' + Date.now(), { cache: 'no-store' }).then((r) => r.json()).then((c) => { if (c.storeUrl) document.getElementById('storeBtn').href = c.storeUrl; }).catch(() => {});
+// lien du Chrome Web Store donné par la config à distance
+fetch('nova-config.json?t=' + Date.now(), { cache: 'no-store' }).then((r) => r.json()).then((c) => { if (c.storeUrl) { document.querySelectorAll('.storeLink').forEach((a) => { a.href = c.storeUrl; }); document.querySelectorAll('.reviewLink').forEach((a) => { a.href = c.storeUrl.replace(/\/?$/, '/reviews'); }); } }).catch(() => {});
 </script>
 <script src="qrcode.min.js"></script>
 <script>

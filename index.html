@@ -103,7 +103,7 @@ h2 { margin: 6px 0 0; font: 700 18px var(--display); text-wrap: balance; }
 .stats .kp b { font-size: 20px; letter-spacing: -.02em; }
 .stats .kp b.pos { color: var(--ok); }
 .stats .kp span { font-size: 12px; color: var(--muted); }
-.mbars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; height: 82px; align-items: end; }
+.mbars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; height: 82px; align-items: end; }
 .mb { display: grid; grid-template-rows: 1fr auto; height: 100%; align-items: end; justify-items: center; gap: 4px; }
 .mb i { width: 100%; max-width: 30px; border-radius: 6px 6px 3px 3px; background: linear-gradient(180deg, var(--cyan), rgba(34,211,238,.35)); }
 .mb span { font-size: 10.5px; color: var(--muted); }
@@ -124,7 +124,7 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
 
 /* Barre d'onglets en bas */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(6, 1fr);
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(7, 1fr);
   padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px));
   background: rgba(10,16,34,.92); backdrop-filter: blur(14px); border-top: 1px solid var(--line); }
 .tab { border: 0; background: none; display: grid; justify-items: center; gap: 2px; padding: 6px 0; font-size: 10px; min-width: 0; letter-spacing: -.1px; font-weight: 600; color: var(--muted); position: relative; }
@@ -146,6 +146,9 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .stock-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }
 .stock-row .st-t { display: grid; min-width: 0; } .stock-row .st-t b { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stock-row .st-r { display: grid; justify-items: end; gap: 2px; flex: none; text-align: right; }
+.card.ab .ab-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.card.ab .ab-cd{font-weight:700;color:#d97706;font-size:13px;margin:4px 0 8px}.card.ab .ab-i{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line,#e5e7eb)}.card.ab .ab-i img,.card.ab .ab-ph{width:52px;height:68px;border-radius:8px;object-fit:cover;flex:none;background:#eee}.card.ab .ab-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.card.ab .ab-tx b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.card.ab .ab-pr{font-weight:700;font-size:13px}.card.ab .btn.sm{padding:8px 12px;font-size:13px}
+.ab-hd{display:flex;align-items:center;gap:10px;margin:4px 0 10px}.ab-hd h2{margin:0;font-size:20px}.card.ab .ab-mg{font-size:12px;font-weight:600}.card.ab .ab-mg.ok{color:#16a34a}.card.ab .ab-mg.mid{color:#d97706}.card.ab .ab-mg.bad{color:#6b7280}.card.ab .ab-btns{display:flex;gap:6px;margin-top:4px}.card.abf{display:flex;flex-direction:column;gap:8px}.card.abf input,.card.abf textarea,.card.abf select{font:inherit;font-size:15px;padding:10px;border-radius:10px;border:1px solid var(--line,#d1d5db);background:var(--bg,#fff);color:inherit;width:100%;box-sizing:border-box}.card.abf .seg{display:flex;gap:4px;background:rgba(127,127,127,.12);border-radius:10px;padding:3px}.card.abf .seg button{flex:1;border:0;background:none;padding:8px 4px;border-radius:8px;font:inherit;font-size:13px;font-weight:600;color:inherit}.card.abf .seg button.on{background:var(--card,#fff);box-shadow:0 1px 3px rgba(0,0,0,.12)}.abf-ph input{display:none}.card .bad{color:#dc2626}.au-t .linkbtn{align-self:flex-start;padding:2px 0;font-size:12.5px;width:auto}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.rt-map{height:240px;border-radius:12px;margin:8px 0;overflow:hidden;background:rgba(127,127,127,.12)}.card.rt{display:flex;flex-direction:column;gap:8px}.card.rt.arrived{border:2px solid #16a34a}.rt-top{display:flex;gap:10px}.rt-top img,.rt-top .ab-ph{width:60px;height:78px;border-radius:9px;object-fit:cover;flex:none;background:#eee}.rt-tx{display:flex;flex-direction:column;gap:3px;min-width:0}.rt-tx b{font-size:15px}.rt-st{font-weight:700;font-size:13.5px;color:#d97706}.rt-st.ok{color:#16a34a}.rt-pt{display:flex;flex-direction:column;gap:3px;padding:10px;border-radius:10px;background:rgba(34,197,94,.1)}.rt-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px}.rt-btns .sub{flex:1}.rt-tl summary{cursor:pointer;font-weight:600;font-size:13.5px}.rt-tl ol{padding-left:18px;margin:8px 0 0;display:flex;flex-direction:column;gap:6px}.rt-tl li{display:flex;flex-direction:column}.tab{font-size:9.5px}
 </style><style>
 :root { padding-top: env(safe-area-inset-top, 0px); }
 [hidden] { display: none !important; }
@@ -316,6 +319,7 @@ a.li { text-decoration: none; color: inherit; }
   <button class="tab" data-tab="favs" id="tabFavs"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></span>Favoris</button>
   <button class="tab" data-tab="messages" id="tabMessages"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-12 7l-5 1 1-4a8 8 0 1 1 16-4z"/></svg></span>Messages</button>
   <button class="tab" data-tab="ventes" id="tabVentes"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg></span>Ventes</button>
+  <button class="tab" data-tab="litiges" id="tabLitiges"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><path d="M9.5 9.5 12 7l2.5 2.5M12 7v5"/></svg></span>Retours</button>
 </nav>
 
 <script src="config.js"></script>
@@ -468,8 +472,11 @@ a.li { text-decoration: none; color: inherit; }
   // ---------- Synchronisation (toutes les 6 s quand l'appli est ouverte) ----------
   // ---------- fenêtre « Active les notifications » : au plus une fois tous les 3 jours, seulement si elles sont coupées ----------
   // « Quoi de neuf » : montré une fois après chaque mise à jour de l'appli
-  const APP_VER = '1.24.1';
+  const APP_VER = '1.25';
   const APP_NOTES = [
+    ['Retours et litiges', 'Nouvel onglet : où est le colis retour, son suivi, et le point relais exact où aller le chercher (carte + itinéraire). Notification dès qu’il arrive.'],
+    ['Auto-buy', 'Une page complète : tes filtres, ajout par lien, description ou photo, et le fil avec Acheter / Offre et la marge estimée.'],
+    ['Centre d’aide', 'Des guides en vidéo : Réglages → aide, ou novaresell.github.io/nova-resell/aide.html.'],
     ['Tous tes navigateurs', 'Chrome et Brave reliés au même compte Nova apparaissent ensemble ; choisis sur quel navigateur créer les annonces.'],
     ['Relancer un automatisme', 'Chaque automatisme montre sa dernière action, avec un bouton ↻ pour le relancer.'],
     ['Réglages en haut à droite', 'Notifications, automatismes un par un, comptes Vinted, clé API, signaler un problème.'],
@@ -529,7 +536,7 @@ a.li { text-decoration: none; color: inherit; }
     } catch { /* on garde la dernière liste */ }
     return devStates;
   }
-  const ARR = ['drafts', 'aiQueue', 'questions', 'reviews', 'inbox', 'sales', 'returns', 'transit', 'repostItems', 'favs', 'advice', 'accounts', 'returnsDone', 'soldMini'];
+  const ARR = ['abFeed', 'drafts', 'aiQueue', 'questions', 'reviews', 'inbox', 'sales', 'returns', 'transit', 'repostItems', 'favs', 'advice', 'accounts', 'returnsDone', 'soldMini'];
   function mergeStates(list, fallback) {
     if (!list.length) return fallback;
     const main = { ...list[0].data, updatedAt: list[0].updatedAt };
@@ -776,6 +783,154 @@ Réponds UNIQUEMENT en JSON :
     }
     return c;
   }
+
+  // ---------- Auto-buy : filtres du PC, ajout par lien / description / photo, fil complet ----------
+  let abForm = null, abBusy = false;
+  function viewAutobuy(v) {
+    const back = h('button', { type: 'button', className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'photos'; render(); scrollTo(0, 0); });
+    v.append(h('div', { className: 'ab-hd' }, back, h('h2', { textContent: 'Auto-buy' }), h('a', { href: 'aide.html#autobuy', className: 'linkbtn', textContent: 'Guide vidéo', style: 'margin-left:auto' })));
+    const rules = state?.abRules || [];
+    // filtres
+    const rc = h('div', { className: 'card' }, h('b', { textContent: `Mes filtres (${rules.length})` }));
+    if (!rules.length) rc.append(h('div', { className: 'sub', textContent: 'Aucun filtre. Ajoute une recherche Vinted, un compte à suivre, ou décris ce que tu cherches.' }));
+    for (const r of rules) {
+      const cb = h('input', { type: 'checkbox', checked: r.on }); cb.addEventListener('change', () => doAction('abt-' + r.id, 'abToggle', { id: r.id, on: cb.checked }));
+      const del = h('button', { type: 'button', className: 'linkbtn danger', textContent: 'Supprimer' }); del.addEventListener('click', () => { if (confirm('Supprimer « ' + r.name + ' » ?')) doAction('abd-' + r.id, 'abDel', { id: r.id }); });
+      const cd = r.countdownEnd && Date.parse(r.countdownEnd) > Date.now() ? (() => { const ms = Date.parse(r.countdownEnd) - Date.now(); return `Ouverture dans ${Math.floor(ms / 864e5)} j ${Math.floor(ms / 36e5) % 24} h ${Math.floor(ms / 6e4) % 60} min`; })() : '';
+      rc.append(h('label', { className: 'au-row' }, h('span', { className: 'au-t' }, h('b', { textContent: (r.kind === 'seller' ? '@ ' : '') + r.name }),
+        h('small', { textContent: [r.maxPrice ? '≤ ' + r.maxPrice + ' €' : '', r.mode === 'auto' ? 'Achat auto' : 'Alerte + achat 1 clic'].filter(Boolean).join(' · ') }),
+        cd ? h('small', { className: 'au-st', textContent: cd }) : '', r.err ? h('small', { className: 'bad', textContent: r.err }) : '', del), h('span', { className: 'sw' }, cb, h('i'))));
+    }
+    const add = h('button', { type: 'button', className: 'btn primary', textContent: '+ Ajouter un filtre' }); add.addEventListener('click', () => { abForm = abForm ? null : { kind: 'filter' }; render(); });
+    rc.append(add); v.append(rc);
+    if (abForm) v.append(abFormCard());
+    // fil
+    const fc = h('div', { className: 'card ab' }, h('b', { textContent: 'Trouvés' }));
+    const feed = state?.abFeed || [];
+    if (!feed.length) fc.append(h('div', { className: 'sub', textContent: 'Rien pour l’instant. Les nouvelles annonces arrivent ici avec une notification.' }));
+    const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'Réservé pour toi', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint', offering: 'Offre en cours…', offered: 'Offre envoyée' };
+    for (const i of feed) {
+      const k = 'ab-' + i.id, a = actions[k], ko = 'abo-' + i.id;
+      const b = h('button', { type: 'button', className: 'btn primary sm', textContent: a?.status === 'new' ? 'Envoi…' : 'Acheter', disabled: /bought|gone/.test(i.status) || a?.status === 'new' });
+      b.addEventListener('click', () => doAction(k, 'abBuy', { id: i.id, _dev: i._dev }));
+      const op = Math.max(1, Math.round(i.price * 0.85 * 2) / 2);
+      const o = h('button', { type: 'button', className: 'btn sm', textContent: 'Offre ' + op + ' €', disabled: /bought|gone|offer/.test(i.status) || i.price < 3 || actions[ko]?.status === 'new' });
+      o.addEventListener('click', () => doAction(ko, 'abOffer', { id: i.id, pct: 15, _dev: i._dev }));
+      const min = Math.max(1, Math.round((Date.now() - i.at) / 60000));
+      const mg = i.est ? Math.round((i.est - (i.total || i.price)) * 2) / 2 : null;
+      fc.append(h('div', { className: 'ab-i' }, i.thumb ? h('img', { src: i.thumb, alt: '', loading: 'lazy' }) : h('span', { className: 'ab-ph' }),
+        h('div', { className: 'ab-tx' }, h('b', { textContent: i.title }), h('span', { className: 'sub', textContent: [i.ruleName, [i.line1, i.line2].filter(Boolean).join(' · '), min < 60 ? `il y a ${min} min` : `il y a ${Math.round(min / 60)} h`].filter(Boolean).join(' · ') }),
+          h('span', { className: 'ab-pr', textContent: i.price + ' €' + (AB_ST[i.status] ? ' · ' + AB_ST[i.status] : '') }),
+          mg != null ? h('span', { className: 'ab-mg ' + (mg >= 5 ? 'ok' : mg > 0 ? 'mid' : 'bad'), textContent: `Prix habituel ≈ ${i.est} € · ${mg > 0 ? 'marge ≈ +' + mg + ' €' : 'pas de marge'}` }) : '',
+          h('div', { className: 'ab-btns' }, b, o))));
+    }
+    v.append(fc);
+  }
+  function abFormCard() {
+    const f = abForm;
+    const seg = h('div', { className: 'seg' }, ...[['filter', 'Recherche'], ['describe', 'Décrire / photo'], ['seller', 'Compte']].map(([k, l]) => { const b = h('button', { type: 'button', className: f.kind === k ? 'on' : '', textContent: l }); b.addEventListener('click', () => { abForm = { ...f, kind: k }; render(); }); return b; }));
+    const card = h('div', { className: 'card abf' }, seg);
+    const inp = (ph, key, type = 'text') => { const i = h('input', { type, placeholder: ph, value: f[key] || '' }); i.addEventListener('input', () => { f[key] = i.value; }); return i; };
+    const msg = h('div', { className: 'sub' + (f.err ? ' bad' : ''), textContent: f.msg || '' });
+    if (f.kind === 'describe') {
+      const ta = h('textarea', { rows: 2, placeholder: 'ex. TN noires taille 42, moins de 40 €' }); ta.value = f.txt || ''; ta.addEventListener('input', () => { f.txt = ta.value; });
+      const ph = h('input', { type: 'file', accept: 'image/*' }); ph.addEventListener('change', async () => { const file = ph.files?.[0]; if (!file) return; const { blob } = await shrink(file, 900, 0.82); f.photo = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.readAsDataURL(blob); }); f.msg = 'Photo ajoutée'; render(); });
+      const go = h('button', { type: 'button', className: 'btn', textContent: abBusy ? 'L’IA prépare…' : 'Préparer avec l’IA', disabled: abBusy });
+      go.addEventListener('click', async () => {
+        if (!f.txt && !f.photo) { f.msg = 'Écris ce que tu cherches ou ajoute une photo.'; f.err = 1; render(); return; }
+        const key = await apiKeyGet(); if (!key) { f.msg = 'Ajoute ta clé API Claude dans les réglages.'; f.err = 1; render(); return; }
+        abBusy = true; render();
+        try {
+          const prompt = `Tu prépares une recherche Vinted France pour un revendeur qui veut être alerté des nouvelles annonces.\n${f.txt ? 'Demande : « ' + f.txt + ' »\n' : ''}${f.photo ? 'La photo montre l’article recherché : identifie marque, modèle, type, couleur.\n' : ''}Réponds UNIQUEMENT en JSON : {"name":"nom court","search_text":"2 à 5 mots à taper sur Vinted","price_max":nombre ou null,"must":"mots obligatoires séparés par des virgules, ou vide","why":"une phrase"}`;
+          const content = f.photo ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: f.photo } }, { type: 'text', text: prompt }] : prompt;
+          const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-haiku-5-5', max_tokens: 300, messages: [{ role: 'user', content }] }) });
+          const j = await res.json(); if (!res.ok) throw new Error(j.error?.message || 'Erreur IA ' + res.status);
+          const out = JSON.parse(((j.content || []).map((b) => b.text || '').join('').match(/\{[\s\S]*\}/) || ['{}'])[0]);
+          if (!out.search_text) throw new Error('Précise la marque ou le type d’article');
+          const q = new URLSearchParams({ search_text: out.search_text, order: 'newest_first' }); if (out.price_max) { q.set('price_to', String(out.price_max)); q.set('currency', 'EUR'); }
+          abForm = { kind: 'filter', url: 'https://www.vinted.fr/catalog?' + q, name: out.name || out.search_text, maxPrice: out.price_max || '', keyword: out.must || '', mode: 'alert', msg: (out.why || '') + ' Vérifie puis « Ajouter ».' };
+        } catch (e) { f.msg = e.message; f.err = 1; } finally { abBusy = false; render(); }
+      });
+      card.append(ta, h('label', { className: 'btn sm abf-ph' }, 'Photo', ph), go, msg);
+      return card;
+    }
+    const mode = h('select', {}, h('option', { value: 'alert', textContent: 'Alerte + achat en 1 clic' }), h('option', { value: 'auto', textContent: 'Achat automatique (plafonds du PC)' })); mode.value = f.mode || 'alert'; mode.addEventListener('change', () => { f.mode = mode.value; });
+    card.append(f.kind === 'seller' ? inp('Lien du profil : vinted.fr/member/…', 'url', 'url') : inp('Lien de ta recherche vinted.fr', 'url', 'url'), inp('Nom (ex. Ralph pulls)', 'name'), inp('Prix max (€)', 'maxPrice', 'number'), inp('Mots obligatoires (virgule = ou)', 'keyword'));
+    if (f.kind === 'seller') card.append(inp('Articles max à acheter', 'maxItems', 'number'));
+    const save = h('button', { type: 'button', className: 'btn primary', textContent: 'Ajouter' });
+    save.addEventListener('click', () => {
+      const rule = { kind: f.kind, name: f.name, url: f.url, maxPrice: f.maxPrice, keyword: f.keyword, mode: mode.value, maxItems: f.maxItems };
+      if (f.kind === 'seller') { rule.sellerId = (String(f.url || '').match(/member\/(\d+)/) || String(f.url || '').match(/^(\d{3,})$/) || [])[1]; if (!rule.sellerId) { f.msg = 'Colle le lien du profil (vinted.fr/member/…).'; f.err = 1; render(); return; } }
+      else if (!/vinted\.fr\/(catalog|vetements)/.test(f.url || '')) { f.msg = 'Colle l’adresse d’une page de résultats vinted.fr.'; f.err = 1; render(); return; }
+      doAction('aba-' + Date.now(), 'abAdd', { rule }); abForm = null; toast('Filtre envoyé au PC'); render();
+    });
+    card.append(mode, save, msg);
+    return card;
+  }
+
+  // ---------- Retours / litiges : où est le colis, et dans quel point relais aller le chercher ----------
+  let leafletP = null;
+  function loadLeaflet() {
+    if (window.L) return Promise.resolve(window.L);
+    leafletP ||= new Promise((ok, ko) => {
+      const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.append(css);
+      const sc = document.createElement('script'); sc.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; sc.onload = () => ok(window.L); sc.onerror = ko; document.head.append(sc);
+    });
+    return leafletP;
+  }
+  const ptLine = (p) => p ? [p.address, [p.zip, p.city].filter(Boolean).join(' ')].filter(Boolean).join(', ') : '';
+  async function geocode(p) {
+    if (p.lat && p.lng) return [p.lat, p.lng];
+    const q = [p.name, ptLine(p)].filter(Boolean).join(', '); if (!ptLine(p)) return null;
+    const cache = store.get('nova_geo') || {}; if (cache[q]) return cache[q];
+    try {
+      const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr,be,lu&q=' + encodeURIComponent(ptLine(p)), { headers: { accept: 'application/json' } });
+      const j = await r.json(); if (!j[0]) return null;
+      cache[q] = [Number(j[0].lat), Number(j[0].lon)]; store.set('nova_geo', cache); return cache[q];
+    } catch { return null; }
+  }
+  const CARRIER = { MONDIAL: 'Mondial Relay', RELAIS_COLIS: 'Relais Colis', COLISSIMO: 'Colissimo', CHRONOPOST: 'Chronopost', DPD: 'DPD', UPS: 'UPS', VINTED_GO: 'Vinted Go', 'PRO-CARRIER': 'Transporteur' };
+  const RT_TYPE = { not_as_described: 'Pas conforme', damaged: 'Abîmé', missing: 'Manquant', counterfeit: 'Contrefaçon', not_received: 'Non reçu' };
+  function viewLitiges(v) {
+    const rets = state?.returns || [];
+    v.append(h('div', { className: 'ab-hd' }, h('h2', { textContent: 'Retours et litiges' }), h('span', { className: 'sub', style: 'margin-left:auto', textContent: rets.length + ' en cours' })));
+    if (!rets.length) { v.append(h('div', { className: 'card' }, h('b', { textContent: 'Aucun colis retour en cours' }), h('div', { className: 'sub', textContent: 'Quand un acheteur renvoie un article, tu vois ici où est le colis et dans quel point relais aller le chercher. Une notification t’avertit dès qu’il arrive.' }))); return; }
+    const withPt = rets.filter((r) => r.track?.point);
+    if (withPt.length) {
+      const mapBox = h('div', { className: 'rt-map', id: 'rtMap' });
+      v.append(h('div', { className: 'card' }, h('b', { textContent: 'Carte des points relais' }), mapBox, h('div', { className: 'sub', textContent: 'Les colis retour arrivés ou attendus, à leur point relais exact.' })));
+      setTimeout(async () => {
+        try {
+          const L = await loadLeaflet(); if (!document.getElementById('rtMap')) return;
+          const m = L.map('rtMap', { zoomControl: true, attributionControl: true }); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(m);
+          const pts = [];
+          for (const r of withPt) { const ll = await geocode(r.track.point); if (!ll) continue; pts.push(ll); L.marker(ll).addTo(m).bindPopup(`<b>${(r.track.point.name || 'Point relais').replace(/</g, '&lt;')}</b><br>${ptLine(r.track.point).replace(/</g, '&lt;')}<br>${(r.title || '').replace(/</g, '&lt;')}`); }
+          if (pts.length) m.fitBounds(pts, { padding: [30, 30], maxZoom: 15 }); else m.setView([46.6, 2.4], 5);
+        } catch { const b = document.getElementById('rtMap'); if (b) b.textContent = 'Carte indisponible (pas de réseau ?)'; }
+      }, 50);
+    }
+    for (const r of rets) {
+      const t = r.track || {};
+      const p = t.point;
+      const status = t.arrived ? 'Arrivé : à récupérer' : t.pickedUp ? 'Récupéré' : t.events?.length ? (t.events[0].msg || 'En route') : (r.step || 'Retour demandé : le colis n’est pas encore parti');
+      const card = h('div', { className: 'card rt' + (t.arrived ? ' arrived' : '') },
+        h('div', { className: 'rt-top' }, r.photo ? h('img', { src: r.photo, alt: '' }) : h('span', { className: 'ab-ph' }),
+          h('div', { className: 'rt-tx' }, h('b', { textContent: r.title }), h('span', { className: 'sub', textContent: [r.skus?.join(' + '), RT_TYPE[r.type] || r.type, r.refund ? 'remboursement ' + r.refund + ' €' : '', r.buyer ? '@' + r.buyer : ''].filter(Boolean).join(' · ') }),
+            h('span', { className: 'rt-st' + (t.arrived ? ' ok' : ''), textContent: status }))));
+      if (t.eta && !t.arrived) card.append(h('div', { className: 'sub', textContent: 'Arrivée estimée : ' + t.eta }));
+      if (p) {
+        const q = encodeURIComponent([p.name, ptLine(p)].filter(Boolean).join(', '));
+        card.append(h('div', { className: 'rt-pt' }, h('b', { textContent: '📍 ' + (p.name || 'Point relais') }), ptLine(p) ? h('span', { textContent: ptLine(p) }) : '', p.hours ? h('span', { className: 'sub', textContent: p.hours }) : '',
+          h('div', { className: 'rt-btns' }, h('a', { className: 'btn primary sm', href: (/iPhone|iPad/.test(navigator.userAgent) ? 'https://maps.apple.com/?q=' : 'https://www.google.com/maps/search/?api=1&query=') + q, target: '_blank', rel: 'noopener', textContent: 'Itinéraire' }))));
+      } else if (!t.arrived) card.append(h('div', { className: 'sub', textContent: 'Le point relais s’affichera dès que le transporteur l’indique.' }));
+      if (t.code || t.url) card.append(h('div', { className: 'rt-btns' }, h('span', { className: 'sub', textContent: (CARRIER[t.carrier] || t.carrier || 'Transporteur') + (t.code ? ' · suivi ' + t.code : '') }), t.url ? h('a', { className: 'btn sm', href: t.url, target: '_blank', rel: 'noopener', textContent: 'Suivre le colis' }) : ''));
+      if (t.events?.length) card.append(h('details', { className: 'rt-tl' }, h('summary', { textContent: 'Historique du colis' }), h('ol', {}, ...t.events.map((e) => h('li', {}, h('b', { textContent: e.msg || e.status }), h('span', { className: 'sub', textContent: e.at ? new Date(e.at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '' }))))));
+      if (r.conversationId) card.append(h('a', { className: 'linkbtn', href: 'https://www.vinted.fr/inbox/' + r.conversationId, target: '_blank', rel: 'noopener', textContent: 'Ouvrir la conversation' }));
+      v.append(card);
+    }
+    const all = rets.filter((r) => r.track?.point);
+    if (all.length > 1) v.append(h('div', { className: 'card' }, h('b', { textContent: 'Liste des points relais' }), ...all.map((r) => h('div', { className: 'set-row' }, h('b', { textContent: r.track.point.name || 'Point relais' }), h('span', { textContent: ptLine(r.track.point) })))));
+  }
   function viewEstim(v) {
     const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'photos'; render(); });
     v.append(h('div', { className: 'set-h' }, h('h2', { textContent: 'Estimer un prix' }), back));
@@ -885,6 +1040,8 @@ Réponds UNIQUEMENT en JSON :
     if (tab === 'ventes') viewVentes(v);
     if (tab === 'settings') viewSettings(v);
     if (tab === 'estim') viewEstim(v);
+    if (tab === 'autobuy') viewAutobuy(v);
+    if (tab === 'litiges') viewLitiges(v);
     $('#setBtn')?.classList.toggle('on', tab === 'settings');
     renderHeader();
   }
@@ -906,7 +1063,8 @@ Réponds UNIQUEMENT en JSON :
     const badge = (id, n) => { const t = $(id); t.querySelector('.n')?.remove(); if (n) t.append(h('span', { className: 'n', textContent: n })); };
     badge('#tabDrafts', s?.drafts?.length || 0);
     badge('#tabMessages', (s?.aiQueue?.length || 0) + (s?.questions?.length || 0) + (s?.reviews?.length || 0) + (s?.inbox || []).filter((c) => c.unread).length);
-    badge('#tabVentes', (s?.stats?.toShip || 0) + (s?.returns?.length || 0));
+    badge('#tabVentes', s?.stats?.toShip || 0);
+    badge('#tabLitiges', (s?.returns || []).filter((r) => r.track?.arrived).length || (s?.returns?.length || 0));
     badge('#tabRepost', (s?.repostItems || []).filter((i) => i.due).length);
     badge('#tabFavs', s?.favs?.length || 0);
     badge('#tabPhotos', jobs.filter((j) => j.status === 'new' || j.status === 'pc').length);
@@ -976,6 +1134,28 @@ Réponds UNIQUEMENT en JSON :
         tile(String(state.stats?.toShip ?? 0), state.stats?.late ? `colis · ${state.stats.late} en retard` : 'colis à déposer', go('ventes'), true),
         tile(String((state.aiQueue || []).length), 'offres à valider', go('messages', 'queue'), true),
         tile(String(unread), 'messages non lus', go('messages', 'inbox'), true))));
+    }
+    // auto-buy : articles trouvés par les filtres du PC, à réserver d'un geste
+    if (state && state.abRules) {
+      const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'Réservé pour toi', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint' };
+      const on = (state.abRules || []).filter((r) => r.on);
+      const cd = (state.abRules || []).find((r) => r.on && r.countdownEnd && Date.parse(r.countdownEnd) > Date.now());
+      const card = h('div', { className: 'card ab' }, h('div', { className: 'ab-h' }, h('b', { textContent: 'Auto-buy' }), h('span', { className: 'sub', textContent: on.length + ' filtre' + (on.length > 1 ? 's' : '') + ' actif' + (on.length > 1 ? 's' : '') })));
+      if (cd) { const ms = Date.parse(cd.countdownEnd) - Date.now(); card.append(h('div', { className: 'ab-cd', textContent: `${cd.name} : ouverture dans ${Math.floor(ms / 864e5)} j ${Math.floor(ms / 36e5) % 24} h ${Math.floor(ms / 6e4) % 60} min` })); }
+      const feed = (state.abFeed || []).slice(0, 6);
+      if (!feed.length) card.append(h('div', { className: 'sub', textContent: 'Rien de nouveau. Tu seras prévenu dès qu’un article sort.' }));
+      for (const i of feed) {
+        const k = 'ab-' + i.id, a = actions[k];
+        const b = h('button', { type: 'button', className: 'btn primary sm', textContent: a?.status === 'new' ? 'Envoi…' : 'Acheter', disabled: /bought|gone/.test(i.status) || a?.status === 'new' });
+        b.addEventListener('click', () => doAction(k, 'abBuy', { id: i.id, _dev: i._dev }));
+        const min = Math.max(1, Math.round((Date.now() - i.at) / 60000));
+        card.append(h('div', { className: 'ab-i' }, i.thumb ? h('img', { src: i.thumb, alt: '', loading: 'lazy' }) : h('span', { className: 'ab-ph' }),
+          h('div', { className: 'ab-tx' }, h('b', { textContent: i.title }), h('span', { className: 'sub', textContent: [i.ruleName, [i.line1, i.line2].filter(Boolean).join(' · '), min < 60 ? `il y a ${min} min` : `il y a ${Math.round(min / 60)} h`].filter(Boolean).join(' · ') }),
+            h('span', { className: 'ab-pr', textContent: i.price + ' €' + (AB_ST[i.status] ? ' · ' + AB_ST[i.status] : '') })), b));
+      }
+      const all = h('button', { type: 'button', className: 'btn', textContent: 'Ouvrir Auto-buy (filtres, photo, fil complet)' }); all.addEventListener('click', () => { tab = 'autobuy'; render(); scrollTo(0, 0); });
+      card.append(all, h('div', { className: 'sub', textContent: '« Acheter » ouvre l’article sur ton PC et le réserve : tu paies ensuite, ou Nova paie seul si l’achat auto est activé.' }));
+      v.append(card);
     }
     // objectif du mois : progression, reste à faire par jour, réglable ici
     if (state?.stats) {

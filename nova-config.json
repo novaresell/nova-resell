@@ -9,5 +9,16 @@
     "/"
   ],
   "relaisRegex": "point relais|disponible|à récupérer|a recuperer|retrait",
-  "storeUrl": "https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj"
+  "storeUrl": "https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj",
+  "ab": {
+    "buy": [
+      "[data-testid=\"item-buy-button\"]"
+    ],
+    "pay": [
+      "[data-testid=\"single-checkout-order-summary-purchase-button\"]"
+    ],
+    "offer": [
+      "[data-testid=\"item-buyer-offer-button\"]"
+    ]
+  }
 }
