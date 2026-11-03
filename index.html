@@ -808,7 +808,7 @@ Réponds UNIQUEMENT en JSON :
     const fc = h('div', { className: 'card ab' }, h('b', { textContent: 'Trouvés' }));
     const feed = state?.abFeed || [];
     if (!feed.length) fc.append(h('div', { className: 'sub', textContent: 'Rien pour l’instant. Les nouvelles annonces arrivent ici avec une notification.' }));
-    const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'Réservé pour toi', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint', offering: 'Offre en cours…', offered: 'Offre envoyée' };
+    const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'À payer vite', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint', offering: 'Offre en cours…', offered: 'Offre envoyée' };
     for (const i of feed) {
       const k = 'ab-' + i.id, a = actions[k], ko = 'abo-' + i.id;
       const b = h('button', { type: 'button', className: 'btn primary sm', textContent: a?.status === 'new' ? 'Envoi…' : 'Acheter', disabled: /bought|gone/.test(i.status) || a?.status === 'new' });
@@ -1137,7 +1137,7 @@ Réponds UNIQUEMENT en JSON :
     }
     // auto-buy : articles trouvés par les filtres du PC, à réserver d'un geste
     if (state && state.abRules) {
-      const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'Réservé pour toi', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint' };
+      const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'À payer vite', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint' };
       const on = (state.abRules || []).filter((r) => r.on);
       const cd = (state.abRules || []).find((r) => r.on && r.countdownEnd && Date.parse(r.countdownEnd) > Date.now());
       const card = h('div', { className: 'card ab' }, h('div', { className: 'ab-h' }, h('b', { textContent: 'Auto-buy' }), h('span', { className: 'sub', textContent: on.length + ' filtre' + (on.length > 1 ? 's' : '') + ' actif' + (on.length > 1 ? 's' : '') })));
@@ -1154,7 +1154,7 @@ Réponds UNIQUEMENT en JSON :
             h('span', { className: 'ab-pr', textContent: i.price + ' €' + (AB_ST[i.status] ? ' · ' + AB_ST[i.status] : '') })), b));
       }
       const all = h('button', { type: 'button', className: 'btn', textContent: 'Ouvrir Auto-buy (filtres, photo, fil complet)' }); all.addEventListener('click', () => { tab = 'autobuy'; render(); scrollTo(0, 0); });
-      card.append(all, h('div', { className: 'sub', textContent: '« Acheter » ouvre l’article sur ton PC et le réserve : tu paies ensuite, ou Nova paie seul si l’achat auto est activé.' }));
+      card.append(all, h('div', { className: 'sub', textContent: '« Acheter » ouvre la page de paiement sur ton PC : paie vite (il n’est à toi qu’une fois payé), ou Nova paie seul si l’achat auto est activé.' }));
       v.append(card);
     }
     // objectif du mois : progression, reste à faire par jour, réglable ici
