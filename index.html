@@ -251,6 +251,19 @@ a.li { text-decoration: none; color: inherit; }
 .tab { position: relative; }
 </style>
 <script>(function(){try{var t=localStorage.getItem('novaPhoneTheme');if(t&&t!=='auto')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<style id="minuit">
+/* Nova 1.26 · direction « Minuit » (mêmes couleurs que l'extension) */
+:root { --bg: #0B1020; --surface: #131A33; --surface-2: #18213F; --line: #222C4D; --text: #EEF2FF; --muted: #8A94B6; --cyan: #38BDF8; --indigo: #818CF8; --grad: linear-gradient(135deg, #22D3EE, #6366F1); --tabbar: rgba(11,16,32,.92); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #F2F5FB; --surface: #FFFFFF; --surface-2: #F5F7FC; --line: #E1E7F2; --text: #0B1226; --muted: #5C6884; --cyan: #0284C7; --indigo: #4F46E5; --tabbar: rgba(255,255,255,.94); } }
+:root[data-theme="light"] { --bg: #F2F5FB; --surface: #FFFFFF; --surface-2: #F5F7FC; --line: #E1E7F2; --text: #0B1226; --muted: #5C6884; --cyan: #0284C7; --indigo: #4F46E5; --tabbar: rgba(255,255,255,.94); }
+body { background: var(--bg); -webkit-font-smoothing: antialiased; }
+.hero { background: var(--surface) !important; border-bottom: 1px solid var(--line); }
+.hero::before, .hero::after { display: none !important; }
+.kpi { background: var(--surface-2) !important; border: 1px solid var(--line) !important; border-radius: 14px !important; }
+.card, .sheet { border-radius: 16px; border: 1px solid var(--line); }
+button, .btn { transition: filter .15s, background .15s, transform .08s; }
+button:active { transform: translateY(1px); }
+</style>
 </head>
 <body>
 <div class="ext-bar" id="extBar" hidden><span><b>Sur ordinateur, Nova s'utilise dans l'extension</b> (gratuite) pour Chrome ou Brave.</span><a class="eb-btn" id="extBarBtn" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">Ajouter l'extension</a><button class="eb-x" id="extBarX" type="button" aria-label="Fermer">×</button></div>
