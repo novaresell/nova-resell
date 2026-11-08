@@ -1013,7 +1013,8 @@ Réponds UNIQUEMENT en JSON :
     v.append(auto);
     const fresh = state && Date.now() - (state.updatedAt || 0) < 6 * 60000;
     const app = h('div', { className: 'card' }, h('b', { textContent: 'Appli et PC' }),
-      h('div', { className: 'set-row' }, h('b', { textContent: 'PC' }), h('span', { textContent: !state ? 'jamais vu' : fresh ? 'en ligne' : 'hors ligne depuis ' + new Date(state.updatedAt).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) })),
+      h('div', { className: 'set-row' }, h('b', { textContent: 'PC' }), h('span', { textContent: (!state ? 'jamais vu' : fresh ? 'en ligne' : 'hors ligne depuis ' + new Date(state.updatedAt).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + (state?.version ? ` · Nova ${state.version}` : '') })),
+      state?.stateError && fresh ? h('div', { className: 'sub', textContent: '⚠️ ' + state.stateError }) : null,
       h('div', { className: 'set-row' }, h('b', { textContent: 'Version de Nova sur le PC' }), h('span', { textContent: state?.version || '–' })));
     const wnB = h('button', { className: 'linkbtn small', textContent: 'Voir les nouveautés de la ' + APP_VER }); wnB.addEventListener('click', () => whatsNew(true)); app.append(wnB);
     const rl = h('button', { className: 'btn', textContent: 'Recharger l’appli' }); rl.addEventListener('click', () => location.reload());
@@ -1063,7 +1064,8 @@ Réponds UNIQUEMENT en JSON :
     const s = state;
     const fresh = s && Date.now() - (s.updatedAt || 0) < 6 * 60000;
     $('#pcStatus').className = 'pc ' + (s ? (fresh ? 'on' : 'off') : '');
-    $('#pcText').textContent = !s ? 'PC jamais vu' : fresh ? 'PC en ligne' : 'PC hors ligne';
+    $('#pcText').textContent = !s ? 'PC jamais vu' : fresh ? (s.stateError ? 'PC en ligne · Vinted à vérifier' : 'PC en ligne') : 'PC hors ligne';
+    $('#pcStatus').title = !s ? 'Ouvre Nova sur ton PC, connecté au même compte Nova (⚙︎ → Compte Nova)' : fresh ? (s.stateError || 'Ton PC répond') : 'Dernier signe du PC : ' + new Date(s.updatedAt).toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + ' · allume le PC, ouvre Chrome et Nova';
     const allK = s?.statsAll && store.get('nova_kpi_all') !== false; const K = allK ? s.statsAll : s?.stats;
     $('#kShip').textContent = K?.toShip ?? '–';
     $('#kDrafts').textContent = K?.drafts ?? '–';
