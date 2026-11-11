@@ -144,7 +144,7 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .stock-q, .stock-f { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3)); background: transparent; color: inherit; font: inherit; font-size: 14px; }
 .stock-list { display: grid; gap: 2px; max-height: 60vh; overflow-y: auto; }
 .stock-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }
-.colis-card{display:flex;flex-direction:column;gap:10px}.colis-map{height:260px}
+.upd-card{border:2px solid #f59e0b}.colis-card{display:flex;flex-direction:column;gap:10px}.colis-map{height:260px}
 .colis-pt{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}.colis-pt.arrived{border:2px solid #16a34a}
 .colis-pt-h{display:flex;gap:10px;align-items:flex-start}.colis-pt-h>div{display:flex;flex-direction:column;gap:2px;min-width:0}
 .colis-n{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:#131A33;color:#fff;border:2px solid #38BDF8}.colis-pt.arrived .colis-n{border-color:#16a34a}
@@ -1147,8 +1147,22 @@ Réponds UNIQUEMENT en JSON :
     return groups;
   }
   pickInput.addEventListener('cancel', () => { picking = false; });
+  // version de Nova la plus récente (mise à jour à chaque sortie) : un PC en retard est signalé ici, avec la marche à suivre
+  const NOVA_LATEST = '1.27.5', STORE = 'https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj';
+  const older = (a, b) => { const pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0); return false; };
+  function updateCard() {
+    const vs = [...new Set([state?.version, ...(state?.devices || []).map((d) => d.version)].filter(Boolean))].filter((x) => older(x, NOVA_LATEST));
+    if (!vs.length || store.get('nova_upd_hide') === NOVA_LATEST) return null;
+    const x = h('button', { className: 'linkbtn', textContent: 'Plus tard' }); const c = h('div', { className: 'card upd-card' },
+      h('b', { textContent: `⬆️ Mets Nova à jour sur ton PC (V${vs[0]} → V${NOVA_LATEST})` }),
+      h('span', { className: 'sub', textContent: 'Ta version n’a pas les derniers correctifs (republication sans doublon, stock, colis…). Sur le PC : installe Nova depuis le Chrome Web Store, il se mettra ensuite à jour tout seul. Tes réglages et ton stock reviennent en te connectant à ton compte Nova.' }),
+      h('div', { className: 'rt-btns' }, h('a', { className: 'btn primary sm', href: STORE, target: '_blank', rel: 'noopener', textContent: 'Ouvrir le Chrome Web Store' }), x));
+    x.addEventListener('click', () => { store.set('nova_upd_hide', NOVA_LATEST); c.remove(); });
+    return c;
+  }
   function viewPhotos(v) {
     const input = pickInput;
+    const uc = updateCard(); if (uc) v.append(uc);
     v.append(
       h('h2', { textContent: 'Nouvel article' }),
       h('p', { className: 'sub', textContent: "Choisis toutes tes photos d'un coup, même pour plusieurs articles : Nova les trie par article. Tu peux ajouter un SKU à chaque article, ou photographier son étiquette SKU." }),
@@ -1477,7 +1491,7 @@ Réponds UNIQUEMENT en JSON :
       async (v) => { if (!v.title) throw new Error('Donne un nom à l’article'); await sendStockOp({ op: 'add', row: v }); });
   }
   function addLot() {
-    stockSheet('🧺 Nouveau lot (ballot, carton…)', [['name', 'Nom du lot', 'text', '', 'Jean Levi’s femme'], ['total', 'Prix total payé (€)', 'num', ''], ['n', 'Nombre d’articles', 'num', '10'], ['px', 'Lettre(s) des SKU (ex. J → J1, J2…)', 'text', ''], ['place', 'Rangement (meuble + étage)', 'text', '', 'ex. A2'], ['cat', 'Catégorie', 'cat', 'Ballot'], ['date', 'Date d’achat', 'date', today()], ['items', 'Articles (optionnel, un par ligne)', 'area', '', 'Veste Adidas\nVeste Nike']],
+    stockSheet('🧺 Nouveau lot (ballot, carton…)', [['name', 'Nom du lot', 'text', '', 'Jean Levi’s femme'], ['total', 'Prix total payé (€)', 'num', ''], ['fees', 'Frais en plus : transport, essence… (€)', 'num', ''], ['n', 'Nombre d’articles', 'num', '10'], ['px', 'Lettre(s) des SKU (ex. J → J1, J2…)', 'text', ''], ['place', 'Rangement (meuble + étage)', 'text', '', 'ex. A2'], ['cat', 'Catégorie', 'cat', 'Ballot'], ['date', 'Date d’achat', 'date', today()], ['items', 'Articles (optionnel, un par ligne)', 'area', '', 'Veste Adidas\nVeste Nike']],
       async (v) => { if (!(Number(v.n) > 0) && !v.items) throw new Error('Indique le nombre d’articles'); await sendStockOp({ op: 'lot', lot: { ...v, items: String(v.items || '').split('\n').map((x) => x.trim()).filter(Boolean) } }); });
   }
   let drawStock = null;
@@ -1514,13 +1528,27 @@ Réponds UNIQUEMENT en JSON :
     for (const x of list) { if (!x.point) { noPt.push(x); continue; } const k = (x.point.name + '|' + ptLine(x.point)).toLowerCase(); if (!groups.has(k)) groups.set(k, { p: x.point, items: [] }); groups.get(k).items.push(x); }
     const G = [...groups.values()].sort((a, b) => b.items.filter((x) => x.arrived).length - a.items.filter((x) => x.arrived).length);
     const nArr = list.filter((x) => x.arrived).length;
-    const st = (x) => x.arrived ? '✅ Arrivé : il t’attend' : x.last?.msg ? '🚚 ' + x.last.msg.slice(0, 80) : '⏳ ' + (x.statusTitle || 'En préparation chez le vendeur');
+    const st = (x) => x.arrived ? (() => { const w = x.arrivedAt ? Math.floor((Date.now() - x.arrivedAt) / 864e5) : null, left = x.leaveAt ? Math.round((x.leaveAt - Date.now()) / 864e5) : null; return `✅ Arrivé${w ? ` depuis ${w} j` : ''} : il t’attend${left != null ? ` · ${left <= 0 ? 'à récupérer aujourd’hui' : `reste ≈ ${left} j`}` : ''}`; })() : x.last?.msg ? '🚚 ' + x.last.msg.slice(0, 80) : '⏳ ' + (x.statusTitle || 'En préparation chez le vendeur');
     const go = (p) => (/iPhone|iPad/.test(navigator.userAgent) ? 'https://maps.apple.com/?q=' : 'https://www.google.com/maps/search/?api=1&query=') + encodeURIComponent([p.name, ptLine(p)].filter(Boolean).join(', '));
     const item = (x) => h('div', { className: 'colis-it' + (x.arrived ? ' ok' : '') }, x.photo ? h('img', { src: x.photo, alt: '' }) : h('span', { className: 'ab-ph' }),
       h('div', {}, h('b', { textContent: x.title }), h('span', { className: 'sub colis-st', textContent: st(x) }), h('span', { className: 'sub', textContent: [CARRIER[String(x.carrier).toUpperCase()] || x.carrier, x.code && 'suivi ' + x.code, !x.arrived && x.eta && 'arrivée ' + x.eta].filter(Boolean).join(' · ') })),
       x.url ? h('a', { className: 'btn sm', href: x.url, target: '_blank', rel: 'noopener', textContent: 'Suivi' }) : '');
     const mapBox = h('div', { className: 'rt-map colis-map', id: 'colisMap' });
-    const card = h('div', { className: 'card colis-card' }, h('b', { textContent: '📍 Mes colis à récupérer' }), h('span', { className: 'sub', textContent: `${list.length} achat${list.length > 1 ? 's' : ''} en cours · ${nArr} arrivé${nArr > 1 ? 's' : ''} · ${G.length} point${G.length > 1 ? 's' : ''} relais` }), G.length ? mapBox : '',
+    const tourPts = G.filter((g) => g.items.some((x) => x.arrived));
+    const tour = tourPts.length >= 2 ? h('button', { className: 'btn primary', textContent: `🧭 Tout récupérer (${tourPts.length} points relais)` }) : '';
+    if (tour) tour.addEventListener('click', async () => {
+      tour.disabled = true;
+      try {
+        const P = await Promise.all(tourPts.map(async (g) => ({ p: g.p, ll: await geocode(g.p) })));
+        const d = (a, b) => Math.hypot(a[0] - b[0], (a[1] - b[1]) * Math.cos(a[0] * Math.PI / 180));
+        const me = await new Promise((ok) => { if (!navigator.geolocation) return ok(null); navigator.geolocation.getCurrentPosition((p) => ok([p.coords.latitude, p.coords.longitude]), () => ok(null), { timeout: 4000, maximumAge: 300000 }); });
+        const ok = P.filter((x) => x.ll), no = P.filter((x) => !x.ll); let best = ok, bl = Infinity;
+        for (let s0 = 0; s0 < ok.length; s0++) { const left = ok.filter((_, i) => i !== s0), path = [ok[s0]]; let len = me ? d(me, ok[s0].ll) : 0; while (left.length) { const cur = path[path.length - 1]; let k = 0; left.forEach((x, i) => { if (d(cur.ll, x.ll) < d(cur.ll, left[k].ll)) k = i; }); len += d(cur.ll, left[k].ll); path.push(left.splice(k, 1)[0]); } if (len < bl) { bl = len; best = path; } }
+        const o = [...best, ...no], q = (x) => [x.p.name, ptLine(x.p)].filter(Boolean).join(', ');
+        location.href = 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(q(o[o.length - 1])) + (o.length > 1 ? '&waypoints=' + encodeURIComponent(o.slice(0, -1).map(q).join('|')) : '');
+      } finally { tour.disabled = false; }
+    });
+    const card = h('div', { className: 'card colis-card' }, h('b', { textContent: '📍 Mes colis à récupérer' }), h('span', { className: 'sub', textContent: `${list.length} achat${list.length > 1 ? 's' : ''} en cours · ${nArr} arrivé${nArr > 1 ? 's' : ''} · ${G.length} point${G.length > 1 ? 's' : ''} relais` }), tour, G.length ? mapBox : '',
       ...G.map((g, i) => h('div', { className: 'colis-pt' + (g.items.some((x) => x.arrived) ? ' arrived' : ''), id: 'colisPt' + i },
         h('div', { className: 'colis-pt-h' }, h('span', { className: 'colis-n', textContent: String(i + 1) }), h('div', {}, h('b', { textContent: g.p.name || 'Point relais' }), h('span', { className: 'sub', textContent: ptLine(g.p) }), g.p.hours ? h('span', { className: 'sub', textContent: '🕒 ' + g.p.hours }) : '')),
         ...g.items.map(item), h('a', { className: 'btn primary sm', href: go(g.p), target: '_blank', rel: 'noopener', textContent: '🧭 Itinéraire' }))),
