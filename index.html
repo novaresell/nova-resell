@@ -144,6 +144,13 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .stock-q, .stock-f { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3)); background: transparent; color: inherit; font: inherit; font-size: 14px; }
 .stock-list { display: grid; gap: 2px; max-height: 60vh; overflow-y: auto; }
 .stock-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }
+.colis-card{display:flex;flex-direction:column;gap:10px}.colis-map{height:260px}
+.colis-pt{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}.colis-pt.arrived{border:2px solid #16a34a}
+.colis-pt-h{display:flex;gap:10px;align-items:flex-start}.colis-pt-h>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.colis-n{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:#131A33;color:#fff;border:2px solid #38BDF8}.colis-pt.arrived .colis-n{border-color:#16a34a}
+.colis-it{display:flex;gap:10px;align-items:center}.colis-it>div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.colis-it b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.colis-it img,.colis-it .ab-ph{width:44px;height:56px;border-radius:8px;object-fit:cover;flex:none;background:#eee}.colis-it.ok .colis-st{color:#16a34a;font-weight:600}
+.colis-pin span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:#131A33;color:#fff;border:2px solid #38BDF8;box-shadow:0 3px 10px rgba(0,0,0,.4)}.colis-pin.ok span{border-color:#16a34a}
 .stock-row { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .stock-row.wait { opacity: .7; }
 .st-ed { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; justify-content: center; }
@@ -1500,7 +1507,41 @@ Réponds UNIQUEMENT en JSON :
     (stockCache && Date.now() - stockAt < 60000 ? Promise.resolve() : loadStock()).then(draw).catch((e) => { head.textContent = e.message; });
     return d;
   }
+  // Mes colis à récupérer (achats) : carte de tous les points relais + liste en dessous
+  function colisCard() {
+    const list = state?.incoming || []; if (!list.length) return null;
+    const groups = new Map(), noPt = [];
+    for (const x of list) { if (!x.point) { noPt.push(x); continue; } const k = (x.point.name + '|' + ptLine(x.point)).toLowerCase(); if (!groups.has(k)) groups.set(k, { p: x.point, items: [] }); groups.get(k).items.push(x); }
+    const G = [...groups.values()].sort((a, b) => b.items.filter((x) => x.arrived).length - a.items.filter((x) => x.arrived).length);
+    const nArr = list.filter((x) => x.arrived).length;
+    const st = (x) => x.arrived ? '✅ Arrivé : il t’attend' : x.last?.msg ? '🚚 ' + x.last.msg.slice(0, 80) : '⏳ ' + (x.statusTitle || 'En préparation chez le vendeur');
+    const go = (p) => (/iPhone|iPad/.test(navigator.userAgent) ? 'https://maps.apple.com/?q=' : 'https://www.google.com/maps/search/?api=1&query=') + encodeURIComponent([p.name, ptLine(p)].filter(Boolean).join(', '));
+    const item = (x) => h('div', { className: 'colis-it' + (x.arrived ? ' ok' : '') }, x.photo ? h('img', { src: x.photo, alt: '' }) : h('span', { className: 'ab-ph' }),
+      h('div', {}, h('b', { textContent: x.title }), h('span', { className: 'sub colis-st', textContent: st(x) }), h('span', { className: 'sub', textContent: [CARRIER[String(x.carrier).toUpperCase()] || x.carrier, x.code && 'suivi ' + x.code, !x.arrived && x.eta && 'arrivée ' + x.eta].filter(Boolean).join(' · ') })),
+      x.url ? h('a', { className: 'btn sm', href: x.url, target: '_blank', rel: 'noopener', textContent: 'Suivi' }) : '');
+    const mapBox = h('div', { className: 'rt-map colis-map', id: 'colisMap' });
+    const card = h('div', { className: 'card colis-card' }, h('b', { textContent: '📍 Mes colis à récupérer' }), h('span', { className: 'sub', textContent: `${list.length} achat${list.length > 1 ? 's' : ''} en cours · ${nArr} arrivé${nArr > 1 ? 's' : ''} · ${G.length} point${G.length > 1 ? 's' : ''} relais` }), G.length ? mapBox : '',
+      ...G.map((g, i) => h('div', { className: 'colis-pt' + (g.items.some((x) => x.arrived) ? ' arrived' : ''), id: 'colisPt' + i },
+        h('div', { className: 'colis-pt-h' }, h('span', { className: 'colis-n', textContent: String(i + 1) }), h('div', {}, h('b', { textContent: g.p.name || 'Point relais' }), h('span', { className: 'sub', textContent: ptLine(g.p) }), g.p.hours ? h('span', { className: 'sub', textContent: '🕒 ' + g.p.hours }) : '')),
+        ...g.items.map(item), h('a', { className: 'btn primary sm', href: go(g.p), target: '_blank', rel: 'noopener', textContent: '🧭 Itinéraire' }))),
+      noPt.length ? h('div', { className: 'colis-pt' }, h('b', { textContent: '📦 Point relais pas encore indiqué' }), ...noPt.map(item)) : '');
+    if (G.length) setTimeout(async () => {
+      try {
+        const L = await loadLeaflet(); const el0 = document.getElementById('colisMap'); if (!el0 || el0._leaflet_id) return;
+        const m = L.map(el0, { zoomControl: true, attributionControl: true }); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(m); m.setView([46.6, 2.4], 5);
+        const pts = [];
+        for (let i = 0; i < G.length; i++) {
+          const g = G[i], ll = await geocode(g.p); if (!ll) continue; pts.push(ll); const arr = g.items.filter((x) => x.arrived).length;
+          L.marker(ll, { icon: L.divIcon({ className: 'colis-pin' + (arr ? ' ok' : ''), html: `<span>${i + 1}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(m)
+            .on('click', () => document.getElementById('colisPt' + i)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+        }
+        if (pts.length === 1) m.setView(pts[0], 14); else if (pts.length) m.fitBounds(pts, { padding: [30, 30], maxZoom: 14 });
+      } catch { const b = document.getElementById('colisMap'); if (b) b.textContent = 'Carte indisponible (pas de réseau ?)'; }
+    }, 50);
+    return card;
+  }
   function viewVentes(v) {
+    const cc = colisCard(); if (cc) v.append(cc);
     v.append(stockCard());
     const list = state?.sales || [], rets = state?.returns || [], transit = state?.transit || [];
     const st = state?.stats;
