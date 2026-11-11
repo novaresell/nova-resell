@@ -144,6 +144,13 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .stock-q, .stock-f { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3)); background: transparent; color: inherit; font: inherit; font-size: 14px; }
 .stock-list { display: grid; gap: 2px; max-height: 60vh; overflow-y: auto; }
 .stock-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }
+.stock-row { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.stock-row.wait { opacity: .7; }
+.st-ed { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; justify-content: center; }
+.st-ed-card { width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 18px 18px 0 0; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+.st-f { display: grid; gap: 4px; } .st-f .stock-q { width: 100%; box-sizing: border-box; }
+.st-ed-btns { display: flex; gap: 8px; justify-content: flex-end; } .st-ed-btns .btn { flex: 1; }
+.st-del { color: #ef4444; justify-self: start; }
 .stock-row .st-t { display: grid; min-width: 0; } .stock-row .st-t b { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stock-row .st-r { display: grid; justify-items: end; gap: 2px; flex: none; text-align: right; }
 .card.ab .ab-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.card.ab .ab-cd{font-weight:700;color:#d97706;font-size:13px;margin:4px 0 8px}.card.ab .ab-i{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line,#e5e7eb)}.card.ab .ab-i img,.card.ab .ab-ph{width:52px;height:68px;border-radius:8px;object-fit:cover;flex:none;background:#eee}.card.ab .ab-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.card.ab .ab-tx b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.card.ab .ab-pr{font-weight:700;font-size:13px}.card.ab .btn.sm{padding:8px 12px;font-size:13px}
@@ -1379,34 +1386,115 @@ Réponds UNIQUEMENT en JSON :
     if (!window.open(url, '_blank')) location.href = url;
   }
   const printBtn = (path, name, label, cls = 'btn small') => { const b = h('button', { className: cls, textContent: label }); b.addEventListener('click', () => openPdf(path, name)); return b; };
-  // Mon stock : le même tableau que l'onglet Stock du PC (envoyé en direct par l'extension)
-  let stockCache = null, stockOpen = false, stockAt = 0;
+  // Mon stock : le même tableau que l'onglet Stock du PC (envoyé en direct par l'extension) + ajout / modification depuis le téléphone
+  let stockCache = null, stockOpen = false, stockAt = 0, stockOps = [];
+  const stockUrl = (f) => `${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_stock/${f}?t=${Date.now()}`;
   async function loadStock() {
-    const offline = () => { const c = store.get('nova_stock'); if (c?.rows) { stockCache = { ...c, offline: true }; stockAt = Date.now(); return stockCache; } return null; };
-    let r;
+    const offline = () => { const c = store.get('nova_stock'); if (c?.rows) { stockCache = { ...c, offline: true }; stockOps = store.get('nova_stock_ops') || []; stockAt = Date.now(); return stockCache; } return null; };
+    let r, t;
     try {
-      const t = await token(); if (!t) throw new Error('Session expirée');
-      r = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_stock/stock.json?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' });
+      t = await token(); if (!t) throw new Error('Session expirée');
+      r = await fetch(stockUrl('stock.json'), { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' });
     } catch (e) { const c = offline(); if (c) return c; throw new Error('Pas de réseau : ton stock s’affichera dès que tu seras connecté.'); }
-    if (!r.ok) { if (r.status !== 400 && r.status !== 404) { const c = offline(); if (c) return c; } throw new Error(r.status === 400 || r.status === 404 ? 'Ton stock apparaîtra ici dès que tu l’auras rempli sur le PC (Accueil → Stock).' : 'Stock indisponible (' + r.status + ')'); }
-    stockCache = await r.json(); stockAt = Date.now(); store.set('nova_stock', stockCache); return stockCache;
+    if (!r.ok && r.status !== 400 && r.status !== 404) { const c = offline(); if (c) return c; throw new Error('Stock indisponible (' + r.status + ')'); }
+    stockCache = r.ok ? await r.json() : { rows: {}, opsDone: [], empty: true };
+    try { const o = await fetch(stockUrl('ops.json'), { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' }); stockOps = o.ok ? ((await o.json()).ops || []) : []; } catch { stockOps = store.get('nova_stock_ops') || []; }
+    stockAt = Date.now(); store.set('nova_stock', stockCache); store.set('nova_stock_ops', stockOps); return stockCache;
   }
+  const opsPending = () => { const done = new Set(stockCache?.opsDone || []); return stockOps.filter((o) => !done.has(o.id)); };
+  const normPlace = (v) => { const t = String(v || '').trim(); const m = t.match(/^([a-z]{1,2})\s*[-.·/ ]?\s*(\d{1,2})$/i); return m ? m[1].toUpperCase() + m[2] : t; };
+  // vue = stock du PC + modifs du téléphone pas encore appliquées par le PC (marquées ⏳)
+  function stockView() {
+    const rows = JSON.parse(JSON.stringify(stockCache?.rows || {})), wait = new Set();
+    for (const o of opsPending()) {
+      if (o.op === 'set' && rows[o.k]) { for (const [k, v] of Object.entries(o.f || {})) { if (k === 'sku') continue; if (v === '' || v == null) delete rows[o.k][k]; else rows[o.k][k] = (k === 'cost' || k === 'sold') ? Number(String(v).replace(',', '.')) : v; } wait.add(o.k); }
+      else if (o.op === 'del') delete rows[o.k];
+      else if (o.op === 'add') { const k = '⏳' + o.id; rows[k] = { ...o.row, cost: o.row.cost === '' || o.row.cost == null ? null : Number(String(o.row.cost).replace(',', '.')), at: o.t }; wait.add(k); }
+      else if (o.op === 'lot') { const n = (o.lot.items || []).filter(Boolean).length || Number(o.lot.n) || 1; const k = '⏳' + o.id; rows[k] = { title: `${o.lot.name || 'Lot'} · ${n} articles (création en cours)`, lot: o.lot.name, cost: Number(String(o.lot.total || 0).replace(',', '.')) || 0, place: o.lot.place, at: o.t }; wait.add(k); }
+    }
+    return Object.entries(rows).map(([k, r]) => ({ ...r, key: k, sku: r.sku || (k.startsWith('_') || k.startsWith('⏳') ? '' : k), wait: wait.has(k) })).sort((a, b) => (b.at || 0) - (a.at || 0));
+  }
+  async function sendStockOp(op) {
+    op.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); op.t = Date.now();
+    const t = await token(); if (!t) throw new Error('Session expirée');
+    let ops = [];
+    try { const o = await fetch(stockUrl('ops.json'), { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' }); if (o.ok) ops = (await o.json()).ops || []; } catch { throw new Error('Pas de réseau : réessaie quand tu es connecté'); }
+    const done = new Set(stockCache?.opsDone || []);
+    ops = [...ops.filter((x) => !done.has(x.id) || Date.now() - (x.t || 0) < 864e5), op].slice(-200);
+    const r = await fetch(`${CFG.url}/storage/v1/object/photos/${session.user.id}/_stock/ops.json`, { method: 'POST', headers: { apikey: CFG.key, authorization: `Bearer ${t}`, 'content-type': 'application/json', 'x-upsert': 'true' }, body: JSON.stringify({ ops }) });
+    if (!r.ok) throw new Error('Envoi refusé (' + r.status + ')');
+    stockOps = ops; store.set('nova_stock_ops', stockOps);
+    const ua = typeof state?.updatedAt === 'number' ? state.updatedAt : Date.parse(state?.updatedAt || ''); const pcOn = ua > 0 && Date.now() - ua < 6 * 60e3;
+    toast(pcOn ? '✅ Enregistré : le PC le met dans ton tableau d’ici 1 minute' : '✅ Enregistré : il ira dans ton tableau dès que ton PC sera allumé');
+  }
+  const CATS = ['Ballot', 'Brocante', 'Friperie', 'Vide-grenier', 'Vinted', 'Neuf', 'Autre'];
+  function stockSheet(title, fields, onSave, extra) {
+    const ov = h('div', { className: 'st-ed', role: 'dialog' });
+    const close = () => ov.remove();
+    const places = [...new Set(Object.values(stockCache?.rows || {}).map((r) => r.place).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
+    const dl = h('datalist', { id: 'stPlacesM' }, ...places.map((p) => h('option', { value: p })));
+    const inputs = {};
+    const body = fields.map(([k, label, type, val, ph]) => {
+      let i;
+      if (type === 'cat') { i = h('select', { className: 'stock-q' }, h('option', { value: '', textContent: '—' }), ...[...new Set([...CATS, val].filter(Boolean))].map((c) => h('option', { value: c, textContent: c }))); i.value = val || ''; }
+      else if (type === 'area') i = h('textarea', { className: 'stock-q', rows: 4, value: val || '', placeholder: ph || '' });
+      else { i = h('input', { className: 'stock-q', type: type === 'num' ? 'text' : type, value: val ?? '', placeholder: ph || '' }); if (type === 'num') i.inputMode = 'decimal'; if (k === 'place') i.setAttribute('list', 'stPlacesM'); if (k === 'px') i.maxLength = 4; }
+      inputs[k] = i; return h('label', { className: 'st-f' }, h('span', { className: 'sub', textContent: label }), i);
+    });
+    const save = h('button', { className: 'btn primary', textContent: 'Enregistrer' });
+    save.addEventListener('click', async () => { save.disabled = true; try { const v = {}; for (const [k, i] of Object.entries(inputs)) v[k] = i.value.trim(); if (v.place != null) v.place = normPlace(v.place); await onSave(v); close(); drawStock?.(); } catch (e) { toast('⚠️ ' + e.message); save.disabled = false; } });
+    const cancel = h('button', { className: 'btn', textContent: 'Annuler' }); cancel.addEventListener('click', close);
+    ov.append(h('div', { className: 'card st-ed-card' }, h('b', { textContent: title }), dl, ...body, extra ? extra(close) : null, h('div', { className: 'st-ed-btns' }, cancel, save)));
+    ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+    document.body.append(ov); setTimeout(() => body[0]?.querySelector('input,textarea,select')?.focus(), 50);
+  }
+  const today = () => new Date().toISOString().slice(0, 10);
+  function editRow(r) {
+    if (r.key.startsWith('⏳')) { toast('⏳ En attente du PC : modifiable dès qu’il l’aura ajouté'); return; }
+    stockSheet(`${r.sku ? r.sku + ' · ' : ''}${r.title || 'Article'}`, [
+      ['title', 'Article', 'text', r.title], ['cost', 'Prix d’achat (€)', 'num', r.cost ?? ''], ['sold', 'Prix de vente (€) : vide = pas vendu', 'num', r.sold ?? ''],
+      ['soldAt', 'Date de vente', 'date', r.soldAt || ''], ['place', 'Rangement (meuble + étage)', 'text', r.place || '', 'ex. A2 = meuble A, étage 2'], ['cat', 'Catégorie', 'cat', r.cat || ''], ['date', 'Date d’achat', 'date', r.date || ''],
+    ], async (v) => {
+      if (v.sold && !v.soldAt) v.soldAt = today();
+      const f = {}; for (const k of Object.keys(v)) { const old = r[k] ?? ''; if (String(old) !== String(v[k])) f[k] = v[k]; }
+      if (!Object.keys(f).length) return;
+      await sendStockOp({ op: 'set', k: r.key, f });
+    }, (close) => {
+      const del = h('button', { className: 'btn small st-del', textContent: '🗑 Supprimer la ligne' });
+      del.addEventListener('click', async () => { if (!del.dataset.ok) { del.dataset.ok = 1; del.textContent = 'Toucher encore pour confirmer la suppression'; return; } try { await sendStockOp({ op: 'del', k: r.key }); close(); drawStock?.(); } catch (e) { toast('⚠️ ' + e.message); } });
+      return del;
+    });
+  }
+  function addRow() {
+    stockSheet('➕ Nouvel achat', [['title', 'Article', 'text', '', 'Jean Levi’s 501 femme'], ['cost', 'Prix d’achat (€)', 'num', ''], ['date', 'Date d’achat', 'date', today()], ['cat', 'Catégorie', 'cat', ''], ['place', 'Rangement (meuble + étage)', 'text', '', 'ex. A2'], ['sku', 'SKU (vide = le suivant)', 'text', '']],
+      async (v) => { if (!v.title) throw new Error('Donne un nom à l’article'); await sendStockOp({ op: 'add', row: v }); });
+  }
+  function addLot() {
+    stockSheet('🧺 Nouveau lot (ballot, carton…)', [['name', 'Nom du lot', 'text', '', 'Jean Levi’s femme'], ['total', 'Prix total payé (€)', 'num', ''], ['n', 'Nombre d’articles', 'num', '10'], ['px', 'Lettre(s) des SKU (ex. J → J1, J2…)', 'text', ''], ['place', 'Rangement (meuble + étage)', 'text', '', 'ex. A2'], ['cat', 'Catégorie', 'cat', 'Ballot'], ['date', 'Date d’achat', 'date', today()], ['items', 'Articles (optionnel, un par ligne)', 'area', '', 'Veste Adidas\nVeste Nike']],
+      async (v) => { if (!(Number(v.n) > 0) && !v.items) throw new Error('Indique le nombre d’articles'); await sendStockOp({ op: 'lot', lot: { ...v, items: String(v.items || '').split('\n').map((x) => x.trim()).filter(Boolean) } }); });
+  }
+  let drawStock = null;
   function stockCard() {
-    const box = h('div', { className: 'stock-list' }), q = h('input', { type: 'search', placeholder: '🔎 Article, SKU, lot…', className: 'stock-q' });
+    const box = h('div', { className: 'stock-list' }), q = h('input', { type: 'search', placeholder: '🔎 Article, SKU, lot, rangement…', className: 'stock-q' });
     const sel = h('select', { className: 'stock-f' }, h('option', { value: 'stock', textContent: 'En stock' }), h('option', { value: 'sold', textContent: 'Vendus' }), h('option', { value: 'all', textContent: 'Tout' }));
     const head = h('div', { className: 'sub', textContent: 'Chargement…' });
+    const bAdd = h('button', { className: 'btn small', textContent: '➕ Achat' }), bLot = h('button', { className: 'btn small', textContent: '🧺 Lot' }), bRe = h('button', { className: 'btn small', textContent: '↻' });
+    bAdd.addEventListener('click', addRow); bLot.addEventListener('click', addLot);
+    bRe.addEventListener('click', () => { head.textContent = 'Chargement…'; loadStock().then(draw).catch((e) => { head.textContent = e.message; }); });
     const draw = () => {
-      const rows = Object.entries(stockCache?.rows || {}).map(([k, r]) => ({ ...r, sku: r.sku || (k.startsWith('_') ? '' : k) })).sort((a, b) => (b.at || 0) - (a.at || 0));
-      const inSt = rows.filter((r) => r.sold == null), sold = rows.filter((r) => r.sold != null);
-      head.textContent = `${stockCache?.offline ? '📴 hors ligne · ' : ''}${inSt.length} en stock · valeur ${euro(inSt.reduce((t, r) => t + (Number(r.cost) || 0), 0))} · ${sold.length} vendus · bénéfice ${euro(sold.reduce((t, r) => t + (r.sold - (Number(r.cost) || 0)), 0))}`;
+      const rows = stockView();
+      const inSt = rows.filter((r) => r.sold == null), sold = rows.filter((r) => r.sold != null), pend = opsPending().length;
+      head.textContent = `${stockCache?.offline ? '📴 hors ligne · ' : ''}${inSt.length} en stock · valeur ${euro(inSt.reduce((t, r) => t + (Number(r.cost) || 0), 0))} · ${sold.length} vendus · bénéfice ${euro(sold.reduce((t, r) => t + (r.sold - (Number(r.cost) || 0)), 0))}${pend ? ` · ⏳ ${pend} modif${pend > 1 ? 's' : ''} en attente du PC` : ''}`;
       const f = sel.value, s2 = q.value.trim().toLowerCase();
-      const list = rows.filter((r) => (f === 'all' || (f === 'sold' ? r.sold != null : r.sold == null)) && (!s2 || `${r.title} ${r.sku} ${r.lot || ''} ${r.place || ''}`.toLowerCase().includes(s2))).slice(0, 200);
-      box.replaceChildren(...(list.length ? list.map((r) => h('div', { className: 'stock-row' },
-        h('div', { className: 'st-t' }, h('b', { textContent: r.title || '—' }), h('span', { className: 'sub', textContent: [r.cat, r.lot && 'lot ' + r.lot, r.place && '📍 ' + r.place].filter(Boolean).join(' · ') })),
-        h('div', { className: 'st-r' }, r.sku ? h('span', { className: 'sku', textContent: r.sku }) : null, h('span', { className: 'sub', textContent: r.sold != null ? `${euro(Number(r.cost) || 0)} → ${euro(r.sold)}` : `acheté ${euro(Number(r.cost) || 0)}` })))) : [h('div', { className: 'sub', textContent: 'Aucun article.' })]));
+      const list = rows.filter((r) => (f === 'all' || (f === 'sold' ? r.sold != null : r.sold == null)) && (!s2 || `${r.title} ${r.sku} ${r.lot || ''} ${r.place || ''}`.toLowerCase().includes(s2))).slice(0, 300);
+      box.replaceChildren(...(list.length ? list.map((r) => { const row = h('button', { className: 'stock-row' + (r.wait ? ' wait' : ''), type: 'button' },
+        h('div', { className: 'st-t' }, h('b', { textContent: (r.wait ? '⏳ ' : '') + (r.title || '—') }), h('span', { className: 'sub', textContent: [r.cat, r.lot && 'lot ' + r.lot, r.place && '📍 ' + r.place].filter(Boolean).join(' · ') })),
+        h('div', { className: 'st-r' }, r.sku ? h('span', { className: 'sku', textContent: r.sku }) : null, h('span', { className: 'sub', textContent: r.sold != null ? `${euro(Number(r.cost) || 0)} → ${euro(r.sold)}` : `acheté ${euro(Number(r.cost) || 0)}` })));
+        row.addEventListener('click', () => editRow(r)); return row; }) : [h('div', { className: 'sub', textContent: stockCache?.empty ? 'Ton stock est vide : ajoute un achat ou un lot.' : 'Aucun article.' })]));
     };
+    drawStock = draw;
     q.addEventListener('input', draw); sel.addEventListener('change', draw);
-    const d = h('details', { className: 'card stock-card' }, h('summary', {}, h('b', { textContent: '📦 Mon stock' }), ' ', head), h('div', { className: 'stock-tools' }, q, sel), box);
+    const d = h('details', { className: 'card stock-card' }, h('summary', {}, h('b', { textContent: '📦 Mon stock' }), ' ', head), h('div', { className: 'stock-tools' }, q, sel), h('div', { className: 'stock-tools' }, bAdd, bLot, bRe), h('p', { className: 'sub', textContent: 'Touche une ligne pour la modifier (prix, vente, rangement…).' }), box);
     d.open = stockOpen;
     d.addEventListener('toggle', () => { stockOpen = d.open; });
     (stockCache && Date.now() - stockAt < 60000 ? Promise.resolve() : loadStock()).then(draw).catch((e) => { head.textContent = e.message; });
