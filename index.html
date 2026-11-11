@@ -144,6 +144,10 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .stock-q, .stock-f { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3)); background: transparent; color: inherit; font: inherit; font-size: 14px; }
 .stock-list { display: grid; gap: 2px; max-height: 60vh; overflow-y: auto; }
 .stock-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 2px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); }
+.gchat{display:flex;flex-direction:column;gap:8px}.gchat-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto}
+.gchat-m{max-width:86%;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.45;white-space:pre-wrap}.gchat-m.user{align-self:flex-end;background:var(--grad);color:#fff;border-bottom-right-radius:4px}
+.gchat-m.assistant{align-self:flex-start;background:var(--surface-2);border:1px solid var(--line);border-bottom-left-radius:4px}.gchat-m.wait{opacity:.6}
+.gchat-in{display:flex;gap:8px;align-items:flex-end}.gchat-in textarea{flex:1;min-width:0;resize:vertical}
 .upd-card{border:2px solid #f59e0b}.colis-card{display:flex;flex-direction:column;gap:10px}.colis-map{height:260px}
 .colis-pt{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}.colis-pt.arrived{border:2px solid #16a34a}
 .colis-pt-h{display:flex;gap:10px;align-items:flex-start}.colis-pt-h>div{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -1148,8 +1152,9 @@ Réponds UNIQUEMENT en JSON :
   }
   pickInput.addEventListener('cancel', () => { picking = false; });
   // version de Nova la plus récente (mise à jour à chaque sortie) : un PC en retard est signalé ici, avec la marche à suivre
-  const NOVA_LATEST = '1.27.5', STORE = 'https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj';
-  const older = (a, b) => { const pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0); return false; };
+  const NOVA_LATEST = '1.27.6', STORE = 'https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj';
+  // on ne compare que la version « 1.27 » : un petit correctif encore en validation chez Chrome ne déclenche pas d'alerte
+  const older = (a, b) => { const pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number); for (let i = 0; i < 2; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0); return false; };
   function updateCard() {
     const vs = [...new Set([state?.version, ...(state?.devices || []).map((d) => d.version)].filter(Boolean))].filter((x) => older(x, NOVA_LATEST));
     if (!vs.length || store.get('nova_upd_hide') === NOVA_LATEST) return null;
@@ -1435,7 +1440,7 @@ Réponds UNIQUEMENT en JSON :
     }
     return Object.entries(rows).map(([k, r]) => ({ ...r, key: k, sku: r.sku || (k.startsWith('_') || k.startsWith('⏳') ? '' : k), wait: wait.has(k) })).sort((a, b) => (b.at || 0) - (a.at || 0));
   }
-  async function sendStockOp(op) {
+  async function sendStockOp(op, quiet) {
     op.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); op.t = Date.now();
     const t = await token(); if (!t) throw new Error('Session expirée');
     let ops = [];
@@ -1446,7 +1451,8 @@ Réponds UNIQUEMENT en JSON :
     if (!r.ok) throw new Error('Envoi refusé (' + r.status + ')');
     stockOps = ops; store.set('nova_stock_ops', stockOps);
     const ua = typeof state?.updatedAt === 'number' ? state.updatedAt : Date.parse(state?.updatedAt || ''); const pcOn = ua > 0 && Date.now() - ua < 6 * 60e3;
-    toast(pcOn ? '✅ Enregistré : le PC le met dans ton tableau d’ici 1 minute' : '✅ Enregistré : il ira dans ton tableau dès que ton PC sera allumé');
+    if (!quiet) toast(pcOn ? '✅ Enregistré : le PC le met dans ton tableau d’ici 1 minute' : '✅ Enregistré : il ira dans ton tableau dès que ton PC sera allumé');
+    return pcOn;
   }
   const CATS = ['Ballot', 'Brocante', 'Friperie', 'Vide-grenier', 'Vinted', 'Neuf', 'Autre'];
   function stockSheet(title, fields, onSave, extra) {
@@ -1568,8 +1574,90 @@ Réponds UNIQUEMENT en JSON :
     }, 50);
     return card;
   }
+  // ---------- Agent gestion sur le téléphone : même chat que sur le PC (questions + modifications envoyées au PC) ----------
+  const EXP_CATS = ['Emballages', 'Étiquettes et impression', 'Transport et essence', 'Abonnements', 'Matériel', 'Frais bancaires', 'Intelligence artificielle', 'Autre'];
+  const G_TOOLS = [
+    { name: 'ajouter_depense', description: 'Ajoute une dépense (hors achat d’articles).', input_schema: { type: 'object', properties: { date: { type: 'string', description: 'AAAA-MM-JJ' }, libelle: { type: 'string' }, categorie: { type: 'string', enum: EXP_CATS }, montant: { type: 'number' }, chaque_mois: { type: 'boolean' } }, required: ['libelle', 'montant'] } },
+    { name: 'supprimer_depense', description: 'Supprime une dépense par son id.', input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+    { name: 'regler_urssaf', description: 'Règle le suivi URSSAF.', input_schema: { type: 'object', properties: { actif: { type: 'boolean' }, frequence: { type: 'string', enum: ['mois', 'trimestre'] }, versement_liberatoire: { type: 'boolean' }, taux: { type: 'number' } } } },
+    { name: 'marquer_declaree', description: 'Coche ou décoche une période URSSAF comme déclarée (clé AAAA-MM ou AAAA-T1…).', input_schema: { type: 'object', properties: { periode: { type: 'string' }, declaree: { type: 'boolean' } }, required: ['periode', 'declaree'] } },
+    { name: 'modifier_stock', description: 'Modifie des lignes du stock (par SKU). Champs : titre, prix_achat, prix_vente (null = pas vendu), date_vente, date_achat, rangement, categorie.', input_schema: { type: 'object', properties: { lignes: { type: 'array', items: { type: 'object', properties: { sku: { type: 'string' }, titre: { type: 'string' }, prix_achat: { type: ['number', 'null'] }, prix_vente: { type: ['number', 'null'] }, date_vente: { type: 'string' }, date_achat: { type: 'string' }, rangement: { type: 'string' }, categorie: { type: 'string' } }, required: ['sku'] } } }, required: ['lignes'] } },
+    { name: 'supprimer_lignes_stock', description: 'Supprime des lignes du stock, seulement si l’utilisateur l’a clairement demandé (sinon demande confirmation).', input_schema: { type: 'object', properties: { skus: { type: 'array', items: { type: 'string' } } }, required: ['skus'] } },
+    { name: 'frais_du_lot', description: 'Ajoute des frais à un lot, répartis sur ses articles.', input_schema: { type: 'object', properties: { lot: { type: 'string' }, montant: { type: 'number' } }, required: ['lot', 'montant'] } },
+    { name: 'lancer_agent', description: 'Relance l’agent gestion sur le PC.', input_schema: { type: 'object', properties: {} } },
+  ];
+  const G_SYS = 'Tu es l’agent gestion de Nova Resell, l’assistant d’un revendeur Vinted (micro-entrepreneur possible), utilisé depuis son téléphone. Réponds en français, court et clair, sans emoji, en tutoyant, uniquement à partir des données fournies. Tu peux modifier ses données avec les outils quand il le demande : fais-le, puis dis précisément ce que tu as changé et que le PC l’applique dans la minute (ou dès qu’il est allumé). Pour supprimer des lignes du stock, demande d’abord une confirmation sauf si elle est déjà donnée. Les montants URSSAF sont des estimations à vérifier sur autoentrepreneur.urssaf.fr. Tu ne peux rien faire sur Vinted (annonces, messages).';
+  const gShort = (x, n = 40) => String(x ?? '').replace(/\s+/g, ' ').slice(0, n);
+  function gContext() {
+    const g = state?.gestion || {}, rows = stockView();
+    const st = rows.slice(0, 400).map((r) => [r.key, gShort(r.title), r.lot ? 'lot ' + gShort(r.lot, 25) : '', 'achat ' + (r.cost ?? '?'), r.sold != null ? `vendu ${r.sold} le ${r.soldAt || '?'}` : 'en stock', r.place || '', r.date || ''].join(' | '));
+    const ex = (g.expenses || []).map((e) => [e.id, e.date, gShort(e.label), e.cat, e.amount + ' €'].join(' | '));
+    const u = g.urssaf || {}, P = (u.periods || []).map((p) => `${p.key} (${p.label}) : CA ${p.ca} €, à payer ${p.due} €, limite ${new Date(p.deadline).toLocaleDateString('fr-FR')}, ${p.done ? 'déclarée' : 'non déclarée'}`);
+    return `Date : ${new Date().toISOString().slice(0, 10)}\nURSSAF : ${u.on ? `actif, ${u.freq}, taux ${u.rate} %` : 'non activé'}\n${P.join('\n')}\n\nDÉPENSES (id | date | libellé | catégorie | montant) :\n${ex.join('\n') || 'aucune'}\n\nSTOCK (sku | article | lot | achat | vente | rangement | date d’achat) :\n${st.join('\n') || 'vide'}\n\nAGENT : ${g.agent ? `${g.agent.issues || 0} point(s) à vérifier, valeur du stock ${g.agent.value?.v ?? '?'} €` : 'pas encore passé'}${state ? '' : '\n(PC jamais vu : données partielles)'}`;
+  }
+  async function gRun(name, a) {
+    const n2 = (v) => (v == null ? '' : String(v));
+    if (name === 'ajouter_depense') { if (!(Number(a.montant) > 0)) return 'montant invalide'; await sendStockOp({ op: 'exp_add', e: { date: a.date, label: a.libelle, cat: a.categorie, amount: Number(a.montant), recurring: !!a.chaque_mois } }, true); return 'envoyée au PC'; }
+    if (name === 'supprimer_depense') { await sendStockOp({ op: 'exp_del', id2: a.id }, true); return 'envoyée au PC'; }
+    if (name === 'regler_urssaf') { await sendStockOp({ op: 'urssaf_set', p: { on: a.actif, freq: a.frequence, vl: a.versement_liberatoire, rate: a.taux } }, true); return 'envoyé au PC'; }
+    if (name === 'marquer_declaree') { await sendStockOp({ op: 'urssaf_done', key: a.periode, done: !!a.declaree }, true); return 'envoyé au PC'; }
+    if (name === 'modifier_stock') {
+      const rows = stockCache?.rows || {}, out = [];
+      for (const l of a.lignes || []) {
+        const k = Object.keys(rows).find((x) => x.toUpperCase() === String(l.sku).toUpperCase()); if (!k) { out.push(`${l.sku} introuvable`); continue; }
+        const f = {};
+        if (l.titre != null) f.title = l.titre; if (l.prix_achat !== undefined) f.cost = n2(l.prix_achat); if (l.prix_vente !== undefined) { f.sold = n2(l.prix_vente); if (l.prix_vente != null && !l.date_vente && !rows[k].soldAt) f.soldAt = new Date().toISOString().slice(0, 10); }
+        if (l.date_vente) f.soldAt = l.date_vente; if (l.date_achat) f.date = l.date_achat; if (l.rangement != null) f.place = normPlace(l.rangement); if (l.categorie != null) f.cat = l.categorie;
+        await sendStockOp({ op: 'set', k, f }, true); out.push(`${k} envoyée au PC`);
+      }
+      return out.join(', ');
+    }
+    if (name === 'supprimer_lignes_stock') { const rows = stockCache?.rows || {}; let n = 0; for (const s0 of a.skus || []) { const k = Object.keys(rows).find((x) => x.toUpperCase() === String(s0).toUpperCase()); if (k) { await sendStockOp({ op: 'del', k }, true); n++; } } return `${n} suppression(s) envoyée(s) au PC (copie gardée dans Stock → Versions)`; }
+    if (name === 'frais_du_lot') { await sendStockOp({ op: 'lot_fees', lot: a.lot, amount: Number(a.montant) }, true); return 'envoyé au PC'; }
+    if (name === 'lancer_agent') { await sendStockOp({ op: 'agent_run' }, true); return 'demandé au PC'; }
+    return 'outil inconnu';
+  }
+  let gBusy = false;
+  function gestChatCard() {
+    const g = state?.gestion, list = h('div', { className: 'gchat-list' }), inp = h('textarea', { rows: 2, className: 'stock-q', placeholder: 'ex. Ajoute 15 € d’emballages · Combien je dois à l’URSSAF ? · Mets le prix d’achat de J4 à 6 €' });
+    const send = h('button', { className: 'btn primary', textContent: 'Envoyer' }), clr = h('button', { className: 'linkbtn', textContent: 'Effacer' });
+    const bub = (role, text) => h('div', { className: 'gchat-m ' + role }, h('span', { textContent: text }));
+    const draw = () => { const c = store.get('nova_gchat') || []; list.replaceChildren(...(c.length ? c.map((m) => bub(m.role, m.text)) : [h('p', { className: 'sub', textContent: 'Pose une question sur tes chiffres ou demande une modification : le PC l’applique dans la minute.' })])); list.scrollTop = list.scrollHeight; };
+    async function go() {
+      const q = inp.value.trim(); if (!q || gBusy) return;
+      const key = await apiKeyGet(); if (!key) { toast('Ajoute ta clé API Claude dans les réglages (⚙︎)'); return; }
+      gBusy = true; send.disabled = true; inp.value = '';
+      const chat = store.get('nova_gchat') || []; chat.push({ role: 'user', text: q }); store.set('nova_gchat', chat.slice(-30)); draw();
+      list.append(bub('assistant wait', 'L’agent réfléchit…'));
+      let usage = { input_tokens: 0, output_tokens: 0 }, answer = '', did = 0;
+      try {
+        if (!stockCache) await loadStock().catch(() => {});
+        const msgs = chat.slice(-10).map((m) => ({ role: m.role, content: m.text })); msgs[msgs.length - 1] = { role: 'user', content: `${gContext()}\n\nDEMANDE : ${q}` };
+        for (let step = 0; step < 6; step++) {
+          const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: 'claude-haiku-5-5', max_tokens: 1000, system: G_SYS, tools: G_TOOLS, messages: msgs }) });
+          const j = await res.json(); if (!res.ok) throw new Error(j.error?.message || 'Erreur ' + res.status);
+          usage.input_tokens += j.usage?.input_tokens || 0; usage.output_tokens += j.usage?.output_tokens || 0;
+          msgs.push({ role: 'assistant', content: j.content });
+          answer = (j.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim() || answer;
+          const uses = (j.content || []).filter((b) => b.type === 'tool_use'); if (!uses.length || j.stop_reason !== 'tool_use') break;
+          const results = []; for (const u of uses) { let r; try { r = await gRun(u.name, u.input || {}); did++; } catch (e) { r = 'erreur : ' + e.message; } results.push({ type: 'tool_result', tool_use_id: u.id, content: String(r) }); }
+          msgs.push({ role: 'user', content: results });
+        }
+      } catch (e) { answer = 'Impossible de répondre : ' + e.message; }
+      const c2 = store.get('nova_gchat') || []; c2.push({ role: 'assistant', text: answer || (did ? 'C’est envoyé au PC.' : 'Pas de réponse.') }); store.set('nova_gchat', c2.slice(-30));
+      if (usage.input_tokens) sendStockOp({ op: 'ai_usage', what: 'telephone', model: 'claude-haiku-5-5', usage }, true).catch(() => {});
+      gBusy = false; send.disabled = false; draw(); if (did) { drawStock?.(); }
+    }
+    send.addEventListener('click', go); clr.addEventListener('click', () => { store.set('nova_gchat', []); draw(); });
+    draw();
+    const nx = g?.agent?.next;
+    return h('div', { className: 'card gchat' }, h('div', { className: 'set-h' }, h('b', { textContent: '🤖 Agent gestion' }), clr),
+      h('span', { className: 'sub', textContent: nx ? `Prochaine déclaration URSSAF : ${nx.label}, ≈ ${euro(nx.due)} avant le ${new Date(nx.deadline).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}` : g?.agent ? `${g.agent.issues || 0} point(s) à vérifier · stock ${euro(g.agent.value?.v || 0)}` : 'Discute avec lui : dépenses, URSSAF, stock…' }),
+      list, h('div', { className: 'gchat-in' }, inp, send));
+  }
   function viewVentes(v) {
     const cc = colisCard(); if (cc) v.append(cc);
+    v.append(gestChatCard());
     v.append(stockCard());
     const list = state?.sales || [], rets = state?.returns || [], transit = state?.transit || [];
     const st = state?.stats;
