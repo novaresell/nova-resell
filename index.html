@@ -483,6 +483,46 @@ button:active { transform: translateY(1px); }
     });
   }
   const uid4 = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  // photos envoyées gardées 7 jours sur le téléphone : le bouton « Relancer » les renvoie si l'annonce a échoué sur le PC
+  const keepPh = (() => { let dbp; const open = () => dbp ||= new Promise((ok, ko) => { const r = indexedDB.open('nova_keep', 1); r.onupgradeneeded = () => r.result.createObjectStore('k', { keyPath: 'job' }); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+    const tx = async (mode, fn) => { const db = await open(); return new Promise((ok, ko) => { const t = db.transaction('k', mode); const r = fn(t.objectStore('k')); t.oncomplete = () => ok(r?.result); t.onerror = () => ko(t.error); }); };
+    return { put: (x) => tx('readwrite', (st) => st.put(x)), get: (id) => tx('readonly', (st) => st.get(id)), del: (id) => tx('readwrite', (st) => st.delete(id)), keys: () => tx('readonly', (st) => st.getAllKeys()), all: () => tx('readonly', (st) => st.getAll()) }; })();
+  let keptIds = new Set();
+  async function keepSweep() {
+    try {
+      const byId = new Map(jobs.map((j) => [j.id, j]));
+      for (const x of await keepPh.all()) { const j = byId.get(x.job); if (Date.now() - x.at > 7 * 864e5 || (j && /^(draft|done)$/.test(j.status))) await keepPh.del(x.job); }
+      keptIds = new Set(await keepPh.keys());
+    } catch { /* stockage indisponible : le bouton demandera les photos */ }
+  }
+  const retrying = new Set();
+  function pickPhotos() {
+    return new Promise((ok) => { const inp = h('input', { type: 'file', accept: 'image/*', multiple: true }); inp.style.display = 'none'; document.body.append(inp); inp.addEventListener('change', () => { ok([...inp.files]); inp.remove(); }); inp.click(); });
+  }
+  async function retryJob(j) {
+    if (retrying.has(j.id)) return;
+    let blobs = (await keepPh.get(j.id).catch(() => null))?.blobs;
+    if (!blobs?.length) {
+      toast('Les photos ne sont plus sur le téléphone : choisis à nouveau les photos de cet article');
+      const files = await pickPhotos(); if (!files.length) return;
+      blobs = []; for (const f of files) blobs.push((await shrink(f)).blob);
+    }
+    retrying.add(j.id); render();
+    try {
+      const folder = `${session.user.id}/${uid4()}`; const paths = [];
+      for (let i = 0; i < blobs.length; i++) { const p = `${folder}/${i + 1}.jpg`; await upload(p, blobs[i]); paths.push(p); }
+      const tgt = (state?.devices || []).length > 1 ? store.get('nova_job_dev') : null;
+      // même ligne remise « en attente » (le PC la reprend avec le même SKU) ; sinon un nouvel envoi
+      let ok = await rest('PATCH', `jobs?id=eq.${j.id}`, { status: 'new', photos: paths, error: null, title: tgt ? '@dev:' + tgt : null }, 'return=representation').catch(() => null);
+      let id = j.id;
+      if (!ok?.length) { const made = await rest('POST', 'jobs', { photos: paths, thumb: j.thumb || null, status: 'new', ...(j.sku ? { sku: j.sku } : {}), ...(tgt ? { title: '@dev:' + tgt } : {}) }, 'return=representation'); id = made?.[0]?.id; rest('DELETE', `jobs?id=eq.${j.id}`).catch(() => {}); }
+      if (id) await keepPh.put({ job: id, blobs, at: Date.now() }).catch(() => {});
+      if (id !== j.id) keepPh.del(j.id).catch(() => {});
+      toast('Relancé ✓ le PC refait l’annonce');
+      await refresh();
+    } catch (e) { toast('Relance impossible : ' + e.message); }
+    retrying.delete(j.id); render();
+  }
   async function sendStaged() {
     if (busy) return;
     if (offline()) { await idb.add({ kind: 'send', at: Date.now(), groups: staged.map((g) => ({ files: g.files, sku: g.sku })) }); staged = []; render(); updQueue(); return toast('Pas de réseau : les articles partiront au retour du réseau'); }
@@ -490,9 +530,11 @@ button:active { transform: translateY(1px); }
     try {
       for (const s of staged.slice()) {
         const folder = `${session.user.id}/${uid4()}`; const paths = []; let thumb = null;
-        for (let i = 0; i < s.files.length; i++) { const { blob, thumb: t } = await shrink(s.files[i]); if (!thumb) thumb = t; const p = `${folder}/${i + 1}.jpg`; await upload(p, blob); paths.push(p); }
+        const blobs = [];
+        for (let i = 0; i < s.files.length; i++) { const { blob, thumb: t } = await shrink(s.files[i]); if (!thumb) thumb = t; const p = `${folder}/${i + 1}.jpg`; await upload(p, blob); paths.push(p); blobs.push(blob); }
         const tgt = (state?.devices || []).length > 1 ? store.get('nova_job_dev') : null;
-        await rest('POST', 'jobs', { photos: paths, thumb, status: 'new', ...(s.sku ? { sku: s.sku } : {}), ...(tgt ? { title: '@dev:' + tgt } : {}) });
+        const made = await rest('POST', 'jobs', { photos: paths, thumb, status: 'new', ...(s.sku ? { sku: s.sku } : {}), ...(tgt ? { title: '@dev:' + tgt } : {}) }, 'return=representation');
+        if (made?.[0]?.id) keepPh.put({ job: made[0].id, blobs, at: Date.now() }).catch(() => {});
         staged.shift();
       }
       toast('Envoyé au PC ✓'); await refresh();
@@ -563,7 +605,14 @@ button:active { transform: translateY(1px); }
         const x = await fetch(`${CFG.url}/storage/v1/object/authenticated/photos/${session.user.id}/_state/${f.name}?t=${Date.now()}`, { headers: { apikey: CFG.key, authorization: `Bearer ${t}` }, cache: 'no-store' }).then((y) => (y.ok ? y.json() : null)).catch(() => null);
         if (x?.data && x.device?.id && Date.now() - (x.updatedAt || 0) < 14 * 864e5) out.push(x);
       }
-      devStates = out.sort((a, b) => b.updatedAt - a.updatedAt);
+      // 1.27.8 : les anciennes installations (navigateur réinstallé, ancien profil…) gardaient leur dernier état dans le cloud et
+      // leurs retours, favoris, ventes… s'additionnaient aux vrais (doublons, notifications pour des choses qui n'existent plus).
+      // On ne garde que les navigateurs vus dans les dernières 24 h (sinon le plus récent seul), et un seul par compte Vinted.
+      out.sort((a, b) => b.updatedAt - a.updatedAt);
+      let fresh = out.filter((x) => Date.now() - (x.updatedAt || 0) < 864e5);
+      if (!fresh.length) fresh = out.slice(0, 1);
+      const seenLogin = new Set();
+      devStates = fresh.filter((x) => { const lg = String(x.device?.login || '').toLowerCase(); if (!lg) return true; if (seenLogin.has(lg)) return false; seenLogin.add(lg); return true; });
       fixLongReply(devStates).catch(() => {});
     } catch { /* on garde la dernière liste */ }
     return devStates;
@@ -614,6 +663,7 @@ button:active { transform: translateY(1px); }
       state = st?.[0] ? { ...st[0].data, updatedAt: new Date(st[0].updated_at).getTime() } : null;
       state = mergeStates(await loadDevices(), state);
       jobs = (js || []).map((j) => ({ ...j, createdAt: new Date(j.created_at).getTime() }));
+      await keepSweep();
       actions = {}; (acts || []).reverse().forEach((a) => { actions[a.key] = { status: a.status, error: a.error, at: a.payload?.at ?? null }; });
       if (!busy && !picking && !document.activeElement?.matches('textarea')) render(); else renderHeader();
       if (!document.querySelector('.np-wrap')) { whatsNew(); if (!document.querySelector('.np-wrap')) pushPrompt(); } if (!flushing) { flushQueue(); updQueue(); }
@@ -1290,7 +1340,8 @@ Réponds UNIQUEMENT en JSON :
     return h('div', { className: 'li' }, j.thumb ? h('img', { src: j.thumb, alt: '' }) : h('img', { alt: '' }),
       h('div', { className: 'meta' }, h('div', { className: 't', textContent: j.title || `${j.photos?.length || 0} photo(s)` }),
         j.sku ? h('div', { className: 's' }, h('span', { className: 'sku', textContent: j.sku }), j.price ? euro(j.price) : '') : null,
-        j.error ? h('div', { className: 's', textContent: j.error }) : null, s));
+        j.error ? h('div', { className: 's', textContent: j.error }) : null, s),
+      j.status === 'error' ? (() => { const b = h('button', { className: 'btn small primary', textContent: retrying.has(j.id) ? 'Envoi…' : '↻ Relancer', disabled: retrying.has(j.id), title: keptIds.has(j.id) ? 'Renvoie les mêmes photos au PC' : 'Choisis à nouveau les photos de cet article' }); b.addEventListener('click', () => retryJob(j)); return b; })() : null);
   }
 
   let planOpen = null;
