@@ -649,10 +649,10 @@ button:active { transform: translateY(1px); }
   }
   // Correctif à distance (sans nouvelle version de l'extension) : sur les PC en 1.27.7 ou moins, l'IA écrivait parfois son raisonnement
   // avant l'annonce et la réponse était coupée (« Réponse de Claude trop longue »). On envoie au PC une règle d'annonce qui l'en empêche.
-  const FIX_RULE = 'FORMAT DE SORTIE (prioritaire sur tout le reste) : réponds UNIQUEMENT par l’objet JSON de l’annonce, du premier { au dernier }. N’écris AUCUN raisonnement, calcul, explication ni second JSON avant ou après (applique le guide des tailles en silence, sans « statut » ni « raisons »). Description courte, 30 hashtags maximum. Champ « taille » : UNE seule taille exactement comme dans la liste Vinted, jamais de fourchette, de longueur L ni de texte autour (jean : « W32 », pas « W32 L34 » ni « W33-34 » ; si la mesure tombe entre deux tailles, prends la plus grande ; haut : « M »). Mets les autres formats (L, FR) seulement dans « taille_affichee ».';
+  const FIX_RULE = 'FORMAT DE SORTIE (prioritaire sur tout le reste) : réponds UNIQUEMENT par l’objet JSON de l’annonce, du premier { au dernier }. N’écris AUCUN raisonnement, calcul, explication ni second JSON avant ou après (applique le guide des tailles en silence, sans « statut » ni « raisons »). Description courte, 30 hashtags maximum. Champ « taille » : UNE seule taille exactement comme dans la liste Vinted, sans fourchette ni texte autour. Jean HOMME : « W32 » (jamais la longueur L). Jean FEMME : Vinted n’a plus de W, écris la taille FR : W24→« FR 32 », W25/W26→« FR 34 », W27→« FR 36 », W28/W29→« FR 38 », W30→« FR 40 », W31/W32→« FR 42 », W33/W34→« FR 44 », W35/W36→« FR 46 » ; étiquette US (ex. 6M, 12) : « US 6 », « US 12 ». Haut : « M ». Si la mesure tombe entre deux tailles, prends la plus grande. Mets les autres formats (W, L, US) seulement dans « taille_affichee ».';
   const verLt = (a, b) => { const x = String(a || '0').split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) < (y[i] || 0); } return false; };
   async function fixLongReply(list) {
-    const done = store.get('nova_fix_long2') || {};
+    const done = store.get('nova_fix_long3') || {};
     const todo = list.filter((d) => d.device?.id && !done[d.device.id] && verLt(d.data?.version, '1.27.8'));
     if (!todo.length) return;
     const t = await token(); if (!t) return;
@@ -661,7 +661,7 @@ button:active { transform: translateY(1px); }
       const r = await fetch(`${CFG.url}/storage/v1/object/photos/${session.user.id}/_settings/${d.device.id}.json`, { method: 'POST', headers: { apikey: CFG.key, authorization: `Bearer ${t}`, 'content-type': 'application/json', 'x-upsert': 'true' }, body });
       if (r.ok) done[d.device.id] = Date.now();
     }
-    store.set('nova_fix_long2', done);
+    store.set('nova_fix_long3', done);
   }
   const ARR = ['abFeed', 'drafts', 'aiQueue', 'questions', 'reviews', 'inbox', 'sales', 'returns', 'transit', 'repostItems', 'favs', 'advice', 'accounts', 'returnsDone', 'soldMini'];
   function mergeStates(list, fallback) {
