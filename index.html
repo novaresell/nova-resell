@@ -281,6 +281,35 @@ body { background: var(--bg); -webkit-font-smoothing: antialiased; }
 .card, .sheet { border-radius: 16px; border: 1px solid var(--line); }
 button, .btn { transition: filter .15s, background .15s, transform .08s; }
 button:active { transform: translateY(1px); }
+
+/* 1.27.8 : diagnostic, tri des photos, brouillons à compléter */
+.card.diag { padding: 12px 14px; display: grid; gap: 10px; }
+.card.diag.bad { border-color: var(--err) !important; }
+.card.diag.warn { border-color: #F59E0B !important; }
+.diag-h { all: unset; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.diag-h b { font-size: 15px; }
+.diag-i { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.diag-i .btn { justify-self: start; }
+.pill.warn { background: rgba(245,158,11,.16); color: #D97706; }
+.card.warn-card { display: grid; gap: 4px; border-color: #F59E0B !important; }
+.plan.edit { display: grid; gap: 8px; }
+.plan.edit .sku-in, .sort-sku { width: 100% !important; max-width: none !important; box-sizing: border-box; }
+.plan.edit .ti { text-transform: none !important; }
+.plan.edit .row { display: flex; gap: 8px; } .plan.edit .row > * { flex: 1; min-width: 0; }
+.sort-top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 8px 0; }
+.sort-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.sort-chip { flex: none; border: 2px solid var(--gc, var(--line)); background: var(--surface); color: var(--text); border-radius: 99px; padding: 8px 14px; font-weight: 700; font-size: 14px; }
+.sort-chip.on { background: var(--gc); color: #fff; }
+.sort-chip.add { border-style: dashed; }
+.sort-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 10px 0 90px; }
+.sort-ph { position: relative; padding: 0; border: 3px solid transparent; border-radius: 12px; overflow: hidden; aspect-ratio: 1; background: var(--surface-2); max-width: 100%; }
+.sort-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sort-ph.cur { border-color: var(--gc); }
+.sort-ph.other { border-color: var(--gc); opacity: .45; }
+.sort-n { position: absolute; top: 6px; left: 6px; min-width: 24px; height: 24px; border-radius: 99px; background: var(--gc); color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; }
+.sort-bar { position: sticky; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; background: var(--bg); padding: 10px 0; }
+.sort-bar .row { display: flex; gap: 8px; }
+.btn.danger { background: var(--err) !important; color: #fff !important; }
 </style>
 </head>
 <body>
@@ -593,7 +622,7 @@ button:active { transform: translateY(1px); }
     document.body.append(box);
   }
   // ---------- plusieurs navigateurs reliés (Chrome, Brave…) : un état par navigateur, réunis ici ----------
-  let devStates = [], devAt = 0;
+  let devStates = [], devAt = 0, devAll = [];
   async function loadDevices() {
     if (Date.now() - devAt < 30000) return devStates; devAt = Date.now();
     try {
@@ -609,6 +638,7 @@ button:active { transform: translateY(1px); }
       // leurs retours, favoris, ventes… s'additionnaient aux vrais (doublons, notifications pour des choses qui n'existent plus).
       // On ne garde que les navigateurs vus dans les dernières 24 h (sinon le plus récent seul), et un seul par compte Vinted.
       out.sort((a, b) => b.updatedAt - a.updatedAt);
+      devAll = out;
       let fresh = out.filter((x) => Date.now() - (x.updatedAt || 0) < 864e5);
       if (!fresh.length) fresh = out.slice(0, 1);
       const seenLogin = new Set();
@@ -1060,6 +1090,25 @@ Réponds UNIQUEMENT en JSON :
     if (devs.length) v.append(h('div', { className: 'card' }, h('b', { textContent: `Navigateurs reliés (${devs.length})` }),
       ...devs.map((d) => { const fresh = Date.now() - (d.at || 0) < 15 * 60000; return h('div', { className: 'set-row' }, h('b', { textContent: d.browser + (d.login ? ' · @' + d.login : '') }), h('span', { className: fresh ? '' : 'bad', textContent: (fresh ? 'en ligne' : 'vu ' + ago(d.at)) + (d.paused ? ' · en pause' : '') })); }),
       h('div', { className: 'sub', textContent: devs.length > 1 ? 'Chaque navigateur gère son compte Vinted ; tu vois tout réuni ici. Les réglages automatiques sont envoyés à tous.' : 'Pour un 2e compte Vinted : installe Nova dans un autre navigateur (Brave, Edge…), connecte-toi au même compte Nova, puis à ton 2e compte Vinted dans ce navigateur.' })));
+    // anciennes installations (navigateur réinstallé, ancien profil) : leur dernier état reste dans le cloud ; on peut le supprimer
+    const olds = devAll.filter((x) => !devStates.includes(x));
+    if (olds.length) {
+      const card = h('div', { className: 'card' }, h('b', { textContent: `Anciens navigateurs (${olds.length})` }),
+        h('div', { className: 'sub', textContent: 'Installations de Nova qui ne donnent plus de nouvelles (ancien Brave, profil supprimé…). Elles sont déjà ignorées ; tu peux effacer leurs vieilles données du cloud. Ton stock, tes réglages et tes annonces ne sont pas touchés.' }),
+        ...olds.map((x) => h('div', { className: 'set-row' }, h('b', { textContent: `${x.device.browser}${x.device.login ? ' · @' + x.device.login : ''} · V${x.data?.version || '?'}` }), h('span', { className: 'bad', textContent: 'vu ' + ago(x.updatedAt) }))));
+      const del = h('button', { className: 'btn small', textContent: 'Effacer ces anciens navigateurs' });
+      let armed = false;
+      del.addEventListener('click', async () => {
+        if (!armed) { armed = true; del.textContent = `Confirmer : effacer ${olds.length} ancien${olds.length > 1 ? 's' : ''} navigateur${olds.length > 1 ? 's' : ''}`; del.classList.add('danger'); return; }
+        del.disabled = true; del.textContent = 'Suppression…';
+        try {
+          const t = await token(); let n = 0;
+          for (const x of olds) { const r = await fetch(`${CFG.url}/storage/v1/object/photos/${session.user.id}/_state/${x.device.id}.json`, { method: 'DELETE', headers: { apikey: CFG.key, authorization: `Bearer ${t}` } }); if (r.ok) n++; }
+          devAt = 0; await loadDevices(); toast(`${n} ancien${n > 1 ? 's' : ''} navigateur${n > 1 ? 's' : ''} effacé${n > 1 ? 's' : ''}`); render();
+        } catch (e) { toast('Suppression impossible : ' + e.message); del.disabled = false; }
+      });
+      card.append(del); v.append(card);
+    }
     if ((state?.accounts || []).length) {
       const A = state.accounts; const agoT = (t) => !t ? 'pas encore de passage' : 'dernier passage ' + ago(t);
       v.append(h('div', { className: 'card' }, h('b', { textContent: `Comptes Vinted reliés (${A.length})` }),
@@ -1232,8 +1281,99 @@ Réponds UNIQUEMENT en JSON :
     x.addEventListener('click', () => { store.set('nova_upd_hide', NOVA_LATEST); c.remove(); });
     return c;
   }
+  // version de Nova sur le PC qui gère un brouillon / l'état (pour proposer seulement ce que ce PC sait faire)
+  const verGe = (a, b) => !verLt(a, b);
+  const devVer = (id) => (state?.devices || []).find((d) => d.id === id)?.version || state?.version || '0';
+  const pcCan = (id) => verGe(devVer(id), '1.27.8');
+  const CLOTH = /jean|pull|sweat|veste|t-?shirt|tee|short|pantalon|chemise|robe|jupe|doudoune|polo|jogging|manteau|blouson|hoodie|surv[eê]tement|chaussure|basket|sneaker|gilet|parka|legging|cargo|bermuda|top|d[eé]bardeur/i;
+  const draftMissing = (d) => (d.warn?.length ? d.warn : (!d.size && CLOTH.test(d.title || '') ? ['taille'] : []));
+
+  // ---------- « Pourquoi ça bloque ? » : ce qui ne va pas, en clair, avec le geste à faire ----------
+  let diagOpen = false;
+  function diagIssues() {
+    const out = [];
+    if (!state) return [{ lvl: 'bad', t: 'PC pas encore relié', d: 'Sur ton PC : Nova → ⚙︎ → « Compte Nova » → connecte-toi au même compte que sur ce téléphone.' }];
+    const age = Date.now() - (state.updatedAt || 0);
+    if (age > 6 * 60000) out.push({ lvl: 'bad', t: `Ton PC ne répond plus depuis ${ago(state.updatedAt).replace(/^il y a /, '')}`, d: 'Il est sans doute en veille, éteint, ou Brave est fermé. Allume-le et ouvre Brave avec Vinted. Pour qu’il tourne même fenêtre fermée : Brave → Paramètres → Système → « Continuer à exécuter les applications en arrière-plan ».' });
+    const err = String(state.stateError || '');
+    if (age <= 6 * 60000 && /TIMEOUT|à temps|channel closed|listener|Receiving end|port closed|back\/forward/i.test(err)) out.push({ lvl: 'bad', t: 'L’onglet Vinted de ton PC est figé', d: 'Nova n’arrive plus à lire Vinted : les annonces et les brouillons attendent. ' + (pcCan(state._dev) ? 'Touche « Débloquer Vinted » : le PC recharge l’onglet et relance les automatismes.' : 'Sur le PC : recharge l’onglet Vinted (F5). Si ça continue, ferme Brave complètement et rouvre-le. Coupe aussi l’« Économiseur de mémoire » de Brave (Paramètres → Système).'), revive: pcCan(state._dev) });
+    else if (age <= 6 * 60000 && /captcha|vérification|403/i.test(err)) out.push({ lvl: 'bad', t: 'Vinted demande une vérification', d: 'Sur le PC, ouvre vinted.fr et passe la vérification (case à cocher ou puzzle). Nova reprend tout seul après.' });
+    if (state.paused) out.push({ lvl: 'warn', t: 'Nova est en pause', d: 'Les automatismes sont arrêtés. Reprends-les dans Réglages → Automatismes.' });
+    const errJobs = jobs.filter((j) => j.status === 'error');
+    if (errJobs.length) out.push({ lvl: 'warn', t: `${errJobs.length} annonce${errJobs.length > 1 ? 's' : ''} en erreur`, d: 'Plus bas dans « Derniers envois » : touche ↻ Relancer à côté de chacune.' });
+    const stuck = jobs.filter((j) => j.status === 'pc' && Date.now() - j.createdAt > 15 * 60000);
+    if (stuck.length) out.push({ lvl: 'warn', t: `${stuck.length} article${stuck.length > 1 ? 's' : ''} bloqué${stuck.length > 1 ? 's' : ''} en analyse`, d: 'Le PC les a reçus mais n’a pas fini. Ouvre Nova sur le PC (le panneau ou la page en grand) : l’analyse se fait là.' });
+    const miss = (state.drafts || []).filter((d) => draftMissing(d).length);
+    if (miss.length) out.push({ lvl: 'warn', t: `${miss.length} brouillon${miss.length > 1 ? 's' : ''} à compléter`, d: 'Il manque une taille, une couleur ou une marque : onglet Brouillons, bouton ✏️.', go: 'drafts' });
+    if (!store.get('nova_api_key')) out.push({ lvl: 'warn', t: 'Clé API Claude absente sur ce téléphone', d: 'Elle sert aux estimations et à l’agent. Réglages → Clé API.' });
+    return out;
+  }
+  function diagCard() {
+    const iss = diagIssues();
+    const bad = iss.filter((x) => x.lvl === 'bad').length;
+    const head = h('button', { type: 'button', className: 'diag-h' }, h('b', { textContent: !iss.length ? '✅ Tout fonctionne' : bad ? `⛔ ${iss[0].t}` : `⚠️ ${iss.length} point${iss.length > 1 ? 's' : ''} à regarder` }), h('span', { className: 'sub', textContent: iss.length ? (diagOpen ? 'Masquer' : 'Pourquoi ça bloque ?') : '' }));
+    const card = h('div', { className: 'card diag ' + (bad ? 'bad' : iss.length ? 'warn' : 'ok') }, head);
+    head.addEventListener('click', () => { diagOpen = !diagOpen; render(); });
+    if (!iss.length) return card;
+    if (bad || diagOpen) for (const x of iss) {
+      const row = h('div', { className: 'diag-i' }, h('b', { textContent: x.t }), h('span', { className: 'sub', textContent: x.d }));
+      if (x.revive) { const k = 'revive-' + (state._dev || ''); const a = actions[k]; const b = h('button', { className: 'btn small primary', textContent: a?.status === 'new' || a?.status === 'running' ? 'Déblocage…' : a?.status === 'done' ? 'Débloqué ✓' : '🔄 Débloquer Vinted', disabled: a?.status === 'new' || a?.status === 'running' }); b.addEventListener('click', () => doAction(k, 'reviveVinted', { _dev: state._dev })); row.append(b); }
+      if (x.go) { const b = h('button', { className: 'btn small', textContent: 'Voir' }); b.addEventListener('click', () => { tab = x.go; render(); scrollTo(0, 0); }); row.append(b); }
+      card.append(row);
+    }
+    return card;
+  }
+
+  // ---------- tri à la main : toutes les photos d'un coup, on touche les photos de chaque annonce ----------
+  let sorting = null; // { pool: [{ f, u, g }], groups: [{ sku }], cur }
+  const GCOL = ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#64748B', '#84CC16'];
+  function sortStart() {
+    const pool = []; staged.forEach((s, gi) => s.files.forEach((f, k) => pool.push({ f, u: s.urls[k], g: gi })));
+    // une seule sélection : on part de zéro (rien de coché) ; tri automatique déjà fait : on garde ses groupes
+    if (staged.length === 1) pool.forEach((p) => { p.g = -1; });
+    sorting = { pool, groups: staged.length > 1 ? staged.map((s) => ({ sku: s.sku || '' })) : [{ sku: staged[0]?.sku || '' }], cur: 0 };
+    if (!sorting.groups.length) sorting.groups.push({ sku: '' });
+    render(); scrollTo(0, 0);
+  }
+  function sortView(v) {
+    const S = sorting;
+    const cnt = (gi) => S.pool.filter((p) => p.g === gi).length;
+    const unsorted = S.pool.filter((p) => p.g < 0).length;
+    v.append(h('h2', { textContent: 'Trier les photos' }),
+      h('p', { className: 'sub', textContent: 'Choisis une annonce en haut, puis touche ses photos. Touche à nouveau une photo pour la retirer. « + Nouvelle annonce » pour passer à l’article suivant.' }));
+    const chips = h('div', { className: 'sort-chips' }, ...S.groups.map((g, gi) => {
+      const c = h('button', { type: 'button', className: 'sort-chip' + (gi === S.cur ? ' on' : ''), style: `--gc:${GCOL[gi % GCOL.length]}`, textContent: `Annonce ${gi + 1} · ${cnt(gi)}` });
+      c.addEventListener('click', () => { S.cur = gi; render(); }); return c;
+    }));
+    const add = h('button', { type: 'button', className: 'sort-chip add', textContent: '+ Nouvelle annonce' });
+    add.addEventListener('click', () => { S.groups.push({ sku: '' }); S.cur = S.groups.length - 1; render(); });
+    chips.append(add);
+    v.append(h('div', { className: 'sort-top' }, chips));
+    const sku = h('input', { className: 'sku-in sort-sku', placeholder: `SKU de l’annonce ${S.cur + 1} (facultatif)`, value: S.groups[S.cur]?.sku || '', autocapitalize: 'characters', maxLength: 10 });
+    sku.addEventListener('input', () => { S.groups[S.cur].sku = sku.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+    v.append(sku);
+    const grid = h('div', { className: 'sort-grid' }, ...S.pool.map((p) => {
+      const t = h('button', { type: 'button', className: 'sort-ph' + (p.g === S.cur ? ' cur' : p.g >= 0 ? ' other' : ''), style: p.g >= 0 ? `--gc:${GCOL[p.g % GCOL.length]}` : '' }, h('img', { src: p.u, alt: '', loading: 'lazy' }), p.g >= 0 ? h('span', { className: 'sort-n', textContent: String(p.g + 1) }) : null);
+      t.addEventListener('click', () => { p.g = p.g === S.cur ? -1 : S.cur; render(); });
+      return t;
+    }));
+    v.append(grid);
+    const used = S.groups.map((g, gi) => cnt(gi)).filter(Boolean).length;
+    const ok = h('button', { className: 'btn primary', disabled: !used, textContent: `Valider : ${used} annonce${used > 1 ? 's' : ''}` + (unsorted ? ` (${unsorted} photo${unsorted > 1 ? 's' : ''} non triée${unsorted > 1 ? 's' : ''} retirée${unsorted > 1 ? 's' : ''})` : '') });
+    ok.addEventListener('click', () => {
+      const ns = [];
+      S.groups.forEach((g, gi) => { const ps = S.pool.filter((p) => p.g === gi); if (ps.length) ns.push({ files: ps.map((p) => p.f), urls: ps.map((p) => p.u), sku: g.sku || '' }); });
+      staged = ns; sorting = null; toast(`${ns.length} annonce${ns.length > 1 ? 's' : ''} prête${ns.length > 1 ? 's' : ''} : vérifie puis envoie`); render(); scrollTo(0, 0);
+    });
+    const reset = h('button', { className: 'btn small', textContent: 'Tout décocher' }); reset.addEventListener('click', () => { S.pool.forEach((p) => { p.g = -1; }); S.groups = [{ sku: '' }]; S.cur = 0; render(); });
+    const cancel = h('button', { className: 'btn small', textContent: 'Annuler' }); cancel.addEventListener('click', () => { sorting = null; render(); });
+    v.append(h('div', { className: 'sort-bar' }, ok, h('div', { className: 'row' }, reset, cancel)));
+  }
+
   function viewPhotos(v) {
+    if (sorting) return sortView(v);
     const input = pickInput;
+    v.append(diagCard());
     const uc = updateCard(); if (uc) v.append(uc);
     v.append(
       h('h2', { textContent: 'Nouvel article' }),
@@ -1324,7 +1464,9 @@ Réponds UNIQUEMENT en JSON :
       })));
       const send = h('button', { className: 'btn primary', disabled: busy, textContent: busy ? 'Envoi en cours…' : `Envoyer ${staged.length} article${staged.length > 1 ? 's' : ''} au PC` });
       send.addEventListener('click', sendStaged);
-      v.append(send);
+      const srt = h('button', { className: 'btn', type: 'button', textContent: `🗂️ Trier les photos à la main (${staged.reduce((n, x) => n + x.files.length, 0)})` });
+      srt.addEventListener('click', sortStart);
+      v.append(srt, send);
     }
     v.append(h('h2', { textContent: 'Derniers envois' }));
     const recent = jobs.slice(0, 20);
@@ -1344,7 +1486,7 @@ Réponds UNIQUEMENT en JSON :
       j.status === 'error' ? (() => { const b = h('button', { className: 'btn small primary', textContent: retrying.has(j.id) ? 'Envoi…' : '↻ Relancer', disabled: retrying.has(j.id), title: keptIds.has(j.id) ? 'Renvoie les mêmes photos au PC' : 'Choisis à nouveau les photos de cet article' }); b.addEventListener('click', () => retryJob(j)); return b; })() : null);
   }
 
-  let planOpen = null;
+  let planOpen = null, editOpen = null;
   const fmtWhen = (t) => new Date(t).toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const toLocalInput = (t) => new Date(t - new Date(t).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   const nextSlot = () => { const d = new Date(Date.now() + 3600e3); d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0); return d.getTime(); };
@@ -1352,7 +1494,9 @@ Réponds UNIQUEMENT en JSON :
     v.append(h('h2', { textContent: 'Brouillons Vinted' }), h('p', { className: 'sub', textContent: 'Publie maintenant ou planifie une date : ton PC publie à l’heure prévue (il doit être allumé).' }));
     const list = state?.drafts || [];
     if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Aucun brouillon' }), state ? 'Envoie des photos depuis l’onglet Photos.' : 'Les brouillons apparaîtront quand ton PC sera relié.'));
-    v.append(h('div', { className: 'list' }, list.map((d) => {
+    const miss = list.filter((d) => draftMissing(d).length);
+    if (miss.length) v.append(h('div', { className: 'card warn-card' }, h('b', { textContent: `📝 ${miss.length} brouillon${miss.length > 1 ? 's' : ''} à compléter` }), h('span', { className: 'sub', textContent: 'Ils sont marqués ⚠︎ ci-dessous. Touche ✏️ pour corriger la taille, le titre ou le prix.' })));
+    v.append(h('div', { className: 'list' }, [...miss, ...list.filter((d) => !miss.includes(d))].map((d) => {
       const a = actions['pub-' + d.id];
       const b = h('button', { className: 'btn small primary', textContent: a ? (a.status === 'done' ? 'Publié ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Publier', disabled: a && a.status !== 'error' });
       b.addEventListener('click', () => doAction('pub-' + d.id, 'publishDraft', { _dev: d._dev, id: d.id }));
@@ -1374,11 +1518,35 @@ Réponds UNIQUEMENT en JSON :
         cancel.addEventListener('click', () => { planOpen = null; if (when) { doAction('plan-' + d.id, 'scheduleDraft', { _dev: d._dev, id: d.id, at: null }); actions['plan-' + d.id].at = null; } render(); });
         picker = h('div', { className: 'plan' }, inp, ok, cancel);
       }
+      const miss = draftMissing(d);
+      const ea = actions['edit-' + d.id];
+      const eb = h('button', { className: 'btn small', textContent: '✏️', ariaLabel: 'Modifier le brouillon' });
+      eb.addEventListener('click', () => { editOpen = editOpen === d.id ? null : d.id; render(); });
+      if (editOpen === d.id) {
+        if (!pcCan(d._dev)) picker = h('div', { className: 'plan' }, h('span', { className: 'sub', textContent: 'Modifier un brouillon depuis le téléphone arrive avec Nova 1.27.8 sur ton PC. En attendant : ouvre le brouillon sur Vinted.' }));
+        else {
+          const ti = h('input', { className: 'sku-in ti', value: d.title || '', maxLength: 100, placeholder: 'Titre' });
+          const pr = h('input', { className: 'sku-in', type: 'number', inputmode: 'numeric', value: d.price || '', placeholder: 'Prix €' });
+          const sz = h('input', { className: 'sku-in', value: d.size || '', placeholder: 'Taille (ex. W32, M, 42)', autocapitalize: 'characters' });
+          const ok = h('button', { className: 'btn small primary', textContent: 'Enregistrer' });
+          ok.addEventListener('click', () => {
+            const p = { _dev: d._dev, id: d.id };
+            if (ti.value.trim() && ti.value.trim() !== d.title) p.title = ti.value.trim();
+            if (Number(pr.value) > 0 && Number(pr.value) !== Number(d.price)) p.price = Math.round(Number(pr.value));
+            if (sz.value.trim() && sz.value.trim() !== d.size) p.size = sz.value.trim();
+            if (Object.keys(p).length <= 2) return toast('Rien n’a changé');
+            editOpen = null; doAction('edit-' + d.id, 'draftEdit', p);
+          });
+          picker = h('div', { className: 'plan edit' }, ti, h('div', { className: 'row' }, pr, sz), ok);
+        }
+      }
       const meta = h('div', { className: 'meta' }, h('div', { className: 't', textContent: d.title }), h('div', { className: 's', textContent: [euro(d.price), d.brand, d.size].filter(Boolean).join(' · ') }),
+        miss.length ? h('div', { className: 's' }, h('span', { className: 'pill warn', textContent: '⚠︎ à compléter : ' + miss.join(', ') })) : null,
+        ea ? h('div', { className: 's', textContent: ea.status === 'error' ? '⚠︎ ' + (ea.error || 'Modification impossible') : ea.status === 'done' ? 'Modifié ✓' : 'Modification envoyée au PC…' }) : null,
         when ? h('div', { className: 's' }, h('span', { className: 'pill plan-on', textContent: '🕒 ' + fmtWhen(when) + (pending ? ' (envoi au PC…)' : '') })) : null,
         d.schedError ? h('div', { className: 's', textContent: '⚠︎ Planification échouée : ' + d.schedError }) : null,
         a?.error ? h('div', { className: 's', textContent: a.error }) : null);
-      const row = h('div', { className: 'li' }, d.photo ? h('img', { src: d.photo, alt: '', loading: 'lazy' }) : null, meta, h('div', { className: 'row' }, pb, b));
+      const row = h('div', { className: 'li' }, d.photo ? h('img', { src: d.photo, alt: '', loading: 'lazy' }) : null, meta, h('div', { className: 'row' }, eb, pb, b));
       return picker ? h('div', { className: 'li-wrap' }, row, picker) : row;
     })));
   }
