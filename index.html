@@ -564,8 +564,25 @@ button:active { transform: translateY(1px); }
         if (x?.data && x.device?.id && Date.now() - (x.updatedAt || 0) < 14 * 864e5) out.push(x);
       }
       devStates = out.sort((a, b) => b.updatedAt - a.updatedAt);
+      fixLongReply(devStates).catch(() => {});
     } catch { /* on garde la dernière liste */ }
     return devStates;
+  }
+  // Correctif à distance (sans nouvelle version de l'extension) : sur les PC en 1.27.7 ou moins, l'IA écrivait parfois son raisonnement
+  // avant l'annonce et la réponse était coupée (« Réponse de Claude trop longue »). On envoie au PC une règle d'annonce qui l'en empêche.
+  const FIX_RULE = 'FORMAT DE SORTIE (prioritaire sur tout le reste) : réponds UNIQUEMENT par l’objet JSON de l’annonce, du premier { au dernier }. N’écris AUCUN raisonnement, calcul, explication ni second JSON avant ou après (applique le guide des tailles en silence, sans « statut » ni « raisons »). Description courte, 30 hashtags maximum.';
+  const verLt = (a, b) => { const x = String(a || '0').split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) < (y[i] || 0); } return false; };
+  async function fixLongReply(list) {
+    const done = store.get('nova_fix_long') || {};
+    const todo = list.filter((d) => d.device?.id && !done[d.device.id] && verLt(d.data?.version, '1.27.8'));
+    if (!todo.length) return;
+    const t = await token(); if (!t) return;
+    for (const d of todo) {
+      const body = JSON.stringify({ from: { browser: 'ton téléphone (correctif annonces)' }, groups: ['annonces'], at: Date.now(), keys: { extraRules: FIX_RULE } });
+      const r = await fetch(`${CFG.url}/storage/v1/object/photos/${session.user.id}/_settings/${d.device.id}.json`, { method: 'POST', headers: { apikey: CFG.key, authorization: `Bearer ${t}`, 'content-type': 'application/json', 'x-upsert': 'true' }, body });
+      if (r.ok) done[d.device.id] = Date.now();
+    }
+    store.set('nova_fix_long', done);
   }
   const ARR = ['abFeed', 'drafts', 'aiQueue', 'questions', 'reviews', 'inbox', 'sales', 'returns', 'transit', 'repostItems', 'favs', 'advice', 'accounts', 'returnsDone', 'soldMini'];
   function mergeStates(list, fallback) {
