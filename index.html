@@ -528,6 +528,19 @@ button:active { transform: translateY(1px); }
   function pickPhotos() {
     return new Promise((ok) => { const inp = h('input', { type: 'file', accept: 'image/*', multiple: true }); inp.style.display = 'none'; document.body.append(inp); inp.addEventListener('change', () => { ok([...inp.files]); inp.remove(); }); inp.click(); });
   }
+  // navigateur qui recevra un envoi : celui choisi s'il est vivant, sinon le plus récent
+  function jobTarget() {
+    const devs = (state?.devices || []).slice().sort((a, b) => (b.at || 0) - (a.at || 0));
+    if (devs.length < 2) return null;
+    const ch = devs.find((d) => d.id === store.get('nova_job_dev'));
+    return ch && Date.now() - (ch.at || 0) < 10 * 60000 ? ch.id : devs[0].id;
+  }
+  async function resendStuck() {
+    const list = jobs.filter((j) => j.status === 'pc' && Date.now() - j.createdAt > 15 * 60000 && keptIds.has(j.id));
+    if (!list.length) return toast('Aucune photo gardée sur ce téléphone pour ces articles : utilise ↻ Renvoyer sur chacun');
+    toast(`Renvoi de ${list.length} article${list.length > 1 ? 's' : ''} au PC…`);
+    for (const j of list) await retryJob(j);
+  }
   async function retryJob(j) {
     if (retrying.has(j.id)) return;
     let blobs = (await keepPh.get(j.id).catch(() => null))?.blobs;
@@ -540,7 +553,7 @@ button:active { transform: translateY(1px); }
     try {
       const folder = `${session.user.id}/${uid4()}`; const paths = [];
       for (let i = 0; i < blobs.length; i++) { const p = `${folder}/${i + 1}.jpg`; await upload(p, blobs[i]); paths.push(p); }
-      const tgt = (state?.devices || []).length > 1 ? store.get('nova_job_dev') : null;
+      const tgt = jobTarget();
       // même ligne remise « en attente » (le PC la reprend avec le même SKU) ; sinon un nouvel envoi
       let ok = await rest('PATCH', `jobs?id=eq.${j.id}`, { status: 'new', photos: paths, error: null, title: tgt ? '@dev:' + tgt : null }, 'return=representation').catch(() => null);
       let id = j.id;
@@ -1302,7 +1315,7 @@ Réponds UNIQUEMENT en JSON :
     const errJobs = jobs.filter((j) => j.status === 'error');
     if (errJobs.length) out.push({ lvl: 'warn', t: `${errJobs.length} annonce${errJobs.length > 1 ? 's' : ''} en erreur`, d: 'Plus bas dans « Derniers envois » : touche ↻ Relancer à côté de chacune.' });
     const stuck = jobs.filter((j) => j.status === 'pc' && Date.now() - j.createdAt > 15 * 60000);
-    if (stuck.length) out.push({ lvl: 'warn', t: `${stuck.length} article${stuck.length > 1 ? 's' : ''} bloqué${stuck.length > 1 ? 's' : ''} en analyse`, d: 'Le PC les a reçus mais n’a pas fini. Ouvre Nova sur le PC (le panneau ou la page en grand) : l’analyse se fait là.' });
+    if (stuck.length) out.push({ lvl: 'warn', t: `${stuck.length} article${stuck.length > 1 ? 's' : ''} bloqué${stuck.length > 1 ? 's' : ''} en analyse`, d: 'Le PC les a reçus mais n’a pas fini. Ouvre Nova sur le PC (page en grand) : l’analyse se fait là. Si tu as changé de navigateur ou réinstallé Nova, touche « Tout renvoyer » : le téléphone renvoie les photos au PC actuel.', resend: true });
     const miss = (state.drafts || []).filter((d) => draftMissing(d).length);
     if (miss.length) out.push({ lvl: 'warn', t: `${miss.length} brouillon${miss.length > 1 ? 's' : ''} à compléter`, d: 'Il manque une taille, une couleur ou une marque : onglet Brouillons, bouton ✏️.', go: 'drafts' });
     if (!store.get('nova_api_key')) out.push({ lvl: 'warn', t: 'Clé API Claude absente sur ce téléphone', d: 'Elle sert aux estimations et à l’agent. Réglages → Clé API.' });
@@ -1318,6 +1331,7 @@ Réponds UNIQUEMENT en JSON :
     if (bad || diagOpen) for (const x of iss) {
       const row = h('div', { className: 'diag-i' }, h('b', { textContent: x.t }), h('span', { className: 'sub', textContent: x.d }));
       if (x.revive) { const k = 'revive-' + (state._dev || ''); const a = actions[k]; const b = h('button', { className: 'btn small primary', textContent: a?.status === 'new' || a?.status === 'running' ? 'Déblocage…' : a?.status === 'done' ? 'Débloqué ✓' : '🔄 Débloquer Vinted', disabled: a?.status === 'new' || a?.status === 'running' }); b.addEventListener('click', () => doAction(k, 'reviveVinted', { _dev: state._dev })); row.append(b); }
+      if (x.resend) { const b = h('button', { className: 'btn small primary', textContent: retrying.size ? 'Renvoi…' : '↻ Tout renvoyer', disabled: !!retrying.size }); b.addEventListener('click', () => resendStuck()); row.append(b); }
       if (x.go) { const b = h('button', { className: 'btn small', textContent: 'Voir' }); b.addEventListener('click', () => { tab = x.go; render(); scrollTo(0, 0); }); row.append(b); }
       card.append(row);
     }
@@ -1483,7 +1497,7 @@ Réponds UNIQUEMENT en JSON :
       h('div', { className: 'meta' }, h('div', { className: 't', textContent: j.title || `${j.photos?.length || 0} photo(s)` }),
         j.sku ? h('div', { className: 's' }, h('span', { className: 'sku', textContent: j.sku }), j.price ? euro(j.price) : '') : null,
         j.error ? h('div', { className: 's', textContent: j.error }) : null, s),
-      j.status === 'error' ? (() => { const b = h('button', { className: 'btn small primary', textContent: retrying.has(j.id) ? 'Envoi…' : '↻ Relancer', disabled: retrying.has(j.id), title: keptIds.has(j.id) ? 'Renvoie les mêmes photos au PC' : 'Choisis à nouveau les photos de cet article' }); b.addEventListener('click', () => retryJob(j)); return b; })() : null);
+      (j.status === 'error' || (j.status === 'pc' && Date.now() - j.createdAt > 15 * 60000)) ? (() => { const b = h('button', { className: 'btn small primary', textContent: retrying.has(j.id) ? 'Envoi…' : j.status === 'pc' ? '↻ Renvoyer' : '↻ Relancer', disabled: retrying.has(j.id), title: keptIds.has(j.id) ? 'Renvoie les mêmes photos au PC' : 'Choisis à nouveau les photos de cet article' }); b.addEventListener('click', () => retryJob(j)); return b; })() : null);
   }
 
   let planOpen = null, editOpen = null;
