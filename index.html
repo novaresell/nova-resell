@@ -1148,7 +1148,7 @@ Réponds UNIQUEMENT en JSON :
         auto.append(h('div', { className: 'sub', textContent: 'Tout est en pause. Tes choix ci-dessous seront appliqués à la reprise.' }), r);
       } else auto.append(h('div', { className: 'sub', textContent: (state.autos.filter((a) => { const w = autoWant[a.k]; return w && Date.now() - w.t < 90000 ? w.on : a.on; }).length) + ' actifs sur ' + state.autos.length + '. Chaque changement est envoyé au PC.' }));
       let g = '';
-      for (const a0 of state.autos) {
+      for (const a0 of state.autos.filter((x) => !/^(dropAuto|upAuto|priceAuto)$/.test(x.k))) {
         const w = autoWant[a0.k]; const a = w && Date.now() - w.t < 90000 && w.on !== a0.on ? { ...a0, on: w.on } : a0;
         if (a.g !== g) { g = a.g; auto.append(h('div', { className: 'au-g', textContent: g })); }
         const cb = h('input', { type: 'checkbox', checked: a.on, disabled: pend(a.k) });
@@ -1209,7 +1209,7 @@ Réponds UNIQUEMENT en JSON :
     if (tab === 'ventes') viewVentes(v);
     if (tab === 'settings') viewSettings(v);
     if (tab === 'estim') viewEstim(v);
-    if (tab === 'autobuy') viewAutobuy(v);
+    if (tab === 'autobuy') { tab = 'photos'; viewPhotos?.(v); }
     if (tab === 'litiges') viewLitiges(v);
     $('#setBtn')?.classList.toggle('on', tab === 'settings');
     renderHeader();
@@ -1413,7 +1413,7 @@ Réponds UNIQUEMENT en JSON :
         tile(String(unread), 'messages non lus', go('messages', 'inbox'), true))));
     }
     // auto-buy : articles trouvés par les filtres du PC, à réserver d'un geste
-    if (state && state.abRules) {
+    if (false && state && state.abRules) { // auto-buy retiré (1.27.11)
       const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'À payer vite', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint' };
       const on = (state.abRules || []).filter((r) => r.on);
       const cd = (state.abRules || []).find((r) => r.on && r.countdownEnd && Date.parse(r.countdownEnd) > Date.now());
