@@ -565,21 +565,29 @@ button:active { transform: translateY(1px); }
     } catch (e) { toast('Relance impossible : ' + e.message); }
     retrying.delete(j.id); render();
   }
-  async function sendStaged() {
+  // limite : le PC ne reçoit que quelques articles à la fois, le reste part tout seul quand il a fini
+  const MAX_PC = 4; let drip = false;
+  const inflight = () => jobs.filter((j) => (j.status === 'new' || j.status === 'pc') && Date.now() - j.createdAt < 3 * 3600e3).length;
+  async function sendStaged(auto) {
     if (busy) return;
+    if (auto !== true) auto = false;
+    const room = MAX_PC - inflight();
+    if (!offline() && room <= 0) { drip = true; render(); if (!auto) toast(`Le PC traite déjà ${inflight()} articles : les tiens partiront tout seuls dès qu’il aura fini (garde l’appli ouverte)`); return; }
     if (offline()) { await idb.add({ kind: 'send', at: Date.now(), groups: staged.map((g) => ({ files: g.files, sku: g.sku })) }); staged = []; render(); updQueue(); return toast('Pas de réseau : les articles partiront au retour du réseau'); }
     busy = true; render();
     try {
-      for (const s of staged.slice()) {
+      let sent = 0;
+      for (const s of staged.slice(0, offline() ? staged.length : Math.max(0, room))) {
         const folder = `${session.user.id}/${uid4()}`; const paths = []; let thumb = null;
         const blobs = [];
         for (let i = 0; i < s.files.length; i++) { const { blob, thumb: t } = await shrink(s.files[i]); if (!thumb) thumb = t; const p = `${folder}/${i + 1}.jpg`; await upload(p, blob); paths.push(p); blobs.push(blob); }
         const tgt = (state?.devices || []).length > 1 ? store.get('nova_job_dev') : null;
         const made = await rest('POST', 'jobs', { photos: paths, thumb, status: 'new', ...(s.sku ? { sku: s.sku } : {}), ...(tgt ? { title: '@dev:' + tgt } : {}) }, 'return=representation');
         if (made?.[0]?.id) keepPh.put({ job: made[0].id, blobs, at: Date.now() }).catch(() => {});
-        staged.shift();
+        staged.shift(); sent++;
       }
-      toast('Envoyé au PC ✓'); await refresh();
+      drip = staged.length > 0;
+      toast(staged.length ? `${sent} envoyé${sent > 1 ? 's' : ''} au PC ✓ · ${staged.length} en attente : ils partiront tout seuls dès que le PC aura fini (garde l’appli ouverte)` : 'Envoyé au PC ✓'); await refresh();
     } catch (e) { toast('Envoi impossible : ' + e.message); }
     busy = false; render();
   }
@@ -712,7 +720,7 @@ button:active { transform: translateY(1px); }
       if (!document.querySelector('.np-wrap')) { whatsNew(); if (!document.querySelector('.np-wrap')) pushPrompt(); } if (!flushing) { flushQueue(); updQueue(); }
     } catch (e) { if (/session/i.test(e.message)) logout(); }
   }
-  let pollT; function poll() { clearInterval(pollT); refresh(); pollT = setInterval(() => { if (!document.hidden) refresh(); }, 6000); }
+  let pollT; function poll() { clearInterval(pollT); refresh(); pollT = setInterval(async () => { if (document.hidden) return; await refresh(); if (drip && staged.length && !busy && !offline() && inflight() < MAX_PC) sendStaged(true); if (!staged.length) drip = false; }, 6000); }
   document.addEventListener('visibilitychange', () => { if (!document.hidden && session) refresh(); });
 
   const ALL_DEV = /^(setAuto|pauseAll|resumeAll|setGoal|setPushKinds|pushSub|pushTest|refreshState|runNow)$/;
@@ -1476,7 +1484,8 @@ Réponds UNIQUEMENT en JSON :
           s.files.length > 1 ? (() => { const b = h('button', { className: 'linkbtn small', textContent: '✂️ Séparer la dernière photo' }); b.addEventListener('click', () => { staged.splice(i + 1, 0, { files: [s.files.pop()], urls: [s.urls.pop()], sku: '' }); render(); }); return b; })() : null);
         return h('div', { className: 'item' }, h('div', { className: 'st-head' }, h('b', { textContent: `Article ${i + 1} · ${s.files.length} photo${s.files.length > 1 ? 's' : ''}` }), sku), h('div', { className: 'thumbs' }, s.urls.map((u) => h('img', { src: u, alt: '' }))), ctl, x);
       })));
-      const send = h('button', { className: 'btn primary', disabled: busy, textContent: busy ? 'Envoi en cours…' : `Envoyer ${staged.length} article${staged.length > 1 ? 's' : ''} au PC` });
+      const send = h('button', { className: 'btn primary', disabled: busy || drip, textContent: busy ? 'Envoi en cours…' : drip ? `⏳ ${staged.length} en attente : départ auto dès que le PC a fini` : `Envoyer ${staged.length} article${staged.length > 1 ? 's' : ''} au PC` });
+      if (!drip && staged.length > MAX_PC) v.append(h('div', { className: 'sub', textContent: `Le PC reçoit ${MAX_PC} articles à la fois pour ne pas saturer : les suivants partent tout seuls, garde l’appli ouverte.` }));
       send.addEventListener('click', sendStaged);
       const srt = h('button', { className: 'btn', type: 'button', textContent: `🗂️ Trier les photos à la main (${staged.reduce((n, x) => n + x.files.length, 0)})` });
       srt.addEventListener('click', sortStart);
