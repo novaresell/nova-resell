@@ -1540,6 +1540,14 @@ Réponds UNIQUEMENT en JSON :
     const g = h('div', { className: 'nv-more' });
     for (const [i, l, n, fn] of more) { const b = h('button', { type: 'button' }, h('span', { textContent: i }), h('b', { textContent: l }), n ? h('i', { textContent: n }) : null); b.addEventListener('click', fn); g.append(b); }
     v.append(g);
+    // mode vacances en un geste
+    const vac = h('button', { type: 'button', className: 'nv-row' + (state.paused ? ' nv-vac-on' : '') }, h('i', { className: 'nv-n ' + (state.paused ? 'y' : 'v'), textContent: state.paused ? '⏸' : '🏖️' }),
+      h('span', {}, h('b', { textContent: state.paused ? 'Mode vacances activé' : 'Mode vacances' }), h('small', { textContent: state.paused ? 'Tous les automatismes sont en pause · touche pour tout reprendre' : 'Met tous les automatismes en pause d’un geste' })), h('em', { textContent: '›' }));
+    vac.addEventListener('click', () => {
+      if (state.paused) { if (confirm('Reprendre tous les automatismes ?')) doAction('stopall', 'resumeAll', {}); return; }
+      if (confirm('Activer le mode vacances ? Nova met tous ses automatismes en pause (réponses, relances, publications…). Pense aussi à activer le mode vacances dans les paramètres de ton compte Vinted pour masquer tes annonces.')) doAction('stopall', 'pauseAll', {});
+    });
+    v.append(h('div', { className: 'nv-sec', textContent: 'Vacances' }), vac);
   }
   // ---- 1.28 : ajout guidé, photo par photo
   const GSTEPS = [['Plié', 'Le jean ou le pull plié, bien net : ce sera la 1re photo'], ['Face', 'À plat, en entier, ceinture ou col en haut'], ['Dos', 'À plat, en entier, de dos'], ['Marque', 'L’étiquette de marque, lisible'], ['Taille', 'L’étiquette de taille et de composition'], ['Mesures', 'Mètre posé, ou un défaut en gros plan (facultatif)']];
