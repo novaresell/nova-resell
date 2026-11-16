@@ -311,6 +311,47 @@ button:active { transform: translateY(1px); }
 .sort-bar .row { display: flex; gap: 8px; }
 .btn.danger { background: var(--err) !important; color: #fff !important; }
 </style>
+<style id="nv128">
+:root{--nv-acc:#6C6FF5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1e1f24;--surface:#26272d;--surface-2:#2b2d33;--line:#33353d;--text:#f2f3f5;--muted:#9396a0;--cyan:#8b8dff;--indigo:#6C6FF5;--grad:linear-gradient(135deg,#7b7ef7,#6C6FF5);--tabbar:rgba(23,24,28,.96)}}
+:root[data-theme="dark"]{--bg:#1e1f24;--surface:#26272d;--surface-2:#2b2d33;--line:#33353d;--text:#f2f3f5;--muted:#9396a0;--cyan:#8b8dff;--indigo:#6C6FF5;--grad:linear-gradient(135deg,#7b7ef7,#6C6FF5);--tabbar:rgba(23,24,28,.96)}
+body{background:var(--bg)!important}
+.tabs{grid-template-columns:repeat(5,1fr)!important}
+.tab.active{color:var(--nv-acc)!important}
+.hero{background:var(--surface)!important;padding-bottom:12px!important}.hero::before,.hero::after{display:none!important}
+.hero .kpis{display:none!important}
+.btn.primary{background:var(--nv-acc)!important;border-color:var(--nv-acc)!important;color:#fff!important}
+.nv-kp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px}
+.nv-k{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:2px}
+.nv-k span{font-size:12px;color:var(--muted)}.nv-k b{font-size:24px;font-weight:800}.nv-k small{font-size:12px;color:var(--muted)}.nv-k small.ok{color:#2fbf71}
+.nv-sec{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:16px 2px 8px}
+.nv-row{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;color:var(--text);font:inherit}
+.nv-row>span{flex:1;min-width:0;display:grid}.nv-row b{font-size:15px}.nv-row small{font-size:12px;color:var(--muted)}.nv-row em{font-style:normal;color:var(--muted);font-size:20px}
+.nv-n{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:16px;flex:none}
+.nv-n.y{background:rgba(240,178,50,.18);color:#f0b232}.nv-n.v{background:rgba(108,111,245,.18);color:#a9abff}.nv-n.g{background:rgba(47,191,113,.16);color:#3fbf7f}
+.nv-run{display:grid;gap:8px;width:100%;text-align:left;color:var(--text);font:inherit}.nv-acc{color:var(--nv-acc);font-weight:600}
+.nv-more{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nv-more button{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--text);font:inherit;text-align:left}
+.nv-more b{flex:1;font-size:13px}.nv-more i{font-style:normal;background:var(--nv-acc);color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
+.nv-guide{display:grid;gap:10px;margin-top:6px}
+.nv-steps{display:flex;gap:6px}.nv-steps i{flex:1;height:5px;border-radius:3px;background:var(--line)}.nv-steps i.d{background:#2fbf71}.nv-steps i.c{background:var(--nv-acc)}
+.nv-shot{display:grid;place-items:center;align-content:center;gap:6px;min-height:240px;border:2px dashed var(--line);border-radius:20px;background:var(--surface-2);text-align:center;padding:16px;cursor:pointer}
+.nv-shot.done{border-style:solid;border-color:#2fbf71}.nv-cam{font-size:40px}.nv-shot b{font-size:19px}.nv-shot small{color:var(--muted)}
+.nv-th{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.nv-t{aspect-ratio:3/4;border-radius:8px;background:var(--surface) center/cover;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;border:2px solid transparent}
+.nv-t span{font-size:10px;color:var(--muted);background:rgba(0,0,0,.35);border-radius:4px;padding:0 3px}.nv-t.has span{color:#fff}.nv-t.on{border-color:var(--nv-acc)}
+.nv-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.nv-two.sm{margin-top:-4px}
+.nv-or{text-align:center;color:var(--muted);font-size:12px;margin:6px 0}
+.pick.small{padding:12px!important;min-height:0!important}.pick.small .ico{font-size:22px!important}
+.nv-seg{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;margin:4px 0 12px}
+.nv-seg button{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:700;padding:9px;border-radius:10px}.nv-seg button.on{background:var(--nv-acc);color:#fff}
+.nv-q{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.nv-qi{aspect-ratio:1/1;max-height:46vh;background:var(--surface-2) center/cover;position:relative}
+.nv-qi span{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:12px;border-radius:8px;padding:3px 8px}
+.nv-qb{padding:14px;display:grid;gap:10px}.nv-qb>b{font-size:17px;line-height:1.25}
+.nv-chips{display:flex;gap:6px;flex-wrap:wrap}.nv-chips span{background:var(--surface-2);border-radius:8px;padding:4px 10px;font-size:14px}.nv-chips .p{color:#a9abff;font-weight:800;background:rgba(108,111,245,.18)}
+.nv-qb small{text-align:center}
+</style>
 </head>
 <body>
 <div class="ext-bar" id="extBar" hidden><span><b>Sur ordinateur, Nova s'utilise dans l'extension</b> (gratuite) pour Chrome ou Brave.</span><a class="eb-btn" id="extBarBtn" href="https://chromewebstore.google.com/detail/ahnbljlkhdpenpchhamlgppappcknbcj" target="_blank" rel="noopener">Ajouter l'extension</a><button class="eb-x" id="extBarX" type="button" aria-label="Fermer">×</button></div>
@@ -373,13 +414,14 @@ button:active { transform: translateY(1px); }
 </div>
 
 <nav class="tabs" aria-label="Sections">
-  <button class="tab active" data-tab="photos" id="tabPhotos"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13.5" r="3.5"/></svg></span>Photos</button>
-  <button class="tab" data-tab="drafts" id="tabDrafts"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v3M16 2.5v3"/></svg></span>Brouillons</button>
-  <button class="tab" data-tab="repost" id="tabRepost"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 6l2.5 3L8 8v13h8V8l1.5 1L20 6l-4-3-1.5 1.5a3 3 0 0 1-5 0z"/></svg></span>Dressing</button>
-  <button class="tab" data-tab="favs" id="tabFavs"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></span>Favoris</button>
+  <button class="tab" data-tab="today" id="tabToday"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>Aujourd’hui</button>
+  <button class="tab" data-tab="photos" id="tabPhotos"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>Ajouter</button>
+  <button class="tab" data-tab="drafts" id="tabDrafts"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v3M16 2.5v3"/></svg></span>Annonces</button>
+  <button class="tab" data-tab="repost" id="tabRepost" hidden><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 6l2.5 3L8 8v13h8V8l1.5 1L20 6l-4-3-1.5 1.5a3 3 0 0 1-5 0z"/></svg></span>Dressing</button>
+  <button class="tab" data-tab="favs" id="tabFavs" hidden><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></span>Favoris</button>
   <button class="tab" data-tab="messages" id="tabMessages"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-12 7l-5 1 1-4a8 8 0 1 1 16-4z"/></svg></span>Messages</button>
   <button class="tab" data-tab="ventes" id="tabVentes"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg></span>Ventes</button>
-  <button class="tab" data-tab="litiges" id="tabLitiges"><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><path d="M9.5 9.5 12 7l2.5 2.5M12 7v5"/></svg></span>Retours</button>
+  <button class="tab" data-tab="litiges" id="tabLitiges" hidden><span class="i"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><path d="M9.5 9.5 12 7l2.5 2.5M12 7v5"/></svg></span>Retours</button>
 </nav>
 
 <script src="config.js"></script>
@@ -389,7 +431,7 @@ button:active { transform: translateY(1px); }
   const $ = (s) => document.querySelector(s);
   const h = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); kids.flat().forEach((k) => k != null && k !== false && n.append(k)); return n; };
   let openConv = null;
-  let tab = 'photos', staged = [], jobs = [], state = null, actions = {}, busy = false, mode = 'in';
+  let tab = 'today', staged = [], jobs = [], state = null, actions = {}, busy = false, mode = 'in';
   const euro = (v) => (Math.round(v) || 0) + ' €';
   const ago = (t) => { const s = (Date.now() - t) / 1000; return s < 90 ? "à l'instant" : s < 3600 ? `il y a ${Math.round(s / 60)} min` : s < 86400 ? `il y a ${Math.round(s / 3600)} h` : `il y a ${Math.round(s / 86400)} j`; };
   let toastT; function toast(m) { let t = $('.toast'); if (!t) { t = h('div', { className: 'toast', role: 'status' }); document.body.append(t); } t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600); }
@@ -1081,7 +1123,7 @@ Réponds UNIQUEMENT en JSON :
     if (all.length > 1) v.append(h('div', { className: 'card' }, h('b', { textContent: 'Liste des points relais' }), ...all.map((r) => h('div', { className: 'set-row' }, h('b', { textContent: r.track.point.name || 'Point relais' }), h('span', { textContent: ptLine(r.track.point) })))));
   }
   function viewEstim(v) {
-    const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'photos'; render(); });
+    const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'today'; render(); });
     v.append(h('div', { className: 'set-h' }, h('h2', { textContent: 'Estimer un prix' }), back));
     const go = h('label', { className: 'btn primary' }, estimPick, estimBusy ? 'Analyse en cours…' : 'Photographier un article');
     v.append(h('p', { className: 'sub', textContent: 'Prends 1 à 4 photos : l’article en entier et l’étiquette (marque, taille, matière). Fonctionne sans le PC.' }), go);
@@ -1104,7 +1146,7 @@ Réponds UNIQUEMENT en JSON :
   let goalWant = null;
   const autoWant = {}; // choix faits sur le téléphone, gardés le temps que le PC les applique
   function viewSettings(v) {
-    const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'photos'; render(); });
+    const back = h('button', { className: 'linkbtn', textContent: '← Retour' }); back.addEventListener('click', () => { tab = 'today'; render(); });
     v.append(h('div', { className: 'set-h' }, h('h2', { textContent: 'Réglages' }), back));
     v.append(pushCard());
     const devs = state?.devices || [];
@@ -1201,6 +1243,7 @@ Réponds UNIQUEMENT en JSON :
   function render() {
     document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === tab));
     const v = $('#view'); v.replaceChildren();
+    if (tab === 'today') viewToday(v);
     if (tab === 'photos') viewPhotos(v);
     if (tab === 'drafts') viewDrafts(v);
     if (tab === 'messages') viewMessages(v);
@@ -1398,20 +1441,10 @@ Réponds UNIQUEMENT en JSON :
     v.append(diagCard());
     const uc = updateCard(); if (uc) v.append(uc);
     v.append(
-      h('h2', { textContent: 'Nouvel article' }),
-      h('p', { className: 'sub', textContent: "Choisis toutes tes photos d'un coup, même pour plusieurs articles : Nova les trie par article. Tu peux ajouter un SKU à chaque article, ou photographier son étiquette SKU." }),
-      h('label', { className: 'pick' }, input, h('span', { className: 'ico', textContent: '📷' }), h('b', { textContent: 'Prendre ou choisir des photos' }), h('span', { className: 'sub', textContent: 'Appareil photo ou galerie' })),
+      guideCard(),
+      h('div', { className: 'nv-or', textContent: 'ou' }),
+      h('label', { className: 'pick small' }, input, h('span', { className: 'ico', textContent: '🖼️' }), h('b', { textContent: 'Choisir plusieurs photos dans la galerie' }), h('span', { className: 'sub', textContent: 'Plusieurs articles d’un coup : Nova les trie par article' })),
     );
-    if (state) {
-      const go = (t, sub) => () => { tab = t; if (sub) msgTab = sub; render(); scrollTo(0, 0); };
-      const tile = (n, l, fn, warn) => { const b = h('button', { type: 'button', className: 'day-t' + (warn && n ? ' warn' : '') }, h('b', { textContent: n }), h('span', { textContent: l })); b.addEventListener('click', fn); return b; };
-      const unread = (state.inbox || []).filter((x) => x.unread).length;
-      v.append(h('div', { className: 'card day' }, h('b', { textContent: 'Aujourd’hui' }), h('div', { className: 'day-g' },
-        tile(state.today ? `${state.today.sales}` : '–', state.today?.ca ? `ventes · ${state.today.ca} €` : 'ventes', go('ventes')),
-        tile(String(state.stats?.toShip ?? 0), state.stats?.late ? `colis · ${state.stats.late} en retard` : 'colis à déposer', go('ventes'), true),
-        tile(String((state.aiQueue || []).length), 'offres à valider', go('messages', 'queue'), true),
-        tile(String(unread), 'messages non lus', go('messages', 'inbox'), true))));
-    }
     // auto-buy : articles trouvés par les filtres du PC, à réserver d'un geste
     if (false && state && state.abRules) { // auto-buy retiré (1.27.11)
       const AB_ST = { buying: 'Ouverture sur le PC…', reserved: 'À payer vite', bought: 'Acheté', check: 'Paiement envoyé', gone: 'Trop tard', cap: 'Plafond atteint' };
@@ -1434,34 +1467,6 @@ Réponds UNIQUEMENT en JSON :
       card.append(all, h('div', { className: 'sub', textContent: '« Acheter » ouvre la page de paiement sur ton PC : paie vite (il n’est à toi qu’une fois payé), ou Nova paie seul si l’achat auto est activé.' }));
       v.append(card);
     }
-    // objectif du mois : progression, reste à faire par jour, réglable ici
-    if (state?.stats) {
-      const st = state.stats, allK = state.statsAll && store.get('nova_kpi_all') !== false;
-      const gw = goalWant && Date.now() - goalWant.t < 120000 ? goalWant : null;
-      const goal = gw ? gw.goal : (st.goal || 0), type = gw ? gw.type : (st.goalType || 'ca');
-      const val = type === 'profit' ? (st.monthProfit || 0) : (allK ? state.statsAll.month : (st.month || 0));
-      const d = new Date(), left = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate() + 1;
-      const card = h('div', { className: 'card goal' });
-      const edit = h('button', { className: 'linkbtn small', textContent: goal ? 'Modifier' : 'Fixer un objectif' });
-      if (goal) {
-        const pc = Math.min(100, Math.round(val / goal * 100));
-        card.append(h('div', { className: 'row' }, h('b', { textContent: 'Objectif du mois' }), h('span', { className: 'grow' }), edit),
-          h('div', { className: 'goal-v' }, h('b', { textContent: euro(val) }), h('span', { textContent: ` / ${euro(goal)}${type === 'profit' ? ' de bénéfice' : ''}${allK && type !== 'profit' ? ' · tous les comptes' : ''}` })),
-          h('div', { className: 'goal-bar' }, h('i', { style: `width:${pc}%` })),
-          h('div', { className: 'sub' + (val >= goal ? ' ok' : ''), textContent: val >= goal ? `Objectif atteint (${pc} %) : bravo !` : `${pc} % · encore ${euro(goal - val)}, soit environ ${euro(Math.ceil((goal - val) / left))} par jour sur les ${left} jour${left > 1 ? 's' : ''} restants` }));
-      } else card.append(h('div', { className: 'row' }, h('b', { textContent: 'Objectif du mois' }), h('span', { className: 'grow' }), edit), h('div', { className: 'sub', textContent: 'Fixe un montant à atteindre ce mois-ci : Nova te montre ta progression et ce qu’il reste à vendre chaque jour.' }));
-      edit.addEventListener('click', () => {
-        const inp = h('input', { className: 'sku-in', type: 'number', inputmode: 'numeric', min: 0, step: 10, value: goal || '', placeholder: 'Montant en €' });
-        const sel = h('select', { className: 'sku-in' }, h('option', { value: 'ca', textContent: 'Chiffre d’affaires', selected: type === 'ca' }), h('option', { value: 'profit', textContent: 'Bénéfice', selected: type === 'profit' }));
-        const ok = h('button', { className: 'btn primary small', textContent: 'Enregistrer' });
-        ok.addEventListener('click', () => { const g = Math.max(0, Math.round(Number(inp.value) || 0)); goalWant = { goal: g, type: sel.value, t: Date.now() }; doAction('goal', 'setGoal', { goal: g, type: sel.value }); });
-        card.replaceChildren(h('b', { textContent: 'Objectif du mois' }), inp, sel, ok);
-        inp.focus();
-      });
-      v.append(card);
-    }
-    const est = h('button', { className: 'btn est-go', type: 'button', textContent: 'Estimer un prix (brocante)' }); est.addEventListener('click', () => { tab = 'estim'; render(); scrollTo(0, 0); });
-    v.append(est);
     const devs = state?.devices || [];
     if (devs.length > 1) {
       const cur = store.get('nova_job_dev') || '';
@@ -1498,6 +1503,119 @@ Réponds UNIQUEMENT en JSON :
     if (!state) v.append(h('div', { className: 'card help' }, h('b', { textContent: 'Relier ton PC (une seule fois)' }), h('ol', {}, h('li', { textContent: 'Sur ton PC, ouvre Nova Resell → ⚙︎ → « Compte Nova ».' }), h('li', { textContent: 'Connecte-toi avec le même e-mail et mot de passe qu\u2019ici.' }), h('li', { textContent: "La pastille en haut passe à « PC en ligne » : tes envois sont traités." }))));
   }
 
+
+  // ---- 1.28 : écran Aujourd'hui
+  function viewToday(v) {
+    const go = (t, sub) => () => { tab = t; if (sub) msgTab = sub; render(); scrollTo(0, 0); };
+    if (!state) {
+      v.append(h('div', { className: 'card help' }, h('b', { textContent: 'Relier ton PC (une seule fois)' }), h('ol', {}, h('li', { textContent: 'Sur ton PC, ouvre Nova Resell → ⚙︎ → « Compte Nova ».' }), h('li', { textContent: 'Connecte-toi avec le même e-mail et mot de passe qu’ici.' }), h('li', { textContent: 'Reviens ici : tout apparaît en quelques secondes.' }))));
+      const b = h('button', { className: 'btn primary', textContent: 'Ajouter un article' }); b.addEventListener('click', go('photos')); v.append(b); return;
+    }
+    const st = state.stats || {}, allK = state.statsAll && store.get('nova_kpi_all') !== false, K = allK ? state.statsAll : st;
+    const sales = state.today ? state.today.sales : null;
+    v.append(h('div', { className: 'nv-kp' },
+      h('div', { className: 'nv-k' }, h('span', { textContent: 'Ce mois-ci' }), h('b', { textContent: euro(K.month || 0) }), st.monthProfit != null ? h('small', { className: 'ok', textContent: `+${euro(st.monthProfit)} de bénéfice` }) : null),
+      h('div', { className: 'nv-k' }, h('span', { textContent: 'Aujourd’hui' }), h('b', { textContent: sales != null ? `${sales} vente${sales > 1 ? 's' : ''}` : '–' }), h('small', { textContent: `${K.online ?? '–'} en ligne · ${K.drafts ?? '–'} brouillons` }))));
+    const unread = (state.inbox || []).filter((x) => x.unread).length, q = (state.aiQueue || []).length + (state.questions || []).length;
+    const rows = [
+      [st.toShip || 0, 'Colis à déposer', st.late ? `${st.late} en retard · bordereaux sur le PC` : 'bordereaux prêts sur le PC', 'y', go('ventes')],
+      [q, 'Messages à valider', 'offres et questions d’acheteurs', 'v', go('messages', 'queue')],
+      [unread, 'Messages non lus', 'conversations Vinted', 'v', go('messages', 'inbox')],
+      [(state.drafts || []).length, 'Brouillons prêts', 'vérification rapide, un par un', 'g', () => { quick = 0; tab = 'drafts'; render(); scrollTo(0, 0); }],
+    ].filter((r) => r[0]);
+    v.append(h('div', { className: 'nv-sec', textContent: 'À faire maintenant' }));
+    if (!rows.length) v.append(h('div', { className: 'card sub', textContent: 'Rien d’urgent : tout est à jour 👌' }));
+    for (const [n, t, d, c, fn] of rows) { const b = h('button', { type: 'button', className: 'nv-row' }, h('i', { className: 'nv-n ' + c, textContent: n }), h('span', {}, h('b', { textContent: t }), h('small', { textContent: d })), h('em', { textContent: '›' })); b.addEventListener('click', fn); v.append(b); }
+    const run = jobs.filter((j) => j.status === 'new' || j.status === 'pc');
+    if (run.length) {
+      const cur = run.find((j) => j.status === 'pc');
+      v.append(h('div', { className: 'nv-sec', textContent: 'En cours sur le PC' }), h('button', { type: 'button', className: 'card nv-run', onclick: go('photos') },
+        h('div', { className: 'row' }, h('b', { textContent: cur ? (cur.title || 'Article en analyse') : 'En attente du PC' }), h('span', { className: 'grow' }), h('span', { className: 'nv-acc', textContent: cur ? 'Analyse…' : '⏳' })),
+        h('div', { className: 'goal-bar' }, h('i', { style: `width:${cur ? 55 : 8}%` })),
+        h('small', { className: 'sub', textContent: `${run.filter((j) => j.status === 'new').length} en attente · ${MAX_PC} maximum à la fois` })));
+    }
+    if (window.__novaGoal) window.__novaGoal(v);
+    v.append(h('div', { className: 'nv-sec', textContent: 'Aussi' }));
+    const more = [['🔁', 'Republier', (state.repostItems || []).filter((i) => i.due).length, go('repost')], ['❤️', 'Favoris', (state.favs || []).length, go('favs')], ['↩️', 'Retours et litiges', (state.returns || []).length, go('litiges')], ['🏷️', 'Estimer un prix (brocante)', 0, go('estim')]];
+    const g = h('div', { className: 'nv-more' });
+    for (const [i, l, n, fn] of more) { const b = h('button', { type: 'button' }, h('span', { textContent: i }), h('b', { textContent: l }), n ? h('i', { textContent: n }) : null); b.addEventListener('click', fn); g.append(b); }
+    v.append(g);
+  }
+  // ---- 1.28 : ajout guidé, photo par photo
+  const GSTEPS = [['Plié', 'Le jean ou le pull plié, bien net : ce sera la 1re photo'], ['Face', 'À plat, en entier, ceinture ou col en haut'], ['Dos', 'À plat, en entier, de dos'], ['Marque', 'L’étiquette de marque, lisible'], ['Taille', 'L’étiquette de taille et de composition'], ['Mesures', 'Mètre posé, ou un défaut en gros plan (facultatif)']];
+  let guide = { files: [], urls: [] };
+  function guideCard() {
+    const i = Math.min(guide.files.length, GSTEPS.length - 1), full = guide.files.length >= GSTEPS.length;
+    const inp = h('input', { type: 'file', accept: 'image/*', capture: 'environment', hidden: true });
+    inp.addEventListener('click', () => { picking = true; clearTimeout(pickT); pickT = setTimeout(() => { picking = false; }, 120000); });
+    inp.addEventListener('change', () => { picking = false; const f = inp.files[0]; if (!f) return; guide.files.push(f); guide.urls.push(URL.createObjectURL(f)); render(); });
+    const shot = h('label', { className: 'nv-shot' + (full ? ' done' : '') }, inp, h('span', { className: 'nv-cam', textContent: full ? '✓' : '📷' }), h('b', { textContent: full ? 'Les 6 photos sont prises' : `${i + 1}. ${GSTEPS[i][0]}` }), h('small', { textContent: full ? 'Ajoute l’article, ou retire une photo pour la refaire' : GSTEPS[i][1] }));
+    if (full) inp.disabled = true;
+    const thumbs = h('div', { className: 'nv-th' }, GSTEPS.map(([l], k) => {
+      const u = guide.urls[k];
+      const t = h('div', { className: 'nv-t' + (k === guide.files.length ? ' on' : '') + (u ? ' has' : ''), style: u ? `background-image:url(${u})` : '' }, h('span', { textContent: l }));
+      if (u) t.addEventListener('click', () => { guide.files.splice(k, 1); URL.revokeObjectURL(guide.urls.splice(k, 1)[0]); render(); });
+      return t;
+    }));
+    const n = guide.files.length;
+    const add = h('button', { className: 'btn', disabled: !n, textContent: 'Article suivant' });
+    add.addEventListener('click', () => { staged.push({ files: guide.files, urls: guide.urls, sku: '' }); guide = { files: [], urls: [] }; toast('Article ajouté : prends le suivant'); render(); });
+    const send = h('button', { className: 'btn primary', disabled: !n && !staged.length || busy || drip, textContent: staged.length || n ? `Envoyer au PC (${staged.length + (n ? 1 : 0)})` : 'Envoyer au PC' });
+    send.addEventListener('click', () => { if (n) { staged.push({ files: guide.files, urls: guide.urls, sku: '' }); guide = { files: [], urls: [] }; } sendStaged(); });
+    return h('div', { className: 'nv-guide' },
+      h('div', { className: 'sub', textContent: n ? `Photo ${Math.min(n + 1, 6)} sur 6 · suis l’ordre, Nova fait le reste` : 'Suis l’ordre des photos : Nova met le plié en premier et tourne tout dans le bon sens' }),
+      h('div', { className: 'nv-steps' }, GSTEPS.map((_, k) => h('i', { className: k < n ? 'd' : k === n ? 'c' : '' }))),
+      shot, thumbs, h('small', { className: 'sub', textContent: 'Touche une miniature pour retirer la photo.' }), h('div', { className: 'nv-two' }, add, send));
+  }
+  // ---- 1.28 : vérification rapide des brouillons
+  let quick = 0;
+  function quickCard(v, list) {
+    if (quick == null || !list.length) return false;
+    quick = Math.max(0, Math.min(quick, list.length - 1));
+    const d = list[quick], a = actions['pub-' + d.id];
+    const seg = h('div', { className: 'nv-seg' }, h('button', { className: 'on', textContent: `Un par un` }), (() => { const b = h('button', { textContent: 'Liste' }); b.addEventListener('click', () => { quick = null; render(); }); return b; })());
+    const pub = h('button', { className: 'btn primary', textContent: a ? (a.status === 'done' ? 'Publié ✓' : a.status === 'error' ? 'Réessayer' : 'Envoi…') : 'Publier', disabled: a && a.status !== 'error' });
+    pub.addEventListener('click', () => { doAction('pub-' + d.id, 'publishDraft', { _dev: d._dev, id: d.id }); setTimeout(() => { quick++; render(); }, 350); });
+    const ed = h('button', { className: 'btn', textContent: 'Modifier' }); ed.addEventListener('click', () => { quick = null; editOpen = d.id; render(); setTimeout(() => document.querySelector('.plan.edit')?.scrollIntoView({ block: 'center' }), 50); });
+    const nav = (x) => () => { quick = (quick + x + list.length) % list.length; render(); };
+    const card = h('div', { className: 'nv-q' }, h('div', { className: 'nv-qi', style: d.photo ? `background-image:url(${d.photo})` : '' }, h('span', { textContent: `${quick + 1} / ${list.length}` })),
+      h('div', { className: 'nv-qb' }, h('b', { textContent: d.title || 'Sans titre' }), h('div', { className: 'nv-chips' }, d.price ? h('span', { className: 'p', textContent: euro(d.price) }) : null, d.size ? h('span', { textContent: d.size }) : null, d.brand ? h('span', { textContent: d.brand }) : null),
+        draftMissing(d).length ? h('div', { className: 'pill warn', textContent: '⚠︎ à compléter : ' + draftMissing(d).join(', ') }) : null,
+        h('div', { className: 'nv-two' }, ed, pub), h('div', { className: 'nv-two sm' }, (() => { const b = h('button', { className: 'linkbtn', textContent: '← Précédent' }); b.addEventListener('click', nav(-1)); return b; })(), (() => { const b = h('button', { className: 'linkbtn', textContent: 'Passer →' }); b.addEventListener('click', nav(1)); return b; })()),
+        h('small', { className: 'sub', textContent: 'Glisse à gauche pour passer · à droite pour publier' })));
+    let x0 = null; card.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    card.addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (dx < -70) nav(1)(); else if (dx > 70 && !pub.disabled) pub.click(); });
+    v.append(seg, card); return true;
+  }
+  window.__novaGoal = (v) => {
+    // objectif du mois : progression, reste à faire par jour, réglable ici
+    if (state?.stats) {
+      const st = state.stats, allK = state.statsAll && store.get('nova_kpi_all') !== false;
+      const gw = goalWant && Date.now() - goalWant.t < 120000 ? goalWant : null;
+      const goal = gw ? gw.goal : (st.goal || 0), type = gw ? gw.type : (st.goalType || 'ca');
+      const val = type === 'profit' ? (st.monthProfit || 0) : (allK ? state.statsAll.month : (st.month || 0));
+      const d = new Date(), left = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate() + 1;
+      const card = h('div', { className: 'card goal' });
+      const edit = h('button', { className: 'linkbtn small', textContent: goal ? 'Modifier' : 'Fixer un objectif' });
+      if (goal) {
+        const pc = Math.min(100, Math.round(val / goal * 100));
+        card.append(h('div', { className: 'row' }, h('b', { textContent: 'Objectif du mois' }), h('span', { className: 'grow' }), edit),
+          h('div', { className: 'goal-v' }, h('b', { textContent: euro(val) }), h('span', { textContent: ` / ${euro(goal)}${type === 'profit' ? ' de bénéfice' : ''}${allK && type !== 'profit' ? ' · tous les comptes' : ''}` })),
+          h('div', { className: 'goal-bar' }, h('i', { style: `width:${pc}%` })),
+          h('div', { className: 'sub' + (val >= goal ? ' ok' : ''), textContent: val >= goal ? `Objectif atteint (${pc} %) : bravo !` : `${pc} % · encore ${euro(goal - val)}, soit environ ${euro(Math.ceil((goal - val) / left))} par jour sur les ${left} jour${left > 1 ? 's' : ''} restants` }));
+      } else card.append(h('div', { className: 'row' }, h('b', { textContent: 'Objectif du mois' }), h('span', { className: 'grow' }), edit), h('div', { className: 'sub', textContent: 'Fixe un montant à atteindre ce mois-ci : Nova te montre ta progression et ce qu’il reste à vendre chaque jour.' }));
+      edit.addEventListener('click', () => {
+        const inp = h('input', { className: 'sku-in', type: 'number', inputmode: 'numeric', min: 0, step: 10, value: goal || '', placeholder: 'Montant en €' });
+        const sel = h('select', { className: 'sku-in' }, h('option', { value: 'ca', textContent: 'Chiffre d’affaires', selected: type === 'ca' }), h('option', { value: 'profit', textContent: 'Bénéfice', selected: type === 'profit' }));
+        const ok = h('button', { className: 'btn primary small', textContent: 'Enregistrer' });
+        ok.addEventListener('click', () => { const g = Math.max(0, Math.round(Number(inp.value) || 0)); goalWant = { goal: g, type: sel.value, t: Date.now() }; doAction('goal', 'setGoal', { goal: g, type: sel.value }); });
+        card.replaceChildren(h('b', { textContent: 'Objectif du mois' }), inp, sel, ok);
+        inp.focus();
+      });
+      v.append(card);
+    }
+      };
+
   const ST = { new: ['En attente du PC', 'warn'], pc: ['Analyse sur le PC…', 'run'], draft: ['Brouillon Vinted ✓', 'ok'], done: ['Terminé', 'ok'], error: ['Erreur', 'err'] };
   function jobRow(j) {
     const [label, cls] = ST[j.status] || ['…', ''];
@@ -1514,9 +1632,11 @@ Réponds UNIQUEMENT en JSON :
   const toLocalInput = (t) => new Date(t - new Date(t).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   const nextSlot = () => { const d = new Date(Date.now() + 3600e3); d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0); return d.getTime(); };
   function viewDrafts(v) {
-    v.append(h('h2', { textContent: 'Brouillons Vinted' }), h('p', { className: 'sub', textContent: 'Publie maintenant ou planifie une date : ton PC publie à l’heure prévue (il doit être allumé).' }));
+    v.append(h('h2', { textContent: 'Brouillons Vinted' }));
     const list = state?.drafts || [];
-    if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Aucun brouillon' }), state ? 'Envoie des photos depuis l’onglet Photos.' : 'Les brouillons apparaîtront quand ton PC sera relié.'));
+    if (!list.length) return v.append(h('div', { className: 'empty' }, h('b', { textContent: 'Aucun brouillon' }), state ? 'Ajoute un article depuis l’onglet Ajouter.' : 'Les brouillons apparaîtront quand ton PC sera relié.'));
+    if (quickCard(v, list)) return;
+    { const seg = h('div', { className: 'nv-seg' }, (() => { const b = h('button', { textContent: 'Un par un' }); b.addEventListener('click', () => { quick = 0; render(); }); return b; })(), h('button', { className: 'on', textContent: 'Liste' })); v.append(seg); }
     const miss = list.filter((d) => draftMissing(d).length);
     if (miss.length) v.append(h('div', { className: 'card warn-card' }, h('b', { textContent: `📝 ${miss.length} brouillon${miss.length > 1 ? 's' : ''} à compléter` }), h('span', { className: 'sub', textContent: 'Ils sont marqués ⚠︎ ci-dessous. Touche ✏️ pour corriger la taille, le titre ou le prix.' })));
     v.append(h('div', { className: 'list' }, [...miss, ...list.filter((d) => !miss.includes(d))].map((d) => {
