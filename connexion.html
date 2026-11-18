@@ -96,7 +96,7 @@ footer { text-align: center; font-size: 12.5px; color: var(--muted); } footer a 
   async function auth(path, body) {
     const r = await fetch(`${CFG.url}/auth/v1/${path}`, { method: 'POST', headers: { apikey: CFG.key, 'content-type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(/invalid login/i.test(j.error_description || j.msg || '') ? 'E-mail ou mot de passe incorrect' : /already registered/i.test(j.msg || '') ? 'Ce compte existe déjà : connecte-toi' : (j.error_description || j.msg || 'Erreur ' + r.status));
+    if (!r.ok) throw new Error(/NOVA_DISPOSABLE|Database error saving new user/i.test(j.error_description || j.msg || j.message || '') ? 'Adresse e-mail temporaire refusée : utilise ta vraie adresse e-mail' : /invalid login/i.test(j.error_description || j.msg || '') ? 'E-mail ou mot de passe incorrect' : /already registered/i.test(j.msg || '') ? 'Ce compte existe déjà : connecte-toi' : (j.error_description || j.msg || 'Erreur ' + r.status));
     return j;
   }
   function sendToExt(j) {

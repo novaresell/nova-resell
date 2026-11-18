@@ -448,7 +448,7 @@ body{background:var(--bg)!important}
     if (!r.ok) throw new Error(frErr(j.error_description || j.msg || j.message || `Erreur ${r.status}`));
     return j;
   }
-  const frErr = (m) => /invalid login/i.test(m) ? 'E-mail ou mot de passe incorrect' : /not confirmed/i.test(m) ? "E-mail pas encore confirmé : clique sur le lien reçu par e-mail" : /already (registered|exists)/i.test(m) ? 'Un compte existe déjà avec cet e-mail : connecte-toi' : /rate limit|too many|security purposes/i.test(m) ? 'Trop de demandes : attends quelques minutes puis réessaie' : /same.*password|different from the old/i.test(m) ? "Choisis un mot de passe différent de l'ancien" : /password/i.test(m) && /6|short|least/i.test(m) ? 'Mot de passe : 6 caractères minimum' : m;
+  const frErr = (m) => /NOVA_DISPOSABLE|Database error saving new user/i.test(m) ? 'Adresse e-mail temporaire refusée : utilise ta vraie adresse e-mail' : /invalid login/i.test(m) ? 'E-mail ou mot de passe incorrect' : /not confirmed/i.test(m) ? "E-mail pas encore confirmé : clique sur le lien reçu par e-mail" : /already (registered|exists)/i.test(m) ? 'Un compte existe déjà avec cet e-mail : connecte-toi' : /rate limit|too many|security purposes/i.test(m) ? 'Trop de demandes : attends quelques minutes puis réessaie' : /same.*password|different from the old/i.test(m) ? "Choisis un mot de passe différent de l'ancien" : /password/i.test(m) && /6|short|least/i.test(m) ? 'Mot de passe : 6 caractères minimum' : m;
   async function token() {
     if (!session?.refresh_token) return null;
     if (session.expires_at - 90 > Date.now() / 1000) return session.access_token;
