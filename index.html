@@ -381,6 +381,8 @@ body{background:var(--bg)!important}
     <label class="field">E-mail<input id="lMail" type="email" autocomplete="username" inputmode="email"></label>
     <label class="field" id="lPassWrap">Mot de passe<input id="lPass" type="password" autocomplete="current-password"></label>
     <label class="field" id="lPass2Wrap" hidden>Confirme le mot de passe<input id="lPass2" type="password" autocomplete="new-password"></label>
+    <label class="field" id="lCodeWrap" hidden>Code reçu par e-mail<input id="lCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456" style="letter-spacing:6px;font-size:20px;text-align:center"></label>
+    <button class="linkbtn small" id="lResend" type="button" hidden>Renvoyer le code</button>
     <button class="btn primary" id="lGo">Se connecter</button>
     <div class="err" id="lErr" role="alert"></div>
     <button class="linkbtn small" id="lForgot">Mot de passe oublié ?</button>
@@ -478,10 +480,12 @@ body{background:var(--bg)!important}
       up: ['Créer mon compte', "Crée ton compte Nova, puis connecte-toi avec le même dans l'extension sur ton PC.", 'Déjà un compte ? Se connecter'],
       forgot: ['Recevoir le lien par e-mail', "Indique l'e-mail de ton compte : tu vas recevoir un lien pour choisir un nouveau mot de passe.", 'Retour à la connexion'],
       reset: ['Enregistrer le mot de passe', 'Choisis ton nouveau mot de passe (6 caractères minimum).', 'Annuler'],
+      code: ['Valider le code', "On t'a envoyé un code à 6 chiffres par e-mail (regarde aussi les spams).", 'Retour à la connexion'],
     }[m];
+    $('#lCodeWrap').hidden = $('#lResend').hidden = m !== 'code';
     $('#lGo').textContent = T[0]; $('#loginSub').textContent = T[1]; $('#lSwitch').textContent = T[2];
     $('#lMail').closest('label').hidden = m === 'reset';
-    $('#lPassWrap').hidden = m === 'forgot';
+    $('#lPassWrap').hidden = m === 'forgot' || m === 'code';
     $('#lPass2Wrap').hidden = !(m === 'up' || m === 'reset');
     $('#lPassWrap').firstChild.textContent = m === 'reset' ? 'Nouveau mot de passe' : 'Mot de passe';
     $('#lPass').autocomplete = m === 'in' ? 'current-password' : 'new-password';
@@ -491,6 +495,7 @@ body{background:var(--bg)!important}
   const okMsg = (m) => { $('#lErr').textContent = m; $('#lErr').classList.add('ok'); };
   $('#lSwitch').addEventListener('click', () => { if (mode === 'reset') history.replaceState(null, '', location.pathname); setMode(mode === 'in' ? 'up' : 'in'); });
   $('#lForgot').addEventListener('click', () => setMode('forgot'));
+  $('#lResend').addEventListener('click', async () => { const email = $('#lMail').value.trim(); try { await auth('resend', { type: 'signup', email }); okMsg('Nouveau code envoyé ✓ (regarde aussi les spams)'); } catch (e) { $('#lErr').classList.remove('ok'); $('#lErr').textContent = /seconds|rate/i.test(e.message) ? 'Attends une minute avant de redemander un code' : e.message; } });
   $('#lGo').addEventListener('click', async () => {
     const email = $('#lMail').value.trim(), password = $('#lPass').value;
     $('#lErr').textContent = ''; $('#lErr').classList.remove('ok'); $('#lGo').disabled = true;
@@ -502,6 +507,13 @@ body{background:var(--bg)!important}
         if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(frErr(j.msg || j.error_description || j.message || `Erreur ${r.status}`)); }
         okMsg(`📧 E-mail envoyé à ${email}. Ouvre le lien (vérifie les spams) pour choisir un nouveau mot de passe.`);
         return;
+      }
+      if (mode === 'code') {
+        const code = $('#lCode').value.replace(/\D/g, '');
+        if (code.length < 6) throw new Error('Entre les 6 chiffres du code');
+        try { session = keep(await auth('verify', { type: 'signup', email, token: code })); }
+        catch (e) { throw new Error(/expired|invalid|token/i.test(e.message) ? 'Code incorrect ou expiré : vérifie-le ou « Renvoyer le code »' : e.message); }
+        store.set('nova_session', session); $('#lPass').value = ''; $('#lPass2').value = ''; $('#lCode').value = ''; showApp(); return;
       }
       if (password.length < 6) throw new Error('Mot de passe : 6 caractères minimum');
       if ((mode === 'up' || mode === 'reset') && password !== $('#lPass2').value) throw new Error('Les deux mots de passe ne sont pas identiques');
@@ -516,9 +528,12 @@ body{background:var(--bg)!important}
       }
       if (mode === 'up') {
         const j = await auth('signup', { email, password });
-        if (!j.access_token) { setMode('in'); okMsg('Compte créé ! Confirme ton e-mail (lien reçu), puis connecte-toi.'); return; }
+        if (!j.access_token) { setMode('code'); okMsg(`📧 Code envoyé à ${email} : entre-le ci-dessus.`); setTimeout(() => $('#lCode').focus(), 50); return; }
         session = keep(j);
-      } else session = keep(await auth('token?grant_type=password', { email, password }));
+      } else {
+        try { session = keep(await auth('token?grant_type=password', { email, password })); }
+        catch (e) { if (/not confirmed|confirm/i.test(e.message)) { setMode('code'); auth('resend', { type: 'signup', email }).catch(() => {}); okMsg('Ton e-mail n’est pas encore confirmé : entre le code qu’on vient de t’envoyer.'); return; } throw e; }
+      }
       store.set('nova_session', session); $('#lPass').value = ''; $('#lPass2').value = ''; showApp();
     } catch (e) { $('#lErr').classList.remove('ok'); $('#lErr').textContent = e.message; }
     finally { $('#lGo').disabled = false; }

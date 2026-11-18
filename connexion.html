@@ -61,6 +61,16 @@ footer { text-align: center; font-size: 12.5px; color: var(--muted); } footer a 
     <p id="dText">L'extension est connectée à ton compte Nova. Tu peux fermer cet onglet et revenir sur Nova.</p>
   </div>
 
+  <!-- code reçu par e-mail -->
+  <form class="card" id="codeCard" hidden autocomplete="off">
+    <h1>Vérifie ton e-mail</h1>
+    <p id="cText">On t'a envoyé un code à 6 chiffres. Regarde aussi dans les spams.</p>
+    <label>Code reçu par e-mail <input id="cCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456" style="font-size:22px;letter-spacing:6px;text-align:center"></label>
+    <button class="btn" id="cGo" type="submit">Valider</button>
+    <div class="msg" id="cMsg" role="alert"></div>
+    <p style="text-align:center"><button class="link" id="cAgain" type="button">Renvoyer le code</button></p>
+  </form>
+
   <!-- pas d'extension détectée -->
   <div class="card" id="noext" hidden>
     <h1>Installe d'abord l'extension</h1>
@@ -101,7 +111,10 @@ footer { text-align: center; font-size: 12.5px; color: var(--muted); } footer a 
       store.set('nova_last_email', email);
       $('known').hidden = $('login').hidden = true; $('done').hidden = false;
       setTimeout(() => { try { window.close(); } catch { /* */ } }, 2500);
-    } catch (e) { msgEl.className = 'msg err'; msgEl.textContent = e.message; }
+    } catch (e) {
+      if (/not confirmed|confirm/i.test(e.message)) { showCode(email); auth('resend', { type: 'signup', email }).catch(() => {}); return; }
+      msgEl.className = 'msg err'; msgEl.textContent = e.message;
+    }
     finally { btn.disabled = false; }
   }
   function showLogin(m = 'in', email = '') {
@@ -123,11 +136,35 @@ footer { text-align: center; font-size: 12.5px; color: var(--muted); } footer a 
     try { await fetch(`${CFG.url}/auth/v1/recover?redirect_to=${encodeURIComponent(location.origin + location.pathname.replace(/[^/]*$/, ''))}`, { method: 'POST', headers: { apikey: CFG.key, 'content-type': 'application/json' }, body: JSON.stringify({ email }) }); m.className = 'msg ok'; m.textContent = 'E-mail envoyé : clique sur le lien pour choisir un nouveau mot de passe.'; } catch { m.className = 'msg err'; m.textContent = 'Envoi impossible, réessaie'; }
   });
   $('known').addEventListener('submit', (e) => { e.preventDefault(); connect($('kUser').value, $('kPass').value, $('kMsg'), $('kGo')); });
+  // ---- code de confirmation reçu par e-mail ----
+  let codeMail = '';
+  function showCode(email) {
+    codeMail = email; $('login').hidden = $('known').hidden = true; $('codeCard').hidden = false;
+    $('cText').textContent = `On a envoyé un code à 6 chiffres à ${email}. Regarde aussi dans les spams.`;
+    $('cMsg').textContent = ''; $('cCode').value = ''; $('cCode').focus();
+  }
+  $('codeCard').addEventListener('submit', async (e) => {
+    e.preventDefault(); const m = $('cMsg'), code = $('cCode').value.replace(/\D/g, '');
+    if (code.length < 6) { m.className = 'msg err'; m.textContent = 'Entre les 6 chiffres du code'; return; }
+    $('cGo').disabled = true; m.className = 'msg'; m.textContent = 'Vérification…';
+    try {
+      const j = await auth('verify', { type: 'signup', email: codeMail, token: code });
+      if (!j.access_token) throw new Error('Code refusé');
+      await sendToExt(j); store.set('nova_last_email', codeMail);
+      $('codeCard').hidden = true; $('done').hidden = false;
+    } catch (er) { m.className = 'msg err'; m.textContent = /expired|invalid|token/i.test(er.message) ? 'Code incorrect ou expiré : vérifie-le ou clique « Renvoyer le code »' : er.message; }
+    finally { $('cGo').disabled = false; }
+  });
+  $('cAgain').addEventListener('click', async () => {
+    const m = $('cMsg');
+    try { await auth('resend', { type: 'signup', email: codeMail }); m.className = 'msg ok'; m.textContent = 'Nouveau code envoyé ✓ (regarde aussi les spams)'; }
+    catch (er) { m.className = 'msg err'; m.textContent = /seconds|rate/i.test(er.message) ? 'Attends une minute avant de redemander un code' : er.message; }
+  });
   $('login').addEventListener('submit', async (e) => {
     e.preventDefault(); const email = $('lMail').value.trim(), pass = $('lPass').value, m = $('lMsg');
     if (mode === 'up') {
       if (pass !== $('lPass2').value) { m.className = 'msg err'; m.textContent = 'Les deux mots de passe ne sont pas identiques'; return; }
-      try { const j = await auth('signup', { email, password: pass }); if (!j.access_token) { m.className = 'msg ok'; m.textContent = 'Compte créé ! Clique sur le lien reçu par e-mail, puis reviens te connecter ici.'; showLogin('in', email); return; } await sendToExt(j); store.set('nova_last_email', email); $('login').hidden = true; $('done').hidden = false; } catch (er) { m.className = 'msg err'; m.textContent = er.message; }
+      try { const j = await auth('signup', { email, password: pass }); if (!j.access_token) { showCode(email); return; } await sendToExt(j); store.set('nova_last_email', email); $('login').hidden = true; $('done').hidden = false; } catch (er) { m.className = 'msg err'; m.textContent = er.message; }
       return;
     }
     connect(email, pass, m, $('lGo'));
