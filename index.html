@@ -138,6 +138,14 @@ textarea { width: 100%; font: inherit; color: var(--text); background: var(--sur
 .relay { border-color: rgba(52,211,153,.4); }
 .beta { display: inline-block; vertical-align: middle; margin-left: 2px; padding: 3px 7px; border-radius: 7px; background: #EF4444; color: #fff; font: 800 11px/1.2 system-ui, sans-serif; font-style: normal; letter-spacing: .08em; box-shadow: 0 0 12px rgba(239,68,68,.5); position: relative; top: -3px; }
 .stock-card summary { cursor: pointer; list-style: none; display: grid; gap: 4px; }
+.lots-box { display: grid; gap: 8px; margin: 10px 0 4px; }
+.lots-h { letter-spacing: .08em; font-weight: 700; font-size: 11px; }
+.lot-m { display: grid; gap: 5px; padding: 12px; border-radius: 14px; background: var(--surface-2, rgba(255,255,255,.04)); border: 1px solid var(--line, rgba(255,255,255,.08)); }
+.lot-m b { font-size: 15px; }
+.lot-bar { height: 6px; border-radius: 6px; background: var(--line, rgba(255,255,255,.1)); overflow: hidden; }
+.lot-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #7C80FF, #5A5EF0); }
+.lot-m.ok .lot-bar i { background: #34D399; }
+.lot-m.ok .lot-v { color: #34D399; font-weight: 600; }
 .stock-card summary::-webkit-details-marker { display: none; }
 .stock-tools { display: flex; gap: 8px; margin: 10px 0; }
 .stock-q { flex: 1; min-width: 0; }
@@ -1910,8 +1918,25 @@ Réponds UNIQUEMENT en JSON :
     const bAdd = h('button', { className: 'btn small', textContent: '➕ Achat' }), bLot = h('button', { className: 'btn small', textContent: '🧺 Lot' }), bRe = h('button', { className: 'btn small', textContent: '↻' });
     bAdd.addEventListener('click', addRow); bLot.addEventListener('click', addLot);
     bRe.addEventListener('click', () => { head.textContent = 'Chargement…'; loadStock().then(draw).catch((e) => { head.textContent = e.message; }); });
+    // rentabilité des ballots (comme sur le PC)
+    const lotsBox = h('div', { className: 'lots-box' });
+    const drawLots = (rows) => {
+      const L = new Map();
+      for (const r of rows) { if (!r.lot || r.wait) continue; const x = L.get(r.lot) || { n: 0, sold: 0, cost: 0, ca: 0 }; x.n++; x.cost += Number(r.cost) || 0; if (r.sold != null) { x.sold++; x.ca += Number(r.sold) || 0; } L.set(r.lot, x); }
+      if (!L.size) return lotsBox.replaceChildren();
+      const cards = [...L.entries()].sort((a, b) => (b[1].ca / (b[1].cost || 1)) - (a[1].ca / (a[1].cost || 1))).map(([name, x]) => {
+        const pct = Math.min(100, Math.round((x.ca / (x.cost || 1)) * 100)), ok = x.ca >= x.cost && x.cost > 0;
+        return h('div', { className: 'lot-m' + (ok ? ' ok' : '') },
+          h('b', { textContent: name }),
+          h('span', { className: 'sub', textContent: `${x.sold}/${x.n} vendus · acheté ${euro(x.cost)} · vendu ${euro(x.ca)}` }),
+          h('div', { className: 'lot-bar' }, h('i', { style: `width:${pct}%` })),
+          h('span', { className: 'sub lot-v', textContent: ok ? `✅ Rentabilisé · bénéfice ${euro(x.ca - x.cost)}` : `Encore ${euro(x.cost - x.ca)} pour rentabiliser · ${x.n - x.sold} à vendre` }));
+      });
+      lotsBox.replaceChildren(h('div', { className: 'sub lots-h', textContent: '🧺 RENTABILITÉ DES BALLOTS' }), ...cards);
+    };
     const draw = () => {
       const rows = stockView();
+      drawLots(rows);
       const inSt = rows.filter((r) => r.sold == null), sold = rows.filter((r) => r.sold != null), pend = opsPending().length;
       head.textContent = `${stockCache?.offline ? '📴 hors ligne · ' : ''}${inSt.length} en stock · valeur ${euro(inSt.reduce((t, r) => t + (Number(r.cost) || 0), 0))} · ${sold.length} vendus · bénéfice ${euro(sold.reduce((t, r) => t + (r.sold - (Number(r.cost) || 0)), 0))}${pend ? ` · ⏳ ${pend} modif${pend > 1 ? 's' : ''} en attente du PC` : ''}`;
       const f = sel.value, s2 = q.value.trim().toLowerCase();
@@ -1923,7 +1948,7 @@ Réponds UNIQUEMENT en JSON :
     };
     drawStock = draw;
     q.addEventListener('input', draw); sel.addEventListener('change', draw);
-    const d = h('details', { className: 'card stock-card' }, h('summary', {}, h('b', { textContent: '📦 Mon stock' }), ' ', head), h('div', { className: 'stock-tools' }, q, sel), h('div', { className: 'stock-tools' }, bAdd, bLot, bRe), h('p', { className: 'sub', textContent: 'Touche une ligne pour la modifier (prix, vente, rangement…).' }), box);
+    const d = h('details', { className: 'card stock-card' }, h('summary', {}, h('b', { textContent: '📦 Mon stock' }), ' ', head), h('div', { className: 'stock-tools' }, q, sel), h('div', { className: 'stock-tools' }, bAdd, bLot, bRe), lotsBox, h('p', { className: 'sub', textContent: 'Touche une ligne pour la modifier (prix, vente, rangement…).' }), box);
     d.open = stockOpen;
     d.addEventListener('toggle', () => { stockOpen = d.open; });
     (stockCache && Date.now() - stockAt < 60000 ? Promise.resolve() : loadStock()).then(draw).catch((e) => { head.textContent = e.message; });
