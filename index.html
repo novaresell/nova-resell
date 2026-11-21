@@ -461,7 +461,11 @@ body{background:var(--bg)!important}
     if (!session?.refresh_token) return null;
     if (session.expires_at - 90 > Date.now() / 1000) return session.access_token;
     try { session = keep(await auth('token?grant_type=refresh_token', { refresh_token: session.refresh_token })); store.set('nova_session', session); return session.access_token; }
-    catch { logout(); return null; }
+    catch (e) {
+      // hors réseau : on garde la session (l'appli reste utilisable avec les données gardées sur le téléphone)
+      if (navigator.onLine === false || e instanceof TypeError || /fetch|network|réseau|load failed/i.test(e.message || '')) throw new Error('Pas de réseau');
+      logout(); return null;
+    }
   }
   async function rest(method, path, body, prefer) {
     const t = await token(); if (!t) throw new Error('Session expirée');
@@ -479,7 +483,7 @@ body{background:var(--bg)!important}
 
   // ---------- Écran de connexion ----------
   function showLogin() { $('#login').hidden = false; document.querySelector('.app').hidden = true; document.querySelector('.tabs').hidden = true; }
-  function showApp() { $('#login').hidden = true; document.querySelector('.app').hidden = false; document.querySelector('.tabs').hidden = false; render(); poll(); }
+  function showApp() { if (!state) { const c = store.get('nova_state_cache'); if (c?.state && navigator.onLine === false) state = { ...c.state, offlineAt: c.at }; } $('#login').hidden = true; document.querySelector('.app').hidden = false; document.querySelector('.tabs').hidden = false; render(); poll(); }
   // modes : in (connexion) · up (création) · forgot (e-mail de réinitialisation) · reset (nouveau mot de passe)
   function setMode(m) {
     mode = m;
@@ -778,15 +782,24 @@ body{background:var(--bg)!important}
       ]);
       state = st?.[0] ? { ...st[0].data, updatedAt: new Date(st[0].updated_at).getTime() } : null;
       state = mergeStates(await loadDevices(), state);
+      try { store.set('nova_state_cache', { state, at: Date.now() }); } catch {}
+      if (!stockAt || Date.now() - stockAt > 3e5) loadStock().then(() => drawStock?.()).catch(() => {});
       jobs = (js || []).map((j) => ({ ...j, createdAt: new Date(j.created_at).getTime() }));
       await keepSweep();
       actions = {}; (acts || []).reverse().forEach((a) => { actions[a.key] = { status: a.status, error: a.error, at: a.payload?.at ?? null }; });
       if (!busy && !picking && !document.activeElement?.matches('textarea')) render(); else renderHeader();
       if (!document.querySelector('.np-wrap')) { whatsNew(); if (!document.querySelector('.np-wrap')) pushPrompt(); } if (!flushing) { flushQueue(); updQueue(); }
-    } catch (e) { if (/session/i.test(e.message)) logout(); }
+    } catch (e) {
+      if (/session/i.test(e.message) && navigator.onLine !== false && !/réseau/i.test(e.message)) return logout();
+      // hors ligne : on affiche la dernière copie gardée sur le téléphone
+      if (!state) { const c = store.get('nova_state_cache'); if (c?.state) { state = { ...c.state, offlineAt: c.at }; render(); } }
+      if (!stockCache) loadStock().then(() => drawStock?.()).catch(() => {});
+    }
   }
   let pollT; function poll() { clearInterval(pollT); refresh(); pollT = setInterval(async () => { if (document.hidden) return; await refresh(); if (drip && staged.length && !busy && !offline() && inflight() < MAX_PC) sendStaged(true); if (!staged.length) drip = false; }, 6000); }
   document.addEventListener('visibilitychange', () => { if (!document.hidden && session) refresh(); });
+  window.addEventListener('online', () => { if (state?.offlineAt) delete state.offlineAt; if (session) refresh(); });
+  window.addEventListener('offline', () => { try { renderHeader(); } catch {} });
 
   const ALL_DEV = /^(setAuto|pauseAll|resumeAll|setGoal|setPushKinds|pushSub|pushTest|refreshState|runNow)$/;
   async function doAction(key, type, payload = {}) {
@@ -1285,7 +1298,7 @@ Réponds UNIQUEMENT en JSON :
     const s = state;
     const fresh = s && Date.now() - (s.updatedAt || 0) < 6 * 60000;
     $('#pcStatus').className = 'pc ' + (s ? (fresh ? 'on' : 'off') : '');
-    $('#pcText').textContent = !s ? 'PC jamais vu' : fresh ? (s.stateError ? 'PC en ligne · Vinted à vérifier' : 'PC en ligne') : 'PC hors ligne';
+    $('#pcText').textContent = navigator.onLine === false || s?.offlineAt ? '📴 Hors réseau · copie du ' + new Date(s?.offlineAt || s?.updatedAt || Date.now()).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : !s ? 'PC jamais vu' : fresh ? (s.stateError ? 'PC en ligne · Vinted à vérifier' : 'PC en ligne') : 'PC hors ligne';
     $('#pcStatus').title = !s ? 'Ouvre Nova sur ton PC, connecté au même compte Nova (⚙︎ → Compte Nova)' : fresh ? (s.stateError || 'Ton PC répond') : 'Dernier signe du PC : ' + new Date(s.updatedAt).toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + ' · allume le PC, ouvre Chrome et Nova';
     const allK = s?.statsAll && store.get('nova_kpi_all') !== false; const K = allK ? s.statsAll : s?.stats;
     $('#kShip').textContent = K?.toShip ?? '–';
